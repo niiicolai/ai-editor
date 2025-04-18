@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+.main-bgg {
+    background-color: #0f0f0f;
+}
+
+.secondary-bgg {
+    background-color: #1f1f1f;
+}
+
+.main-highlight {
+    background-color: #3b3b3b;
+}
