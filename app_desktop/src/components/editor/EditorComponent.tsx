@@ -1,5 +1,8 @@
 import { Editor } from '@monaco-editor/react';
 import { useState } from 'react';
+import EditorBarComponent from './EditorBarComponent';
+import EditorTabsComponent from './EditorTabsComponent';
+import TerminalComponent from "../terminal/TerminalComponent"
 
 interface EditorComponentProps {
     content: string;
@@ -15,7 +18,7 @@ const themes = [
 ];
 
 function EditorComponent({ content, language, onContentChange }: EditorComponentProps) {
-    const [theme, setTheme] = useState('hc-black');
+    const [theme, setTheme] = useState('vs-dark');
 
     const handleEditorChange = (value: string | undefined) => {
         if (value !== undefined) {
@@ -23,38 +26,19 @@ function EditorComponent({ content, language, onContentChange }: EditorComponent
         }
     };
 
+    const handleSave = () => {
+
+    }
+
+    const isPendingSave = false;
+
     return (
         <div className="flex-1 flex min-h-screen">
             <div className="flex h-screen w-full flex-1">
                 {/* Code Editor Section */}
                 <div className="w-full flex">
-                    <div className="w-full flex-1 flex flex-col border-r border-gray-800">
-                        {/* Code Editor Header */}
-                        <div className="main-bgg shadow-sm">
-                            <div className="px-4 py-3 border-b border-gray-800">
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <h2 className="text-lg font-medium text-gray-100">Code Editor</h2>
-                                        <p className="text-sm text-gray-200">Language: {language}</p>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <label htmlFor="theme-select" className="text-sm text-gray-200">Theme:</label>
-                                        <select
-                                            id="theme-select"
-                                            value={theme}
-                                            onChange={(e) => setTheme(e.target.value)}
-                                            className="bg-indigo-700 text-white rounded px-2 py-1 text-sm"
-                                        >
-                                            {themes.map((t) => (
-                                                <option key={t.id} value={t.id}>
-                                                    {t.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div className="w-full flex-1 flex flex-col border-r border-color main-bgg">
+                        <EditorTabsComponent />
 
                         {/* Code Editor */}
                         <div className="flex-1 overflow-auto bg-white">
@@ -92,6 +76,14 @@ function EditorComponent({ content, language, onContentChange }: EditorComponent
                                 }}
                             />
                         </div>
+
+                        <TerminalComponent />
+                        <EditorBarComponent 
+                            handleSave={handleSave} 
+                            isPendingSave={isPendingSave} 
+                            language={language} 
+                        />
+
                     </div>
                 </div>
             </div>

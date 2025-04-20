@@ -1,13 +1,51 @@
 @import "tailwindcss";
 
+:root {
+    --background-color: #080808;
+    --secondary-color: #1f1f1f;
+    --secondary-color: #1f1f1f;
+    --input-color: #272727;
+    --text-color: #f3f3f3;
+    --highlight-color: #3c49f7;
+    --highlight-color-hover: #113ed1;
+}
+
 .main-bgg {
-    background-color: #0f0f0f;
+    background-color: var(--background-color);
 }
 
 .secondary-bgg {
-    background-color: #1f1f1f;
+    background-color: var(--secondary-color);
 }
 
-.main-highlight {
-    background-color: #3b3b3b;
+.main-color {
+    color: var(--text-color);
+}
+
+.button-main {
+    background-color: var(--highlight-color);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.button-main:hover {
+    background-color: var(--highlight-color-hover);
+}
+
+.highlight-color {
+    color: var(--highlight-color);
+}
+
+.highlight-bgg {
+    background-color: var(--highlight-color);
+    color: var(--text-color);
+}
+
+.input-main {
+    background-color: var(--input-color);
+    color: var(--text-color);
+}
+
+.border-color {
+    color: var(--highlight-color);
 }

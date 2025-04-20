@@ -10,6 +10,10 @@ export default {
                 type: 'string',
                 description: 'Message content'
             },
+            code: {
+                type: 'string',
+                description: 'Message code'
+            },
             role: {
                 type: 'string',
                 description: 'Role of the user who sent the message'
@@ -56,6 +60,10 @@ export default {
                         content: {
                             type: 'string',
                             description: 'Message content'
+                        },
+                        code: {
+                            type: 'string',
+                            description: 'Message code'
                         },
                         role: {
                             type: 'string',

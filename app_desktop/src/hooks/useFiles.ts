@@ -9,6 +9,13 @@ declare global {
             onReadDirectory: (callback: (files: Array<{ name: string; path: string; isDirectory: boolean }>) => void) => void;
             readFile: (path: string) => void;
             onReadFile: (callback: (content: string | null) => void) => void;
+            terminalCmd: (cmd: string) => void;
+            onTerminalCmd: (callback: (response: string) => void) => void;
+            openExternalBrowser: (url: string) => void;
+            writeFile: (path: string, content: string) => void;
+            onWriteFile: (callback: () => void) => void;
+            writeDir: (path: string) => void;
+            onWriteDir: (callback: () => void) => void;
         };
     }
 }
@@ -40,6 +47,24 @@ const readFile = (path: string) => {
     });
 };
 
+const writeFile = (path: string, content: string) => {
+    return new Promise<string | null>((resolve) => {
+        window.electron.writeFile(path, content);
+        window.electron.onWriteFile(() => {
+            resolve("");
+        });
+    });
+};
+
+const writeDir = (path: string) => {
+    return new Promise<string | null>((resolve) => {
+        window.electron.writeDir(path);
+        window.electron.onWriteDir(() => {
+            resolve("");
+        });
+    });
+};
+
 export const useFiles = () => {
     const useOpenFolder = () => {
         return useQuery({
@@ -52,6 +77,8 @@ export const useFiles = () => {
     return {
         useOpenFolder,
         readDirectory,
-        readFile
+        readFile,
+        writeFile,
+        writeDir,
     };
 };

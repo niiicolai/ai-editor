@@ -1,6 +1,7 @@
 import { useLoginUser } from "../../hooks/useUser"
 import { useState } from "react"
 import { useNavigate } from "react-router";
+import { Link } from "react-router-dom";
 
 function UserLoginView() {
     const navigate = useNavigate();
@@ -12,7 +13,7 @@ function UserLoginView() {
         setFormError(null);
         const form = e.target as HTMLFormElement;
         const formData = new FormData(form);
-        
+
         try {
             await mutateAsync({
                 email: formData.get('email') as string,
@@ -31,6 +32,12 @@ function UserLoginView() {
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
                         Sign in to your account
                     </h2>
+                    <p className="mt-2 text-center text-sm text-gray-600">
+                        Or{' '}
+                        <Link to="/user/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
+                            Create a new account
+                        </Link>
+                    </p>
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="rounded-md shadow-sm -space-y-px">
@@ -68,11 +75,10 @@ function UserLoginView() {
                         <button
                             type="submit"
                             disabled={isPending}
-                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                                isPending 
-                                    ? 'bg-indigo-400 cursor-not-allowed' 
+                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${isPending
+                                    ? 'bg-indigo-400 cursor-not-allowed'
                                     : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
-                            }`}
+                                }`}
                         >
                             {isPending ? (
                                 <span className="absolute left-0 inset-y-0 flex items-center pl-3">
@@ -86,10 +92,13 @@ function UserLoginView() {
                         </button>
                     </div>
                 </form>
+
+                <Link to="/" className="font-medium text-indigo-600 hover:text-indigo-500 text-center w-full mx-auto block">
+                    Home
+                </Link>
             </div>
         </div>
     )
 }
 
 export default UserLoginView
-  

@@ -16,7 +16,6 @@ export default class CodingAgent extends OpenAIAgent {
                         properties: {
                             message: { type: "string" },
                             code: { type: "string" },
-                            markdown: { type: "string" },
                         }
                     }
                 }
@@ -30,11 +29,9 @@ export default class CodingAgent extends OpenAIAgent {
     async call(args) {
         const choice = await super.prompt("user", args.content, args.messages, [])
         const data = JSON.parse(choice.content || "{}")
-        console.log(data)
         return {
             message: data?.properties?.message || data?.message || "",
             code: data?.properties?.code || data?.code || "",
-            markdown: data?.properties?.markdown || data?.markdown || ""
         }
     }
 }

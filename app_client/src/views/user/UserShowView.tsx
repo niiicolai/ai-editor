@@ -35,10 +35,10 @@ function UserShowView() {
                             </h3>
                             <div className="flex justify-start items-center gap-3">
                                 <Link
-                                    to="/dashboard"
+                                    to="/"
                                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >
-                                    Dashboard
+                                    Home
                                 </Link>
                                 <Link
                                     to="/user/edit"

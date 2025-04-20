@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import productImage from "../assets/product.png"
+import productImage from "../../assets/product.png"
 
-function HomeView() {
+function PricingIndexView() {
   return (
     <div className="bg-white">
       {/* Header Section */}
@@ -11,7 +11,6 @@ function HomeView() {
         </div>
         <div>
           <nav className="flex gap-1">
-            <Link to="/" className="p-2 hover:underline">Home</Link>
             <Link to="/pricing" className="p-2 hover:underline">Pricing</Link>
             <Link to="/features" className="p-2 hover:underline">Features</Link>
             <Link to="/docs" className="p-2 hover:underline">Docs</Link>
@@ -173,4 +172,4 @@ function HomeView() {
   )
 }
 
-export default HomeView
+export default PricingIndexView;

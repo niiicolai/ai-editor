@@ -59,7 +59,6 @@ export default class RootAgent extends OpenAIAgent {
                         properties: {
                             message: { type: "string" },
                             code: { type: "string" },
-                            markdown: { type: "string" },
                         }
                     }
                 }
@@ -81,7 +80,6 @@ export default class RootAgent extends OpenAIAgent {
                     return {
                         message: result?.message || "no message",
                         code: result?.code,
-                        markdown: result?.markdown,
                     }
                 }
             }
@@ -92,7 +90,6 @@ export default class RootAgent extends OpenAIAgent {
             return {
                 message: data?.properties?.message || data?.message || "",
                 code: data?.properties?.code || data?.code || "",
-                markdown: data?.properties?.markdown || data?.markdown || ""
             }
         }
     }

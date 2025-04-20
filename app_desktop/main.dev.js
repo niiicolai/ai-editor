@@ -1,11 +1,11 @@
 import { createServer } from "vite";
-import { app, BrowserWindow, ipcMain, dialog, session } from "electron";
+import { app, BrowserWindow, ipcMain, dialog, session, shell } from "electron";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import fs from "fs";
 import path from "path";
 import unzipper from "unzipper";
-import { execFile } from "child_process";
+import { exec } from "child_process";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -67,6 +67,77 @@ async function createWindow() {
     } catch (error) {
       console.error('Error reading file:', error);
       event.reply('on-read-file', null);
+    }
+  });
+
+  ipcMain.on("write-file", async (event, filePath, content) => {
+    try {
+      const result = fs.writeFileSync(filePath, content, 'utf8');
+      event.reply('on-write-file', result);
+    } catch (error) {
+      console.error('Error writing file:', error);
+      event.reply('on-write-file', null);
+    }
+  });
+
+  ipcMain.on("write-dir", async (event, dirPath) => {
+    try {
+      fs.mkdirSync(dirPath, { recursive: true });
+      event.reply('on-write-dir', dirPath);
+    } catch (error) {
+      console.error('Error writing dir:', error);
+      event.reply('on-write-dir', null);
+    }
+  });
+
+  ipcMain.on("terminal-cmd", async (event, cmd) => {
+    // Validate the command is safe to execute
+    if (!cmd || typeof cmd !== 'string') {
+      event.reply('on-terminal-cmd', 'Invalid command');
+      return;
+    }
+
+    // List of allowed commands or patterns
+    const allowedCommands = [
+      /^git\s+/,
+      /^npm\s+/,
+      /^yarn\s+/,
+      /^cd\s+/,
+      /^ls\s*/,
+      /^dir\s*/,
+      /^pwd\s*/,
+    ];
+
+    // Check if the command matches any allowed pattern
+    const isAllowed = allowedCommands.some(pattern => pattern.test(cmd));
+    if (!isAllowed) {
+      event.reply('on-terminal-cmd', 'Command not allowed');
+      return;
+    }
+
+    try {
+      const content = await new Promise((resolve, reject) => {
+        exec(cmd, (error, stdout, stderr) => {
+          if (error) {
+            reject({ message: error.message, code: error.code });
+            return;
+          }
+          resolve(`${stdout} ${stderr}`);
+        });
+      });
+
+      event.reply('on-terminal-cmd', content);
+    } catch (error) {
+      console.error('Error executing terminal cmd:', error);
+      event.reply('on-terminal-cmd', error.message || 'Command execution failed');
+    }
+  });
+
+  ipcMain.on("open-external-browser", async (event, url) => {
+    try {
+      shell.openExternal(url);
+    } catch (error) {
+      console.error('Error opening external browser:', error);
     }
   });
 

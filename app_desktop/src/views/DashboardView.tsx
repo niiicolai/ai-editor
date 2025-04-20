@@ -1,30 +1,19 @@
 import { useState, useRef, useEffect } from "react";
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import ChatComponent from "../components/chat/ChatComponent"
-import HierarchyComponent, { DirectoryState } from "../components/hierarchy/HierarchyComponent"
+import HierarchyComponent from "../components/hierarchy/HierarchyComponent"
 import EditorComponent from "../components/editor/EditorComponent"
-
-interface File {
-    id: string;
-    name: string;
-    content: string;
-    language: string;
-}
-
-interface DirectoryInfo {
-    currentPath: string | null;
-    directoryState: DirectoryState;
-}
+import { FileType } from "../types/directoryInfoType";
+import { DirectoryInfoType } from "../types/directoryInfoType";
+import AuthorizedLayoutComponent from "../components/AuthorizedLayoutComponent";
 
 function DashboardView() {
-    const [currentFile, setCurrentFile] = useState<File>({
+    const [currentFile, setCurrentFile] = useState<FileType>({
         id: "",
         name: "unkown",
         content: "",
         language: "javascript"
     });
-    const [directoryInfo, setDirectoryInfo] = useState<DirectoryInfo>({
+    const [directoryInfo, setDirectoryInfo] = useState<DirectoryInfoType>({
         currentPath: null,
         directoryState: {}
     });
@@ -47,7 +36,7 @@ function DashboardView() {
 
     const getLanguageFromCurrentFile = (filename: string): string => {
         const extension = filename.split('.').pop()?.toLowerCase();
-        
+
         switch (extension) {
             case 'js':
                 return 'javascript';
@@ -110,31 +99,33 @@ function DashboardView() {
         });
     }
 
-    const handleDirectoryStateChange = (newState: DirectoryInfo) => {
+    const handleDirectoryStateChange = (newState: DirectoryInfoType) => {
         setDirectoryInfo(newState);
     }
 
     return (
-        <div className="flex min-h-screen">
-            <ChatComponent 
-                currentFile={currentFile} 
-                directoryInfo={directoryInfo}
-            />
-            <EditorComponent 
-                content={currentFile.content} 
-                language={currentFile.language} 
-                onContentChange={(content: string) => setCurrentFile({
-                    id: currentFile.id,
-                    name: currentFile.name,
-                    content,
-                    language: currentFile.language
-                })} 
-            />
-            <HierarchyComponent 
-                    getFileContent={openFile} 
+        <AuthorizedLayoutComponent slot={
+            <div className="flex flex-col lg:flex-row min-h-screen">
+                <ChatComponent
+                    currentFile={currentFile}
+                    directoryInfo={directoryInfo}
+                />
+                <EditorComponent
+                    content={currentFile.content}
+                    language={currentFile.language}
+                    onContentChange={(content: string) => setCurrentFile({
+                        id: currentFile.id,
+                        name: currentFile.name,
+                        content,
+                        language: currentFile.language
+                    })}
+                />
+                <HierarchyComponent
+                    getFileContent={openFile}
                     onDirectoryStateChange={handleDirectoryStateChange}
                 />
-        </div>
+            </div>
+        } />
     );
 }
 

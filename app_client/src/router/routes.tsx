@@ -12,16 +12,40 @@ import ProductIndexView from '../views/product/ProductIndexView';
 import CheckoutIndexView from '../views/checkout/CheckoutIndexView';
 import CheckoutShowView from '../views/checkout/CheckoutShowView';
 
-import ProjectCreateView from '../views/project/ProjectCreateView';
-import ProjectUpdateView from '../views/project/ProjectUpdateView';
-import ProjectDeleteView from '../views/project/ProjectDeleteView';
-import ProjectShowView from '../views/project/ProjectShowView';
-import ProjectIndexView from '../views/project/ProjectIndexView';
+import DocsIndexView from '../views/docs/DocsIndexView';
+
+import FeaturesIndexView from '../views/features/FeaturesIndexView';
+
+import PricingIndexView from '../views/pricing/PricingIndexView';
 
 export const routes = [
   {
     path: "/",
     element: <HomeView />,
+  },
+
+  /**
+   * Pricing routes
+   */
+  {
+    path: "/pricing",
+    element: <PricingIndexView />,
+  },
+
+  /**
+   * Features routes
+   */
+  {
+    path: "/features",
+    element: <FeaturesIndexView />,
+  },
+
+  /**
+   * Docs routes
+   */
+  {
+    path: "/docs",
+    element: <DocsIndexView />,
   },
 
   /**
@@ -66,30 +90,6 @@ export const routes = [
   {
     path: "/checkout/:_id",
     element: <CheckoutShowView />,
-  },
-
-  /**
-   * Project routes
-   */
-  {
-    path: "/projects",
-    element: <ProjectIndexView />,
-  },
-  {
-    path: "/project/:_id",
-    element: <ProjectShowView />,
-  },
-  {
-    path: "/project",
-    element: <ProjectCreateView />,
-  },
-  {
-    path: "/project/:_id/edit",
-    element: <ProjectUpdateView />,
-  },
-  {
-    path: "/project/:_id/delete",
-    element: <ProjectDeleteView />,
   },
 
   /**

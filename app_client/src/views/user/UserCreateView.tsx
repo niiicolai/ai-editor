@@ -105,6 +105,10 @@ function UserCreateView() {
                         </button>
                     </div>
                 </form>
+
+                <Link to="/" className="font-medium text-indigo-600 hover:text-indigo-500 text-center w-full mx-auto block">
+                    Home
+                </Link>
             </div>
         </div>
     )

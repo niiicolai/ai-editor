@@ -1,31 +1,14 @@
-import { useCreateUserAgentSessionMessage } from "../../hooks/useUserAgentSessionMessage"
+
+import { useCreateUserAgentSessionMessage } from "../../../hooks/useUserAgentSessionMessage";
+import { DirectoryInfoType, FileType } from "../../../types/directoryInfoType";
 import { useState } from "react";
-
-export interface FileItem {
-    name: string;
-    path: string;
-    isDirectory: boolean;
-}
-
-export interface DirectoryState {
-    [path: string]: {
-        isOpen: boolean;
-        files: FileItem[];
-    };
-}
+import LoaderIcon from "../../../icons/LoaderIcon";
+import { Check } from "lucide-react";
 
 interface ChatMessagesComponentProps {
     sessionId: string;
-    currentFile: {
-        id: string,
-        name: string,
-        content: string,
-        language: string
-    }
-    directoryInfo: {
-        currentPath: string | null;
-        directoryState: DirectoryState;
-    };
+    currentFile: FileType;
+    directoryInfo: DirectoryInfoType;
 }
 
 function ChatInputComponent(props: ChatMessagesComponentProps) {
@@ -51,23 +34,23 @@ function ChatInputComponent(props: ChatMessagesComponentProps) {
     }
 
     return (
-        < div className="secondary-bgg p-4" >
+        <div className="main-bgg border-t border-r border-color h-12">
             {formError && (
                 <div>{formError}</div>
             )}
-            <form onSubmit={handleSubmit} className="flex space-x-4">
+            <form onSubmit={handleSubmit} className="flex h-full">
                 <input
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Type your message..."
-                    className="bg-gray-600 flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="input-main flex-1 border-0 px-4 py-1 focus:outline-none focus:border-transparent"
                 />
                 <button
                     type="submit"
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="button-main px-4 py-2 cursor-pointer focus:outline-none"
                 >
-                    {isPending ? 'Loading...' : 'Send' }
+                    {isPending ? <LoaderIcon h="h-4" w="w-4" /> : <Check className="h-4 w-4" /> }
                 </button>
             </form>
         </div >

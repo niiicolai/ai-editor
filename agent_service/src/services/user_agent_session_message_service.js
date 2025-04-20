@@ -139,7 +139,6 @@ export default class UserAgentSessionMessageService {
             const userAgentSessionMessageAI = new UserAgentSessionMessage({
                 content: response.message,
                 code: response.code,
-                markdown: response.markdown,
                 role: "assistant",
                 state: "completed",
                 user_agent_session: userAgentSession._id,

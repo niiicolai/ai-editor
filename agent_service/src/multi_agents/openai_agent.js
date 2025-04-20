@@ -31,7 +31,6 @@ export default class OpenAIAgent extends Agent {
     }
 
     async prompt(role, content, messages, developerMessages) {
-        console.log({ role: "developer", content: `YOU MUST FOLLOW THESE INSTRUCTIONS: ${this.instructions}` })
         const response = await openai.chat.completions.create({
             model: this.model,
             messages: [
@@ -41,6 +40,7 @@ export default class OpenAIAgent extends Agent {
                 ...developerMessages.map(m => {
                     return { role: m.role, content: m.content }
                 }),
+                { role: "developer", content: `Please, use the message field for short responses` },
                 { role: "developer", content: `YOU MUST RETURN DATA IN THE CORRECT RESPONSE FORMAT` },
                 { role: "developer", content: `YOU MUST FOLLOW THESE INSTRUCTIONS: ${this.instructions}` },
                 { role: "developer", content: `REMEMBER TO TRANSFER INPUT TO OTHER AGENTS IF THEIR DESCRIPTION PROVIDES IT` },
@@ -51,7 +51,6 @@ export default class OpenAIAgent extends Agent {
             temperature: this.temperature,
             tools: this.tools
         });
-        console.log(response.choices[0].message)
         return response.choices[0].message;
     }
 }
