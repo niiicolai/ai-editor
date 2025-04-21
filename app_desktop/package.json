@@ -24,6 +24,7 @@
     "react-router-sitemap-maker": "^1.1.0",
     "react-scrollbars-custom": "^4.1.1",
     "react-syntax-highlighter": "^15.6.1",
+    "react-use-websocket": "^4.13.0",
     "tailwindcss": "^4.1.4",
     "unzipper": "^0.12.3"
   },

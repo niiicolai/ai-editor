@@ -5,6 +5,7 @@ import { setupRabbitMq } from "./src/rabbitmq/index.js";
 import { setupCron } from "./src/jobs/index.js";
 import { setupSwagger } from "./src/controllers/swagger/swagger_controller.js";
 import { rateLimit } from 'express-rate-limit'
+import { setupWebsocket } from "./src/websocket/index.js";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -29,6 +30,7 @@ mongoConnect()
     setupControllers(app);
     setupSwagger(app);
     setupRabbitMq();
+    setupWebsocket();
     setupCron();
 
     app.listen(PORT, () => {

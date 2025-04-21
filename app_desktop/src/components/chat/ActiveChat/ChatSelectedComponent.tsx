@@ -4,6 +4,7 @@ import CreditInfoComponent from "./CreditInfoComponent";
 import { DirectoryInfoType, FileType } from "../../../types/directoryInfoType";
 import { Computer, User } from "lucide-react";
 import { useExternalBrowser } from "../../../hooks/useExternalBrowser";
+import { useWebsocket } from "../../../hooks/useWebsocket";
 
 interface ChatShowComponentProps {
     sessionId: string;
@@ -14,9 +15,13 @@ interface ChatShowComponentProps {
 
 function ChatSelectedComponent(props: ChatShowComponentProps) {
     const externalBrowser = useExternalBrowser();
-    const openInBrowser = (url: string) => {
-        externalBrowser.openExternalBrowser(url);
+    const openInBrowser = (url: string) => externalBrowser.openExternalBrowser(url);
+    const { leaveSession, messageHistory, connectionStatus, lastMessage, sendMessage } = useWebsocket(props.sessionId);
+    const handleToggleSessions = () => {
+        props.toggleSessions();
+        leaveSession();
     }
+
     return (
         <>
             {/* Header */}
@@ -34,7 +39,7 @@ function ChatSelectedComponent(props: ChatShowComponentProps) {
                             <User className="h-4 w-4" />
                         </button>
                         <button
-                            onClick={() => props.toggleSessions()}
+                            onClick={() => handleToggleSessions()}
                             className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -45,11 +50,24 @@ function ChatSelectedComponent(props: ChatShowComponentProps) {
                 </div>
             </div>
             <ChatMessagesComponent sessionId={props.sessionId} />
-            <ChatInputComponent
-                sessionId={props.sessionId}
-                currentFile={props.currentFile}
-                directoryInfo={props.directoryInfo}
-            />
+            {connectionStatus == 'Open' && (
+                <ChatInputComponent
+                    sendMessage={sendMessage}
+                    sessionId={props.sessionId}
+                    currentFile={props.currentFile}
+                    directoryInfo={props.directoryInfo}
+                />
+            )}
+            {connectionStatus == 'Connecting' && (
+                <div className="h-12 flex items-center justify-center border-r border-color">
+                    Connecting...
+                </div>
+            )}
+            {connectionStatus == 'Closed' && (
+                <div className="h-12 flex items-center justify-center border-r border-color">
+                    Connection is closed.
+                </div>
+            )}
         </>
     )
 }

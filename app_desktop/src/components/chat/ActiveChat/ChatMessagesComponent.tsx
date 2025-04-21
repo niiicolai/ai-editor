@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import Markdown from 'react-markdown';
-import { Computer, User } from "lucide-react";
+import { ChevronRight, Computer, User } from "lucide-react";
 import Scrollbar from "react-scrollbars-custom";
 
 interface ChatMessagesComponentProps {
@@ -61,7 +61,7 @@ function ChatMessagesComponent(props: ChatMessagesComponentProps) {
                     <button
                         onClick={prevPage}
                         disabled={page === 1}
-                        className="cursor-pointer inline-flex items-center px-3 py-1 font-medium rounded-md button disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="cursor-pointer inline-flex items-center px-3 py-1 font-medium rounded-md button-main disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Previous
                     </button>
@@ -71,7 +71,7 @@ function ChatMessagesComponent(props: ChatMessagesComponentProps) {
                     <button
                         onClick={nextPage}
                         disabled={page >= data.pages}
-                        className="cursor-pointer inline-flex items-center px-3 py-1 font-medium rounded-md button disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="cursor-pointer inline-flex items-center px-3 py-1 font-medium rounded-md button-main disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Next
                     </button>
@@ -115,29 +115,8 @@ function ChatMessagesComponent(props: ChatMessagesComponentProps) {
                                         </div>
                                     </div>
 
-                                    {message.markdown && (
-                                        <div className="w-64">
-                                            <button
-                                                onClick={() => toggleBlock(message._id, 'markdown')}
-                                                className="w-full text-left px-4 py-2 button-main rounded-lg flex items-center justify-between"
-                                            >
-                                                <span className="text-sm font-medium text-gray-100">Markdown</span>
-                                                <span className="text-gray-500">
-                                                    {expandedBlocks[`${message._id}-markdown`] ? '▼' : '▶'}
-                                                </span>
-                                            </button>
-                                            {expandedBlocks[`${message._id}-markdown`] && (
-                                                <div className="mt-2 rounded-lg px-4 py-2 secondary-bgg shadow-sm">
-                                                    <Markdown>
-                                                        {message.markdown}
-                                                    </Markdown>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-
                                     {message.code && (
-                                        <div className="w-64">
+                                        <div className="w-full">
                                             <button
                                                 onClick={() => toggleBlock(message._id, 'code')}
                                                 className="w-full text-left px-4 py-2 button-main rounded-lg flex items-center justify-between"
@@ -148,10 +127,28 @@ function ChatMessagesComponent(props: ChatMessagesComponentProps) {
                                                 </span>
                                             </button>
                                             {expandedBlocks[`${message._id}-code`] && (
-                                                <div className="mt-2 rounded-lg bg-white shadow-sm">
-                                                    <SyntaxHighlighter style={docco}>{message.code}</SyntaxHighlighter>
+                                                <div className="mt-2 rounded-lg shadow-sm">
+                                                    <SyntaxHighlighter>{message.code}</SyntaxHighlighter>
                                                 </div>
                                             )}
+                                        </div>
+                                    )}
+
+                                    {message.clientFn && (
+                                        <div className="w-full">
+                                            <div className="rounded-lg bg-black highlight-bgg border-color border-1 p-1 shadow-sm flex gap-1 overflow-hidden">
+                                                <div><ChevronRight className="w-4 h-4 main-color mt-0.5" /></div>
+                                                <div>
+                                                    <div className="flex gap-1 main-color">
+                                                        <p className="font-bold">Function:</p>
+                                                        <p>{message.clientFn.name}</p>
+                                                    </div>
+                                                    <div className="flex gap-1 main-color">
+                                                        <p className="font-bold">Args:</p>
+                                                        <p>{message.clientFn.args}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
                                 </div>

@@ -60,7 +60,7 @@ function TerminalComponent() {
                 </button>
             </div>
             <Scrollbar style={{ height: 250 }} className='w-full border-b border-color h-full text-sm text-white'>
-                <div className='p-3 text-white'>
+                <div className='p-1 text-white'>
                     {terminalMessages.map((m: string, i: number) => (
                         <pre key={i}>{m}</pre>
                     ))}
@@ -70,7 +70,7 @@ function TerminalComponent() {
                 {formError && (<>{formError}</>)}
 
                 <form onSubmit={handleTerminalCommand} className='flex'>
-                    <input type="text" name='command' value={message} onChange={(e: any) => setMessage(e.target.value)} placeholder="$" className="input-main text-sm px-3 py-2 w-full focus:outline-none" />
+                    <input type="text" name='command' value={message} onChange={(e: any) => setMessage(e.target.value)} placeholder="$" className="input-main text-sm px-3 py-2 w-full focus:outline-none h-12" />
                     <button
                         type="submit"
                         className="button-main px-4 py-2 cursor-pointer focus:outline-none"

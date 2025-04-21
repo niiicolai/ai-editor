@@ -106,8 +106,10 @@ async function createWindow() {
       /^ls\s*/,
       /^dir\s*/,
       /^pwd\s*/,
+      /^grep\s*/,
+      /^powershell\s*/,
     ];
-
+    
     // Check if the command matches any allowed pattern
     const isAllowed = allowedCommands.some(pattern => pattern.test(cmd));
     if (!isAllowed) {
@@ -139,6 +141,10 @@ async function createWindow() {
     } catch (error) {
       console.error('Error opening external browser:', error);
     }
+  });
+
+  ipcMain.on("search", async (event, searchPath, patternStr) => {
+    console.log(searchPath, patternStr)
   });
 
   // Open the DevTools.

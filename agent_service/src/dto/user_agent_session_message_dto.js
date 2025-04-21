@@ -3,6 +3,7 @@ export default (doc) => {
     _id: doc._id,
     content: doc.content,
     code: doc.code,
+    clientFn: doc.clientFn,
     role: doc.role,
     state: doc.state,
     user_files: doc.user_files,

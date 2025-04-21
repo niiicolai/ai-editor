@@ -1,5 +1,5 @@
 
-import DashboardView from '../views/DashboardView';
+import EditorView from '../views/EditorView';
 import SettingIndexView from '../views/setting/SettingIndexView';
 
 import UserLoginView from '../views/user/UserLoginView';
@@ -8,7 +8,7 @@ import UserCreateView from '../views/user/UserCreateView';
 export const routes = [
   {
     path: "/",
-    element: <DashboardView />,
+    element: <EditorView />,
   },
   {
     path: "/settings",

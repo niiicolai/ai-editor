@@ -2,7 +2,10 @@ export interface UserAgentSessionMessageType {
     _id: string;
     content: string;
     code: string;
-    markdown: string;
+    clientFn: {
+        name: string;
+        args: string;
+    }
     role: string;
     user_files: {
         _id: string;

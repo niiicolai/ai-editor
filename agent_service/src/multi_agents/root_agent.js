@@ -8,7 +8,7 @@ const loadAgents = async () => {
     const functions = [];
     const dir = path.resolve('src', 'multi_agents', 'agents');
     const files = fs.readdirSync(dir);
-    
+
     for (const file of files) {
         try {
             const filePath = path.join(dir, file);
@@ -31,7 +31,7 @@ const loadAgents = async () => {
                         "additionalProperties": false
                     },
                     "strict": true
-                }, 
+                },
                 "type": "function"
             })
         } catch (error) {
@@ -42,6 +42,46 @@ const loadAgents = async () => {
 };
 
 const { tools, functions } = await loadAgents();
+
+tools.push({
+    "function": {
+        "name": "Search",
+        "description": "you can use the terminal command 'Search' to look up content of files in the project",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "description": "why are you calling this method"
+                },
+                "args": {
+                    "type": "string",
+                    "description": "the arguments, path(required*): ensure to use forslash / e.g., pattern(required*): must be something within a file {\"path\": \"C:/Users/niiic/Desktop/job-agent/app_desktop\", \"pattern\": \"content within the file\"}"
+                }
+            },
+            "required": ["message", "args"],
+            "additionalProperties": false
+        },
+        "strict": true
+    },
+    "type": "function"
+})
+functions.push({
+    name: "Search",
+    agent: {
+        call: async (userArgs, gptArgs) => {
+            console.log(gptArgs)
+            return {
+                message: gptArgs.message,
+                code: "",
+                clientFn: {
+                    name: "Search",
+                    args: JSON.stringify(gptArgs.args)
+                }
+            };
+        }
+    }
+})
 
 export default class RootAgent extends OpenAIAgent {
     constructor() {
@@ -75,11 +115,13 @@ export default class RootAgent extends OpenAIAgent {
 
             for (const fn of functions) {
                 if (fn.name === choice.tool_calls[0].function.name) {
-                    console.log(`Transfer message to agent ${fn.name}`)
-                    const result = await fn.agent.call(args);
+                    console.log(`Transfer message to agent ${JSON.stringify(choice.tool_calls[0])}`)
+                    const gptArgs = JSON.parse(choice.tool_calls[0].function.arguments || "{'args':''}")
+                    const result = await fn.agent.call(args, gptArgs);
                     return {
                         message: result?.message || "no message",
                         code: result?.code,
+                        clientFn: result?.clientFn,
                     }
                 }
             }

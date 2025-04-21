@@ -31,7 +31,8 @@
     "nodemon": "^3.1.9",
     "openai": "^4.95.0",
     "swagger-themes": "^1.4.3",
-    "vitest": "^3.0.2"
+    "vitest": "^3.0.2",
+    "websocket": "^1.0.35"
   },
   "devDependencies": {
     "swagger-jsdoc": "^6.2.8",

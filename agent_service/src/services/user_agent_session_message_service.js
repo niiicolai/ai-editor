@@ -16,6 +16,7 @@ const allowedFields = [
     "_id",
     "content",
     "code",
+    "clientFn",
     "markdown",
     "role",
     "state",
@@ -95,8 +96,8 @@ export default class UserAgentSessionMessageService {
      */
     static async create(body, userId, fields = null) {
         objectValidator(body, "body");
-        stringValidator(body.content, "content");
         stringValidator(body.role, "role");
+        stringValidator(body?.context?.content, "context.content");
         idValidator(body.userAgentSessionId, "userAgentSessionId");
         idValidator(userId, "userId");
 
@@ -113,7 +114,7 @@ export default class UserAgentSessionMessageService {
 
         try {
             const userAgentSessionMessageUser = new UserAgentSessionMessage({
-                content: body.content,
+                content: body?.context?.content,
                 role: body.role,
                 state: "completed",
                 user_files: body.user_files,
@@ -129,16 +130,15 @@ export default class UserAgentSessionMessageService {
                     ...lastMessages.map(m => {
                         return { role: m.role, content: m.content }
                     }),
-                    { role: "developer", content: `The current file is named ${body.currentFile?.name} and the content is ${body.currentFile?.content}` },
-                    { role: "developer", content: `The directory state is ${JSON.stringify(body.directoryInfo)}` },
+                    { role: "developer", content: `The current file is named ${body?.context?.currentFile?.name} and the content is ${body?.context?.currentFile?.content}` },
+                    { role: "developer", content: `The directory state is ${JSON.stringify(body?.context?.directoryInfo)}` },
                 ]
             });
-
-            console.log(body)
             
             const userAgentSessionMessageAI = new UserAgentSessionMessage({
                 content: response.message,
                 code: response.code,
+                clientFn: response.clientFn,
                 role: "assistant",
                 state: "completed",
                 user_agent_session: userAgentSession._id,
@@ -150,6 +150,62 @@ export default class UserAgentSessionMessageService {
                 msg: await this.find(userAgentSessionMessageUser._id.toString(), userId, fields),
                 response: await this.find(userAgentSessionMessageAI._id.toString(), userId, fields)
             }
+        } catch (error) {
+            console.error("Error creating user agent session message", error);
+            throw new Error("Error creating user agent session message", error);
+        }
+    }
+
+    /**
+     * @function createAgentResponse
+     * @description Create a new user agent session message
+     * @param {object} body - Request body
+     * @param {string} userId - User id
+     * @param {array} fields - Fields to return
+     * @return {Promise<object>} - Created user agent session object
+     */
+    static async createAgentResponse(body, userId, fields = null) {
+        objectValidator(body, "body");
+        stringValidator(body.role, "role");
+        stringValidator(body?.context?.content, "context.content");
+        idValidator(body.userAgentSessionId, "userAgentSessionId");
+        idValidator(userId, "userId");
+
+        const user = await User.findOne({ _id: userId });
+        if (!user) ClientError.notFound("user not found");
+
+        const userAgentSession = await UserAgentSession.findOne({ _id: body.userAgentSessionId, user: userId });
+        if (!userAgentSession) ClientError.notFound("user agent session not found");
+
+        const lastMessages = await UserAgentSessionMessage
+            .find({ user_agent_session: userAgentSession._id })
+            .limit(5)
+            .sort({ created_at: -1 });
+
+        try {
+            const response = await rootAgent.call({
+                content: body?.context?.content,
+                role: body.role,
+                messages: [
+                    ...lastMessages.map(m => {
+                        return { role: m.role, content: m.content }
+                    }),
+                    ...body?.context?.messages,
+                ]
+            });
+            
+            const userAgentSessionMessageAI = new UserAgentSessionMessage({
+                content: response.message,
+                code: response.code,
+                clientFn: response.clientFn,
+                role: "assistant",
+                state: "completed",
+                user_agent_session: userAgentSession._id,
+                user: user._id,
+            });
+            await userAgentSessionMessageAI.save();
+
+            return await this.find(userAgentSessionMessageAI._id.toString(), userId, fields)
         } catch (error) {
             console.error("Error creating user agent session message", error);
             throw new Error("Error creating user agent session message", error);

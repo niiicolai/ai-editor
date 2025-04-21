@@ -1,18 +1,19 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, use } from "react";
 import ChatComponent from "../components/chat/ChatComponent"
 import HierarchyComponent from "../components/hierarchy/HierarchyComponent"
 import EditorComponent from "../components/editor/EditorComponent"
-import { FileType } from "../types/directoryInfoType";
+import { FileType, TabType } from "../types/directoryInfoType";
 import { DirectoryInfoType } from "../types/directoryInfoType";
 import AuthorizedLayoutComponent from "../components/AuthorizedLayoutComponent";
 
-function DashboardView() {
+function EditorView() {
     const [currentFile, setCurrentFile] = useState<FileType>({
         id: "",
-        name: "unkown",
+        name: "new_file",
         content: "",
         language: "javascript"
     });
+    const [tabs, setTabs] = useState<TabType[]>([{ file: currentFile }]);
     const [directoryInfo, setDirectoryInfo] = useState<DirectoryInfoType>({
         currentPath: null,
         directoryState: {}
@@ -38,6 +39,10 @@ function DashboardView() {
         const extension = filename.split('.').pop()?.toLowerCase();
 
         switch (extension) {
+            case 'mjs':
+                return 'javascript';
+            case 'cjs':
+                return 'javascript';
             case 'js':
                 return 'javascript';
             case 'ts':
@@ -91,12 +96,56 @@ function DashboardView() {
 
     const openFile = (name: string, content: string) => {
         const language = getLanguageFromCurrentFile(name);
-        setCurrentFile({
+        const file = {
             id: name,
             name,
             content,
             language
-        });
+        };
+        setCurrentFile(file);
+        updateTabsOnFileOpen(file);
+    }
+
+    const updateTabsOnFileOpen = (file: FileType) => {
+        if (tabs.length === 1 && tabs[0].file.name === "new_file" && tabs[0].file.content === "") {
+            setTabs([{file}]);
+            return;
+        }
+        for (const tab of tabs) {
+            if (tab.file.name === file.name) {
+                viewTab({ file })
+                return;
+            }
+        }
+        setTabs([{file},...tabs]);
+    }
+
+    const viewTab = (t: TabType) => {
+        setCurrentFile(t.file);
+    }
+
+    const removeTab = (t: TabType) => {
+        let i = 0;
+        for (const tab of tabs) {
+            if (tab.file.name === t.file.name) {
+                tabs.splice(i, 1); // Remove the tab at index i
+                break;
+            }
+            i++;
+        }
+        if (tabs.length === 0) {
+            const dummyFile = {
+                id: "",
+                name: "new_file",
+                content: "",
+                language: "javascript"
+            };
+            setCurrentFile(dummyFile);
+            setTabs([{ file: dummyFile }])
+        } else {
+            if (currentFile.name === t.file.name) setCurrentFile(tabs[0].file)
+            setTabs([...tabs]);
+        }
     }
 
     const handleDirectoryStateChange = (newState: DirectoryInfoType) => {
@@ -111,6 +160,10 @@ function DashboardView() {
                     directoryInfo={directoryInfo}
                 />
                 <EditorComponent
+                    tabs={tabs}
+                    removeTab={removeTab}
+                    viewTab={viewTab}
+                    currentFile={currentFile}
                     content={currentFile.content}
                     language={currentFile.language}
                     onContentChange={(content: string) => setCurrentFile({
@@ -129,4 +182,4 @@ function DashboardView() {
     );
 }
 
-export default DashboardView;
+export default EditorView;

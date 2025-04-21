@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+import { userAgentSessionMessageClientFunctionSchema } from '../sub_documents/user_agent_session_message_client_function_model.js';
+
 const userAgentSessionMessageSchema = new mongoose.Schema({
     content: {
         type: String,
@@ -9,6 +11,7 @@ const userAgentSessionMessageSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    clientFn: userAgentSessionMessageClientFunctionSchema,
     markdown: {
         type: String,
         required: false

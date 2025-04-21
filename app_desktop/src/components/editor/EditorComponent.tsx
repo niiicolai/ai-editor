@@ -1,10 +1,18 @@
 import { Editor } from '@monaco-editor/react';
 import { useState } from 'react';
+import EditorCodeComponent from './EditorCodeComponent';
 import EditorBarComponent from './EditorBarComponent';
 import EditorTabsComponent from './EditorTabsComponent';
 import TerminalComponent from "../terminal/TerminalComponent"
+import { FileType, TabType } from '../../types/directoryInfoType';
 
 interface EditorComponentProps {
+    tabs: TabType[];
+    viewTab: (t: TabType) => void;
+    removeTab: (t: TabType) => void;
+    saveCurrentFile: () => void;
+    isPendingSave: boolean;
+    currentFile: FileType;
     content: string;
     language: string;
     onContentChange: (content: string) => void;
@@ -17,7 +25,17 @@ const themes = [
     { id: 'hc-black', name: 'High Contrast Dark' }
 ];
 
-function EditorComponent({ content, language, onContentChange }: EditorComponentProps) {
+function EditorComponent({
+    content,
+    language,
+    onContentChange,
+    saveCurrentFile,
+    isPendingSave,
+    viewTab,
+    removeTab,
+    tabs,
+    currentFile
+}: EditorComponentProps) {
     const [theme, setTheme] = useState('vs-dark');
 
     const handleEditorChange = (value: string | undefined) => {
@@ -26,64 +44,33 @@ function EditorComponent({ content, language, onContentChange }: EditorComponent
         }
     };
 
-    const handleSave = () => {
-
-    }
-
-    const isPendingSave = false;
-
     return (
         <div className="flex-1 flex min-h-screen">
             <div className="flex h-screen w-full flex-1">
                 {/* Code Editor Section */}
                 <div className="w-full flex">
                     <div className="w-full flex-1 flex flex-col border-r border-color main-bgg">
-                        <EditorTabsComponent />
-
-                        {/* Code Editor */}
-                        <div className="flex-1 overflow-auto bg-white">
-                            <Editor
-                                height="100%"
-                                language={language.toLowerCase()}
-                                value={content}
-                                onChange={handleEditorChange}
-                                theme={theme}
-                                options={{
-                                    minimap: { enabled: false },
-                                    fontSize: 14,
-                                    fontFamily: "'Fira Code', 'Fira Mono', monospace",
-                                    lineNumbers: "on",
-                                    roundedSelection: false,
-                                    scrollBeyondLastLine: false,
-                                    readOnly: false,
-                                    automaticLayout: true,
-                                    tabSize: 4,
-                                    suggestOnTriggerCharacters: true,
-                                    wordBasedSuggestions: true,
-                                    parameterHints: {
-                                        enabled: true
-                                    },
-                                    quickSuggestions: {
-                                        other: true,
-                                        comments: true,
-                                        strings: true
-                                    },
-                                    folding: true,
-                                    foldingStrategy: "auto",
-                                    foldingHighlight: true,
-                                    showFoldingControls: "always",
-                                    foldingImportsByDefault: true
-                                }}
-                            />
-                        </div>
-
-                        <TerminalComponent />
-                        <EditorBarComponent 
-                            handleSave={handleSave} 
-                            isPendingSave={isPendingSave} 
-                            language={language} 
+                        <EditorTabsComponent
+                            tabs={tabs}
+                            currentFile={currentFile}
+                            viewTab={viewTab}
+                            removeTab={removeTab}
                         />
 
+                        <EditorCodeComponent
+                            content={content}
+                            language={language}
+                            onContentChange={onContentChange}
+                            theme={theme}
+                        />
+
+                        <EditorBarComponent
+                            handleSave={saveCurrentFile}
+                            isPendingSave={isPendingSave}
+                            language={language}
+                        />
+
+                        <TerminalComponent />
                     </div>
                 </div>
             </div>

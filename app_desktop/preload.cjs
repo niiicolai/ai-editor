@@ -12,6 +12,8 @@ contextBridge.exposeInMainWorld('electron', {
     onWriteFile: (callback) => ipcRenderer.send('on-write-file', (event) => callback()),
     writeDir: (path) => ipcRenderer.send('write-dir', path),
     onWriteDir: (callback) => ipcRenderer.send('on-write-dir', (event) => callback()),
+    search: (path, pattern) => ipcRenderer.send('search', path, pattern),
+    onSearchComplete: (callback) => ipcRenderer.send('on-search-complete', (event, content) => callback(content)),
     terminalCmd: (cmd) => ipcRenderer.send('terminal-cmd', cmd),
     onTerminalCmd: (callback) => ipcRenderer.on('on-terminal-cmd', (event, content) => callback(content)),
     openExternalBrowser: (url) => ipcRenderer.send('open-external-browser', url),

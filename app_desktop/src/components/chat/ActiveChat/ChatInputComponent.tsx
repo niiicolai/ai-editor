@@ -9,6 +9,7 @@ interface ChatMessagesComponentProps {
     sessionId: string;
     currentFile: FileType;
     directoryInfo: DirectoryInfoType;
+    sendMessage: (content:string) => void;
 }
 
 function ChatInputComponent(props: ChatMessagesComponentProps) {
@@ -19,14 +20,23 @@ function ChatInputComponent(props: ChatMessagesComponentProps) {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setFormError(null);
-        console.log("props.directoryInfo",props.directoryInfo)
+
         try {
-            await mutateAsync({
+            props.sendMessage(JSON.stringify({
+                event: 'user_input',
+                data: {
+                    content: newMessage,
+                    currentFile: props.currentFile,
+                    directoryInfo: props.directoryInfo,
+                    user_agent_session_id: props.sessionId
+                }
+            }));
+            /*await mutateAsync({
                 content: newMessage,
                 currentFile: props.currentFile,
                 directoryInfo: props.directoryInfo,
                 user_agent_session_id: props.sessionId
-            });
+            });*/
             setNewMessage("");
         } catch (err) {
             setFormError(err as string);

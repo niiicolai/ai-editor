@@ -12,6 +12,10 @@ export interface FileItemType {
     isDirectory: boolean;
 }
 
+export interface TabType {
+    file: FileType;
+}
+
 export interface DirectoryStateType {
     [path: string]: {
         isOpen: boolean;

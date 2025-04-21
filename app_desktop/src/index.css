@@ -1,13 +1,28 @@
 @import "tailwindcss";
 
 :root {
-    --background-color: #080808;
+    --background-color: #151527;
     --secondary-color: #1f1f1f;
     --secondary-color: #1f1f1f;
     --input-color: #272727;
     --text-color: #f3f3f3;
     --highlight-color: #3c49f7;
     --highlight-color-hover: #113ed1;
+
+    --tab-color: #d2d3da;
+    --tab-bgg: #1d1d1d;
+    --tab-border: #3c49f7;
+
+    --tab-active-color: #d2d3da;
+    --tab-active-bgg: #3c49f7;
+    --tab-active-border: #3c49f7;
+
+    --tab-color-hover: #d2d3da;
+    --tab-bgg-hover: #113ed1;
+}
+
+.hide-y-scrollbar {
+    overflow-y: hidden;
 }
 
 .main-bgg {
@@ -20,6 +35,24 @@
 
 .main-color {
     color: var(--text-color);
+}
+
+.tab {
+    border-color: var(--tab-border);
+    background-color: var(--tab-bgg);
+    color:  var(--tab-color);
+}
+
+.tab-active {
+    border-color: var(--tab-active-border);
+    background-color: var(--tab-active-bgg);
+    color:  var(--tab-active-color);
+}
+
+.tab .view-tab-button:hover,
+.tab .close-tab-button:hover {
+    background-color: var(--tab-bgg-hover);
+    color:  var(--tab-color-hover);
 }
 
 .button-main {

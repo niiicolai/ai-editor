@@ -16,6 +16,8 @@ declare global {
             onWriteFile: (callback: () => void) => void;
             writeDir: (path: string) => void;
             onWriteDir: (callback: () => void) => void;
+            search: (path: string, pattern: string) => void;
+            onSearchComplete: (callback: () => void) => void;
         };
     }
 }
@@ -65,6 +67,15 @@ const writeDir = (path: string) => {
     });
 };
 
+const search = (path: string, pattern: string) => {
+    return new Promise<string | null>((resolve) => {
+        window.electron.search(path, pattern);
+        window.electron.onSearchComplete(() => {
+            resolve("");
+        });
+    });
+};
+
 export const useFiles = () => {
     const useOpenFolder = () => {
         return useQuery({
@@ -80,5 +91,6 @@ export const useFiles = () => {
         readFile,
         writeFile,
         writeDir,
+        search
     };
 };
