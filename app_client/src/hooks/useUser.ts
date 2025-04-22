@@ -8,6 +8,10 @@ export const useGetUser = () => {
     return useQuery({ queryKey: key, queryFn: UserService.get });
 }
 
+export const useIsAuthorized = () => {
+    return useQuery({ queryKey: ['user_auth_state'], queryFn: UserService.isAuthorized });
+}
+
 export const useLoginUser = () => {
     return useMutation({
         mutationFn: (credentials: { email: string, password: string }) =>

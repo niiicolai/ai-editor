@@ -1,27 +1,12 @@
 import { Link } from "react-router-dom";
 import productImage from "../assets/product.png"
+import LayoutComponent from "../components/LayoutComponent";
 
 function HomeView() {
   return (
-    <div className="bg-white">
-      {/* Header Section */}
-      <div className="flex justify-between gap-3 bg-slate-800 text-white px-2">
-        <div>
-          <h1 className="p-2 font-bold">AI Editor</h1>
-        </div>
-        <div>
-          <nav className="flex gap-1">
-            <Link to="/" className="p-2 hover:underline">Home</Link>
-            <Link to="/pricing" className="p-2 hover:underline">Pricing</Link>
-            <Link to="/features" className="p-2 hover:underline">Features</Link>
-            <Link to="/docs" className="p-2 hover:underline">Docs</Link>
-            <Link to="/user/login" className="p-2 hover:underline">Login</Link>
-            <Link to="/user/signup" className="p-2 hover:underline">Signup</Link>
-          </nav>
-        </div>
-      </div>
-
-      {/* Hero Section */}
+    <LayoutComponent pageName="home" slot={
+      <div className="bg-white">
+        {/* Hero Section */}
       <div className="relative bg-indigo-800 overflow-hidden flex gap-3">
         <div className="max-w-7xl mx-auto">
           <div className="relative z-10 pb-8 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
@@ -169,8 +154,9 @@ function HomeView() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    } />
   )
 }
 
-export default HomeView
+export default HomeView;

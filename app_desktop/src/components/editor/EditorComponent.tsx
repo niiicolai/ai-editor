@@ -18,12 +18,7 @@ interface EditorComponentProps {
     onContentChange: (content: string) => void;
 }
 
-const themes = [
-    { id: 'vs-light', name: 'Light' },
-    { id: 'vs-dark', name: 'Dark' },
-    { id: 'hc-light', name: 'High Contrast Light' },
-    { id: 'hc-black', name: 'High Contrast Dark' }
-];
+
 
 function EditorComponent({
     content,

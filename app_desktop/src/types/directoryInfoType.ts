@@ -4,6 +4,7 @@ export interface FileType {
     name: string;
     content: string;
     language: string;
+    path: string;
 }
 
 export interface FileItemType {

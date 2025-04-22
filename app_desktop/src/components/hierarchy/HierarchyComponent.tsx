@@ -5,7 +5,7 @@ import { FileItemType, DirectoryStateType } from "../../types/directoryInfoType"
 import Scrollbar from 'react-scrollbars-custom';
 
 interface HierarchyComponentProps {
-    getFileContent: (fileName: string, content: string) => void;
+    getFileContent: (fileName: string, content: string, path: string) => void;
     onDirectoryStateChange: (state: { currentPath: string | null, directoryState: DirectoryStateType }) => void;
 }
 
@@ -75,7 +75,7 @@ function HierarchyComponent({ getFileContent, onDirectoryStateChange }: Hierarch
             try {
                 const content = await readFile(file.path);
                 setCurrentFile(file);
-                getFileContent(file.name, content || '');
+                getFileContent(file.name, content || '', file.path);
             } catch (error) {
                 console.error('Error reading file:', error);
             } finally {

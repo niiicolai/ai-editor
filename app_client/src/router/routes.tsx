@@ -1,5 +1,4 @@
 import HomeView from '../views/HomeView';
-import DashboardView from '../views/DashboardView';
 
 import UserLoginView from '../views/user/UserLoginView';
 import UserCreateView from '../views/user/UserCreateView';
@@ -92,11 +91,4 @@ export const routes = [
     element: <CheckoutShowView />,
   },
 
-  /**
-   * Dashboard routes
-   */
-  {
-    path: "/dashboard",
-    element: <DashboardView />,
-  }
 ];

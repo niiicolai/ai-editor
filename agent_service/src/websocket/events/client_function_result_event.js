@@ -15,14 +15,11 @@ export default class UserInputEvent extends WebsocketEvent {
             reply('error', { content: "SessionId not found" });
             return;
         }
-        console.log("client_function_result", data)
         const sessionId = connection.userData.sessionId;
         const userId = connection.userData.user._id;
         const result = await UserAgentSessionMessageService.createAgentResponse({
-            context: { ...data, messages: [
-                { role: "developer", content: "The user input contains the result of the function call" }
-            ]},
-            role: "user",
+            context: { ...data, messages: []},
+            role: "system",
             userAgentSessionId: sessionId
         }, userId);
 

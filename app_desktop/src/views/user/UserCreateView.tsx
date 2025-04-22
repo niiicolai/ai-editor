@@ -20,7 +20,7 @@ function UserCreateView() {
                 email: formData.get('email') as string,
                 password: formData.get('password') as string
             });
-            navigate('/user');
+            navigate('/');
         } catch (err) {
             setFormError(err as string);
         }

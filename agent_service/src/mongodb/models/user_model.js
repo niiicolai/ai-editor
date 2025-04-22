@@ -12,6 +12,17 @@ export const userSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
+    creditInfo: {
+      totalMaxCredits: {
+        type: Number,
+      },
+      totalUsedCredits: {
+        type: Number,
+      },
+      creditsLeft: {
+        type: Number,
+      },
+    },
     incomplete_transactions: [
       {
         transaction: {

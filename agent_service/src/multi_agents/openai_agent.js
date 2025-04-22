@@ -13,14 +13,12 @@ export default class OpenAIAgent extends Agent {
         instructions: null, 
         model: null,
         tools: null, 
-        parameters: null,
         response_format: null,
         max_tokens: 10000,
         temperature: 0.3
     }) {
         super(options);
         this.tools = options.tools;
-        this.parameters = options.parameters;
         this.response_format = options.response_format;
         this.max_tokens = options.max_tokens;
         this.temperature = options.temperature;
@@ -40,10 +38,12 @@ export default class OpenAIAgent extends Agent {
                 ...developerMessages.map(m => {
                     return { role: m.role, content: m.content }
                 }),
+                { role: "developer", content: `Always use tools when you are searching for answer for a goal` },
+                { role: "developer", content: `Use function results to give the user answer on their goal` },
+                { role: "developer", content: `Always mention your goal in your messages` },
                 { role: "developer", content: `Please, use the message field for short responses` },
                 { role: "developer", content: `YOU MUST RETURN DATA IN THE CORRECT RESPONSE FORMAT` },
                 { role: "developer", content: `YOU MUST FOLLOW THESE INSTRUCTIONS: ${this.instructions}` },
-                { role: "developer", content: `REMEMBER TO TRANSFER INPUT TO OTHER AGENTS IF THEIR DESCRIPTION PROVIDES IT` },
                 { role, content },
             ],
             response_format: this.response_format,

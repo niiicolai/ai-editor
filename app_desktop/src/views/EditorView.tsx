@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect, use } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useFiles } from "../hooks/useFiles";
 import ChatComponent from "../components/chat/ChatComponent"
 import HierarchyComponent from "../components/hierarchy/HierarchyComponent"
 import EditorComponent from "../components/editor/EditorComponent"
@@ -7,11 +8,14 @@ import { DirectoryInfoType } from "../types/directoryInfoType";
 import AuthorizedLayoutComponent from "../components/AuthorizedLayoutComponent";
 
 function EditorView() {
+    const files = useFiles();
+    const [isPendingSave, setIsPendingSave] = useState(false);
     const [currentFile, setCurrentFile] = useState<FileType>({
         id: "",
         name: "new_file",
         content: "",
-        language: "javascript"
+        language: "javascript",
+        path: ""
     });
     const [tabs, setTabs] = useState<TabType[]>([{ file: currentFile }]);
     const [directoryInfo, setDirectoryInfo] = useState<DirectoryInfoType>({
@@ -94,13 +98,14 @@ function EditorView() {
         }
     };
 
-    const openFile = (name: string, content: string) => {
+    const openFile = (name: string, content: string, path: string) => {
         const language = getLanguageFromCurrentFile(name);
         const file = {
             id: name,
             name,
             content,
-            language
+            language,
+            path
         };
         setCurrentFile(file);
         updateTabsOnFileOpen(file);
@@ -138,7 +143,8 @@ function EditorView() {
                 id: "",
                 name: "new_file",
                 content: "",
-                language: "javascript"
+                language: "javascript",
+                path: ""
             };
             setCurrentFile(dummyFile);
             setTabs([{ file: dummyFile }])
@@ -152,6 +158,18 @@ function EditorView() {
         setDirectoryInfo(newState);
     }
 
+    const saveCurrentFile = async () => {
+        if (currentFile.id == "") return;
+        setIsPendingSave(true);
+        try {
+            await files.writeFile(currentFile.path, currentFile.content);
+        } catch (error:any) {
+            console.log(error)
+        } finally {
+            setIsPendingSave(false);
+        }
+    }
+
     return (
         <AuthorizedLayoutComponent slot={
             <div className="flex flex-col lg:flex-row min-h-screen">
@@ -160,6 +178,8 @@ function EditorView() {
                     directoryInfo={directoryInfo}
                 />
                 <EditorComponent
+                    saveCurrentFile={saveCurrentFile}
+                    isPendingSave={isPendingSave}
                     tabs={tabs}
                     removeTab={removeTab}
                     viewTab={viewTab}
@@ -170,7 +190,8 @@ function EditorView() {
                         id: currentFile.id,
                         name: currentFile.name,
                         content,
-                        language: currentFile.language
+                        language: currentFile.language,
+                        path: currentFile.path
                     })}
                 />
                 <HierarchyComponent

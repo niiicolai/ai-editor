@@ -3,97 +3,41 @@ import fs from "fs";
 import path from "path";
 import { pathToFileURL } from "url";
 
-const loadAgents = async () => {
+const loadFunctions = async () => {
     const tools = [];
     const functions = [];
-    const dir = path.resolve('src', 'multi_agents', 'agents');
+    const dir = path.resolve('src', 'multi_agents', 'functions');
     const files = fs.readdirSync(dir);
 
     for (const file of files) {
         try {
-            const filePath = path.join(dir, file);
-            const fileUrl = pathToFileURL(filePath).href;
-            const agentModule = await import(fileUrl);
-            const agent = new agentModule.default();
-
-            functions.push({
-                name: agent.name.replace(/\s+/, "_"),
-                agent: agent
-            })
-            tools.push({
-                "function": {
-                    "name": agent.name.replace(/\s+/, "_"),
-                    "description": agent.description,
-                    "parameters": {
-                        "type": "object",
-                        "properties": {},
-                        "required": [],
-                        "additionalProperties": false
-                    },
-                    "strict": true
-                },
-                "type": "function"
-            })
+            const fileDir = path.join(dir, file);
+            const filePath = pathToFileURL(fileDir);
+            const module = await import(filePath.href);
+            const { fn, tool } = module.default();
+            tools.push(tool);
+            functions.push(fn);
         } catch (error) {
-            console.error('ERROR: Failed to load agent:', file, error);
+            console.error('ERROR: Failed to load function:', file, error);
         }
     }
-    return { functions, tools };
+
+    return { tools, functions };
 };
 
-const { tools, functions } = await loadAgents();
-
-tools.push({
-    "function": {
-        "name": "Search",
-        "description": "you can use the terminal command 'Search' to look up content of files in the project",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string",
-                    "description": "why are you calling this method"
-                },
-                "args": {
-                    "type": "string",
-                    "description": "the arguments, path(required*): ensure to use forslash / e.g., pattern(required*): must be something within a file {\"path\": \"C:/Users/niiic/Desktop/job-agent/app_desktop\", \"pattern\": \"content within the file\"}"
-                }
-            },
-            "required": ["message", "args"],
-            "additionalProperties": false
-        },
-        "strict": true
-    },
-    "type": "function"
-})
-functions.push({
-    name: "Search",
-    agent: {
-        call: async (userArgs, gptArgs) => {
-            console.log(gptArgs)
-            return {
-                message: gptArgs.message,
-                code: "",
-                clientFn: {
-                    name: "Search",
-                    args: JSON.stringify(gptArgs.args)
-                }
-            };
-        }
-    }
-})
+const { tools, functions } = await loadFunctions();
 
 export default class RootAgent extends OpenAIAgent {
     constructor() {
         super({
             name: "Root Agent",
-            description: "The agent responsible for orchestrating user input to the right agent.",
-            instructions: "Look at the user input and select the correct tool for solving the problem",
+            description: "This agent acts as the central router that interprets user input and delegates tasks to the most appropriate tool or agent.",
+            instructions: "Carefully analyze the user's intent and context. Choose the most relevant tool or agent that can effectively solve the task. Prioritize accuracy and avoid guessing. If the task requires finding file types, prefer using directory state tools. Use content-based tools like 'Search_File_Content' only when the user is looking for specific text inside files. Do not route commands to tools that are not meant for the task.",
             model: "gpt-4o-mini",
             tools,
             response_format: {
                 type: "json_schema", json_schema: {
-                    name: "orchestrating_user_input_to_the_right_agent",
+                    name: "solving-problems",
                     schema: {
                         type: "object",
                         properties: {
@@ -103,7 +47,6 @@ export default class RootAgent extends OpenAIAgent {
                     }
                 }
             },
-            parameters: null,
             max_tokens: 10000,
             temperature: 0.7
         })
@@ -115,7 +58,6 @@ export default class RootAgent extends OpenAIAgent {
 
             for (const fn of functions) {
                 if (fn.name === choice.tool_calls[0].function.name) {
-                    console.log(`Transfer message to agent ${JSON.stringify(choice.tool_calls[0])}`)
                     const gptArgs = JSON.parse(choice.tool_calls[0].function.arguments || "{'args':''}")
                     const result = await fn.agent.call(args, gptArgs);
                     return {

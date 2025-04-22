@@ -2,7 +2,7 @@ import ChatMessagesComponent from "./ChatMessagesComponent";
 import ChatInputComponent from "./ChatInputComponent";
 import CreditInfoComponent from "./CreditInfoComponent";
 import { DirectoryInfoType, FileType } from "../../../types/directoryInfoType";
-import { Computer, User } from "lucide-react";
+import { Computer, HelpingHand, Info, ShoppingBag, User } from "lucide-react";
 import { useExternalBrowser } from "../../../hooks/useExternalBrowser";
 import { useWebsocket } from "../../../hooks/useWebsocket";
 
@@ -32,6 +32,18 @@ function ChatSelectedComponent(props: ChatShowComponentProps) {
                     <CreditInfoComponent />
 
                     <div className="p-3 flex gap-1">
+                        <button
+                            onClick={() => openInBrowser("http://localhost:5173/docs")}
+                            className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Info className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={() => openInBrowser("http://localhost:5173/products")}
+                            className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <ShoppingBag className="h-4 w-4" />
+                        </button>
                         <button
                             onClick={() => openInBrowser("http://localhost:5173/user")}
                             className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm button-main disabled:opacity-50 disabled:cursor-not-allowed"

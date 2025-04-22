@@ -6,6 +6,8 @@ import ClientError from '../errors/clientError.js';
 import Stripe from 'stripe';
 import mongoose from 'mongoose';
 
+import { updateCreditSaga } from '../rabbitmq/sagas/update_credit_saga.js';
+
 import { idValidator } from "../validators/id_validator.js";
 import { stringValidator } from "../validators/string_validator.js";
 import { paginatorValidator } from "../validators/paginator_validator.js";
@@ -260,6 +262,8 @@ export default class CheckoutService {
             // End the session
             session.endSession();
         }
+
+        await updateCreditSaga(checkout.user._id.toString());
     }
 
     /**
