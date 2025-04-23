@@ -1,20 +1,18 @@
-import { useGetUserAgentSessionMessages } from "../../../hooks/useUserAgentSessionMessage"
-import { useState, useRef, useEffect } from "react";
-import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import Markdown from 'react-markdown';
-import { ChevronRight, Computer, User } from "lucide-react";
 import Scrollbar from "react-scrollbars-custom";
+import { useGetUserAgentSessionMessages } from "../../hooks/useUserAgentSessionMessage"
+import { useState, useRef, useEffect } from "react";
+import { ChevronRight, Computer, User } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
-interface ChatMessagesComponentProps {
-    sessionId: string;
-}
-
-function ChatMessagesComponent(props: ChatMessagesComponentProps) {
+function ChatMessagesComponent() {
+    const sessionId = useSelector((state: RootState) => state.userAgentSession.sessionId);
     const limit = 10;
     const [page, setPage] = useState(1);
     const [expandedBlocks, setExpandedBlocks] = useState<{ [key: string]: boolean }>({});
-    const { data, isLoading, error } = useGetUserAgentSessionMessages(page, limit, props.sessionId);
+    const { data, isLoading, error } = useGetUserAgentSessionMessages(page, limit, sessionId || '');
     const messages = data?.messages
     const messagesEndRef = useRef<HTMLDivElement>(null);
 

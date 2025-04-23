@@ -1,5 +1,5 @@
-import { useCreateUser } from "../../hooks/useUser"
-import { useState } from "react"
+import { useCreateUser } from "../../hooks/useUser";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 

@@ -1,4 +1,4 @@
-import { useGetCreditInfo } from "../../../hooks/useUserProduct"
+import { useGetCreditInfo } from "../../hooks/useUserProduct";
 
 function CreditInfoComponent() {
     const { data: creditInfo, isLoading, error } = useGetCreditInfo();

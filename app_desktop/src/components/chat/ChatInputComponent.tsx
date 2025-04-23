@@ -1,19 +1,15 @@
-
-import { useCreateUserAgentSessionMessage } from "../../../hooks/useUserAgentSessionMessage";
-import { DirectoryInfoType, FileType } from "../../../types/directoryInfoType";
 import { useState } from "react";
-import LoaderIcon from "../../../icons/LoaderIcon";
 import { Check } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 interface ChatMessagesComponentProps {
-    sessionId: string;
-    currentFile: FileType;
-    directoryInfo: DirectoryInfoType;
     sendMessage: (content:string) => void;
 }
 
 function ChatInputComponent(props: ChatMessagesComponentProps) {
-    const { mutateAsync, isPending } = useCreateUserAgentSessionMessage();
+    const sessionId = useSelector((state: RootState) => state.userAgentSession.sessionId);
+    const hierarchy = useSelector((state: RootState) => state.hierarchy);
     const [formError, setFormError] = useState<string | null>(null);
     const [newMessage, setNewMessage] = useState("");
 
@@ -26,17 +22,11 @@ function ChatInputComponent(props: ChatMessagesComponentProps) {
                 event: 'user_input',
                 data: {
                     content: newMessage,
-                    currentFile: props.currentFile,
-                    directoryInfo: props.directoryInfo,
-                    user_agent_session_id: props.sessionId
+                    currentFile: hierarchy.currentFile,
+                    directoryInfo: hierarchy.directoryState,
+                    user_agent_session_id: sessionId
                 }
             }));
-            /*await mutateAsync({
-                content: newMessage,
-                currentFile: props.currentFile,
-                directoryInfo: props.directoryInfo,
-                user_agent_session_id: props.sessionId
-            });*/
             setNewMessage("");
         } catch (err) {
             setFormError(err as string);
@@ -60,7 +50,7 @@ function ChatInputComponent(props: ChatMessagesComponentProps) {
                     type="submit"
                     className="button-main px-4 py-2 cursor-pointer focus:outline-none"
                 >
-                    {isPending ? <LoaderIcon h="h-4" w="w-4" /> : <Check className="h-4 w-4" /> }
+                    <Check className="h-4 w-4" />
                 </button>
             </form>
         </div >

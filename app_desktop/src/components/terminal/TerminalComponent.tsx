@@ -3,14 +3,18 @@ import LoaderIcon from "../../icons/LoaderIcon"
 import Scrollbar from "react-scrollbars-custom";
 import { useState } from "react";
 import { useTerminal } from "../../hooks/useTerminal";
+import { editorSettingsActions } from "../../features/editorSettings";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store";
 
 function TerminalComponent() {
     const terminal = useTerminal();
+    const isMinimized = useSelector((state: RootState) => state.editorSettings.terminal.minimized);
     const [terminalMessages, setTerminalMessages] = useState<string[]>([]);
     const [formIsLoading, setFormIsLoading] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
     const [message, setMessage] = useState<string>("");
-    const [terminalIsHidden, setTerminalIsHidden] = useState(true);
+    const dispatch = useDispatch();
 
     const handleTerminalCommand = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -33,13 +37,13 @@ function TerminalComponent() {
         }
     }
 
-    if (terminalIsHidden) {
+    if (isMinimized) {
         return (
             <div className="border-t border-color flex flex-col justify-between">
                 <div className="p-2 flex justify-between">
                     <h2 className="text-md font-medium highlight-color">Terminal</h2>
                     <button
-                        onClick={() => setTerminalIsHidden(false)}
+                        onClick={() => dispatch(editorSettingsActions.setTerminalMinimized(false))}
                         className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <ChevronUp className='w-4 h-4' />
@@ -53,7 +57,7 @@ function TerminalComponent() {
             <div className="p-2 border-b border-color flex justify-between">
                 <h2 className="text-md font-medium highlight-color">Terminal</h2>
                 <button
-                    onClick={() => setTerminalIsHidden(true)}
+                    onClick={() => dispatch(editorSettingsActions.setTerminalMinimized(true))}
                     className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <ChevronDown className='w-4 h-4' />

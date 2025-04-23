@@ -1,88 +1,82 @@
-import { useState } from "react";
-import { DirectoryInfoType, FileType } from "../../types/directoryInfoType";
-import { UserAgentSessionType } from "../../types/userAgentSessionType";
-import { useIsAuthorized } from "../../hooks/useUser";
-import ChatSelectedComponent from "./ActiveChat/ChatSelectedComponent";
-import ChatSessionsComponent from "./SessionList/ChatSessionsComponent";
-import { Link } from "react-router-dom";
-import { ChevronDown, ChevronLeft, ChevronRight, Unlock } from "lucide-react";
+import ChatMessagesComponent from "./ChatMessagesComponent";
+import ChatInputComponent from "./ChatInputComponent";
+import CreditInfoComponent from "./CreditInfoComponent";
+import { Computer, Info, ShoppingBag, User } from "lucide-react";
+import { useExternalBrowser } from "../../hooks/useExternalBrowser";
+import { useWebsocket } from "../../hooks/useWebsocket";
+import { RootState } from "../../store";
+import { useDispatch, useSelector } from "react-redux";
+import { setSessionId } from "../../features/userAgentSession";
 
-interface ChatComponentProps {
-    currentFile: FileType;
-    directoryInfo: DirectoryInfoType;
-}
-
-function ChatComponent(props: ChatComponentProps) {
-    const { data: isAuthorized } = useIsAuthorized();
-    const [selectedSession, setSelectedSession] = useState<UserAgentSessionType | null>(null);
-    const [showSessions, setShowSessions] = useState(true);
-    const [isHidden, setIsHidden] = useState(false);
-
-    if (!isAuthorized) {
-        return (
-            <div className="lg:h-screen lg:w-16 text-center relative main-bgg text-white gap-3 flex lg:flex-col items-center p-3 justify-end lg:border-r border-color">
-                <Link title="Login" to="/user/login" className="button-main p-1 text-sm rounded-md"><Unlock className="w-4 h-4" /></Link>
-            </div>
-        )
-    }
-
-    if (isHidden) {
-        return (
-            <div className="lg:h-screen flex flex-col border-r border-color justify-center items-center main-bgg text-white p-1">
-                <button
-                    onClick={() => setIsHidden(false)}
-                    className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <ChevronRight className='w-4 h-4 hidden lg:block' />
-                    <ChevronDown className='w-4 h-4 block lg:hidden' />
-                </button>
-            </div>
-        );
-    }
-
-    if (showSessions) {
-        return (
-            <div className="h-screen w-96 relative main-bgg text-white flex flex-col justify-between">
-                <ChatSessionsComponent
-                    setSelectedSession={setSelectedSession}
-                    setShowSessions={setShowSessions}
-                    selectedSession={selectedSession}
-                    setIsHidden={setIsHidden}
-                />
-            </div>
-        )
+function ChatComponent() {
+    const externalBrowser = useExternalBrowser();
+    const sessionId = useSelector((state: RootState) => state.userAgentSession.sessionId);
+    const openInBrowser = (url: string) => externalBrowser.openExternalBrowser(url);
+    const { leaveSession, connectionStatus, sendMessage } = useWebsocket(sessionId || '');
+    const dispatch = useDispatch();
+    const handleToggleSessions = () => {
+        dispatch(setSessionId(null));
+        leaveSession();
     }
 
     return (
-        <div className="h-screen w-96 relative main-bgg text-white">
-            <div className="h-screen w-96 w-full flex-1 flex flex-col">
-                {selectedSession && (
-                    <ChatSelectedComponent
-                        currentFile={props.currentFile}
-                        directoryInfo={props.directoryInfo}
-                        toggleSessions={() => setShowSessions(!showSessions)}
-                        sessionId={selectedSession._id}
-                    />
-                )}
+        <>
+            {/* Header */}
+            <div className="h-12 border-b border-r border-color main-bgg text-white">
+                <div className="flex items-center justify-between">
+                    <h2 className="p-3 text-sm font-medium highlight-color"><Computer className="w-4 h-4" /></h2>
 
-                {!selectedSession && (
-                    <div className="flex-1 flex items-center justify-center">
-                        <div className="text-center">
-                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                                <span className="text-2xl">💬</span>
-                            </div>
-                            <h3 className="text-lg font-medium text-gray-100 mb-2">
-                                Select a Session
-                            </h3>
-                            <p className="text-sm text-gray-200">
-                                Choose a chat session from the sidebar
-                            </p>
-                        </div>
+                    <CreditInfoComponent />
+
+                    <div className="p-3 flex gap-1">
+                        <button
+                            onClick={() => openInBrowser("http://localhost:5173/docs")}
+                            className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Info className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={() => openInBrowser("http://localhost:5173/products")}
+                            className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <ShoppingBag className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={() => openInBrowser("http://localhost:5173/user")}
+                            className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <User className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={() => handleToggleSessions()}
+                            className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
-                )}
+                </div>
             </div>
-        </div>
-    );
+            <ChatMessagesComponent />
+
+            {connectionStatus == 'Open' && (
+                <ChatInputComponent sendMessage={sendMessage} />
+            )}
+
+            {connectionStatus == 'Connecting' && (
+                <div className="h-12 flex items-center justify-center border-r border-color">
+                    Connecting...
+                </div>
+            )}
+
+            {connectionStatus == 'Closed' && (
+                <div className="h-12 flex items-center justify-center border-r border-color">
+                    Connection is closed.
+                </div>
+            )}
+        </>
+    )
 }
 
 export default ChatComponent;

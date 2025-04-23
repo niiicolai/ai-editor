@@ -1,206 +1,57 @@
-import { useState, useRef, useEffect } from "react";
-import { useFiles } from "../hooks/useFiles";
-import ChatComponent from "../components/chat/ChatComponent"
-import HierarchyComponent from "../components/hierarchy/HierarchyComponent"
-import EditorComponent from "../components/editor/EditorComponent"
-import { FileType, TabType } from "../types/directoryInfoType";
-import { DirectoryInfoType } from "../types/directoryInfoType";
-import AuthorizedLayoutComponent from "../components/AuthorizedLayoutComponent";
+import ChatComponent from "../components/chat/ChatComponent";
+import SessionsComponent from "../components/sessions/SessionsComponent";
+import HierarchyComponent from "../components/hierarchy/HierarchyComponent";
+import EditorComponent from "../components/editor/EditorComponent";
+import TerminalComponent from "../components/terminal/TerminalComponent";
+import { RootState } from "../store";
+import { useSelector } from "react-redux";
+import { useIsAuthorized } from "../hooks/useUser";
+import { Link } from "react-router-dom";
+import { Unlock } from "lucide-react";
 
 function EditorView() {
-    const files = useFiles();
-    const [isPendingSave, setIsPendingSave] = useState(false);
-    const [currentFile, setCurrentFile] = useState<FileType>({
-        id: "",
-        name: "new_file",
-        content: "",
-        language: "javascript",
-        path: ""
-    });
-    const [tabs, setTabs] = useState<TabType[]>([{ file: currentFile }]);
-    const [directoryInfo, setDirectoryInfo] = useState<DirectoryInfoType>({
-        currentPath: null,
-        directoryState: {}
-    });
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const displayRef = useRef<HTMLDivElement>(null);
+  const { data: isAuthorized } = useIsAuthorized();
+  const terminalDisabled = useSelector(
+    (state: RootState) => state.editorSettings.terminal.disabled
+  );
+  const sessionId = useSelector(
+    (state: RootState) => state.userAgentSession.sessionId
+  );
 
-    // Sync scroll positions between textarea and display
-    useEffect(() => {
-        const textarea = textareaRef.current;
-        const display = displayRef.current;
-        if (textarea && display) {
-            const syncScroll = () => {
-                display.scrollTop = textarea.scrollTop;
-                display.scrollLeft = textarea.scrollLeft;
-            };
-            textarea.addEventListener('scroll', syncScroll);
-            return () => textarea.removeEventListener('scroll', syncScroll);
-        }
-    }, [currentFile]);
-
-    const getLanguageFromCurrentFile = (filename: string): string => {
-        const extension = filename.split('.').pop()?.toLowerCase();
-
-        switch (extension) {
-            case 'mjs':
-                return 'javascript';
-            case 'cjs':
-                return 'javascript';
-            case 'js':
-                return 'javascript';
-            case 'ts':
-                return 'typescript';
-            case 'jsx':
-                return 'javascript';
-            case 'tsx':
-                return 'typescript';
-            case 'html':
-                return 'html';
-            case 'css':
-                return 'css';
-            case 'scss':
-            case 'sass':
-                return 'scss';
-            case 'json':
-                return 'json';
-            case 'md':
-                return 'markdown';
-            case 'py':
-                return 'python';
-            case 'java':
-                return 'java';
-            case 'c':
-                return 'c';
-            case 'cpp':
-            case 'cc':
-            case 'cxx':
-                return 'cpp';
-            case 'cs':
-                return 'csharp';
-            case 'go':
-                return 'go';
-            case 'rs':
-                return 'rust';
-            case 'rb':
-                return 'ruby';
-            case 'php':
-                return 'php';
-            case 'sh':
-                return 'shell';
-            case 'yaml':
-            case 'yml':
-                return 'yaml';
-            case 'xml':
-                return 'xml';
-            default:
-                return 'plaintext';
-        }
-    };
-
-    const openFile = (name: string, content: string, path: string) => {
-        const language = getLanguageFromCurrentFile(name);
-        const file = {
-            id: name,
-            name,
-            content,
-            language,
-            path
-        };
-        setCurrentFile(file);
-        updateTabsOnFileOpen(file);
-    }
-
-    const updateTabsOnFileOpen = (file: FileType) => {
-        if (tabs.length === 1 && tabs[0].file.name === "new_file" && tabs[0].file.content === "") {
-            setTabs([{file}]);
-            return;
-        }
-        for (const tab of tabs) {
-            if (tab.file.name === file.name) {
-                viewTab({ file })
-                return;
-            }
-        }
-        setTabs([{file},...tabs]);
-    }
-
-    const viewTab = (t: TabType) => {
-        setCurrentFile(t.file);
-    }
-
-    const removeTab = (t: TabType) => {
-        let i = 0;
-        for (const tab of tabs) {
-            if (tab.file.name === t.file.name) {
-                tabs.splice(i, 1); // Remove the tab at index i
-                break;
-            }
-            i++;
-        }
-        if (tabs.length === 0) {
-            const dummyFile = {
-                id: "",
-                name: "new_file",
-                content: "",
-                language: "javascript",
-                path: ""
-            };
-            setCurrentFile(dummyFile);
-            setTabs([{ file: dummyFile }])
-        } else {
-            if (currentFile.name === t.file.name) setCurrentFile(tabs[0].file)
-            setTabs([...tabs]);
-        }
-    }
-
-    const handleDirectoryStateChange = (newState: DirectoryInfoType) => {
-        setDirectoryInfo(newState);
-    }
-
-    const saveCurrentFile = async () => {
-        if (currentFile.id == "") return;
-        setIsPendingSave(true);
-        try {
-            await files.writeFile(currentFile.path, currentFile.content);
-        } catch (error:any) {
-            console.log(error)
-        } finally {
-            setIsPendingSave(false);
-        }
-    }
-
-    return (
-        <AuthorizedLayoutComponent slot={
-            <div className="flex flex-col lg:flex-row min-h-screen">
-                <ChatComponent
-                    currentFile={currentFile}
-                    directoryInfo={directoryInfo}
-                />
-                <EditorComponent
-                    saveCurrentFile={saveCurrentFile}
-                    isPendingSave={isPendingSave}
-                    tabs={tabs}
-                    removeTab={removeTab}
-                    viewTab={viewTab}
-                    currentFile={currentFile}
-                    content={currentFile.content}
-                    language={currentFile.language}
-                    onContentChange={(content: string) => setCurrentFile({
-                        id: currentFile.id,
-                        name: currentFile.name,
-                        content,
-                        language: currentFile.language,
-                        path: currentFile.path
-                    })}
-                />
-                <HierarchyComponent
-                    getFileContent={openFile}
-                    onDirectoryStateChange={handleDirectoryStateChange}
-                />
+  return (
+    <div className="flex flex-col lg:flex-row min-h-screen">
+      <div className="h-screen w-96 relative main-bgg text-white">
+        <div className="h-screen w-96 w-full flex-1 flex flex-col">
+          {isAuthorized && sessionId && <ChatComponent />}
+          {isAuthorized && !sessionId && <SessionsComponent />}
+          {!isAuthorized && (
+            <div className="h-full flex items-center justify-end">
+              <Link
+                title="Login"
+                to="/user/login"
+                className="button-main p-1 text-sm rounded-md"
+              >
+                <Unlock className="w-4 h-4" />
+              </Link>
             </div>
-        } />
-    );
+          )}
+        </div>
+      </div>
+
+      <div className="flex-1 flex min-h-screen">
+        <div className="flex h-screen w-full flex-1">
+          <div className="w-full flex">
+            <div className="w-full flex-1 flex flex-col border-r border-color main-bgg">
+              <EditorComponent />
+              {!terminalDisabled && <TerminalComponent />}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <HierarchyComponent />      
+    </div>
+  );
 }
 
 export default EditorView;

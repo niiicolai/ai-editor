@@ -1,5 +1,7 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { editorSettingsActions } from "../../features/editorSettings";
+import { RootState } from "../../store";
 
 const themes = [
     { id: 'vs-light', name: 'Light' },
@@ -9,6 +11,8 @@ const themes = [
 ];
 
 function SettingIndexView() {
+    const dispatch = useDispatch();
+    const editorSettings = useSelector((state: RootState) => state.editorSettings);
 
     return (
         <div className="flex min-h-screen main-bgg main-color p-6">
@@ -38,8 +42,17 @@ function SettingIndexView() {
                                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 flex flex-col gap-3">
 
                                     <div className="bg-slate-800 p-3 rounded-md flex justify-between">
-                                        <p className=" text-white mb-3">Theme:</p>
-                                        <select className="bg-white">
+                                        <p className="text-white mb-3">Theme: {editorSettings.theme.name}</p>
+                                        <select
+                                            className="bg-white"
+                                            onChange={(e) => {
+                                                const selectedThemeId = e.target.value;
+                                                const selectedTheme = themes.find((t: any) => t.id === selectedThemeId);
+                                                if (selectedTheme) {
+                                                    dispatch(editorSettingsActions.setTheme(selectedTheme));
+                                                }
+                                            }}
+                                            defaultValue={editorSettings.theme.id}>
                                             {themes.map((t: any) => (
                                                 <option key={t.id} value={t.id}>{t.name}</option>
                                             ))}
@@ -62,7 +75,7 @@ function SettingIndexView() {
                                     </div>
                                     <div className="bg-slate-800 p-3 rounded-md flex justify-between">
                                         <p className=" text-white mb-3">Disable:</p>
-                                        <input type="checkbox" />
+                                        <input type="checkbox" onChange={() => dispatch(editorSettingsActions.setTerminalDisabled(!editorSettings.terminal.disabled))} checked={editorSettings.terminal.disabled} />
                                     </div>
                                 </dd>
                             </div>
@@ -81,7 +94,7 @@ function SettingIndexView() {
                                     </div>
                                     <div className="bg-slate-800 p-3 rounded-md flex justify-between">
                                         <p className=" text-white mb-3">Disable Search:</p>
-                                        <input type="checkbox" />
+                                        <input type="checkbox" onChange={() => dispatch(editorSettingsActions.setSearchDisabled(!editorSettings.search.disabled))} checked={editorSettings.search.disabled} />
                                     </div>
                                     <div className="bg-slate-800 p-3 rounded-md flex justify-between">
                                         <p className=" text-white mb-3">Disable branch info:</p>

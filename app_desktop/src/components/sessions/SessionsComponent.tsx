@@ -1,52 +1,29 @@
-import { useGetUserAgentSessions, useCreateUserAgentSession, useDestroyUserAgentSession } from "../../../hooks/useUserAgentSession"
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
-import { UserAgentSessionType } from "../../../types/userAgentSessionType";
-import { ChevronLeft, ChevronRight, ChevronUp, Computer } from "lucide-react";
+import SessionItemComponent from "./SessionItemComponent";
+import { useGetUserAgentSessions, useCreateUserAgentSession } from "../../hooks/useUserAgentSession";
+import { useState } from "react";
+import { Computer } from "lucide-react";
+import { RootState } from "../../store";
+import { useDispatch, useSelector } from "react-redux";
+import { setSessionId } from "../../features/userAgentSession";
 
-interface ChatShowComponentProps {
-    setSelectedSession: Dispatch<SetStateAction<UserAgentSessionType | null>>;
-    setShowSessions: Dispatch<SetStateAction<boolean>>;
-    selectedSession: UserAgentSessionType | null;
-    setIsHidden: (state: boolean) => void;
-}
-
-function ChatSessionsComponent(props: ChatShowComponentProps) {
-    const { setSelectedSession, setShowSessions, selectedSession, setIsHidden } = props;
+function SessionsComponent() {
+    const sessionId = useSelector((state: RootState) => state.userAgentSession.sessionId);
     const limit = 10;
     const [page, setPage] = useState(1);
     const { data, isLoading: isLoadingSessions, error: errorSessions } = useGetUserAgentSessions(page, limit);
     const { mutateAsync, isPending: isPendingCreate, error: errorCreate } = useCreateUserAgentSession();
-    const { mutateAsync: destroySessionAsync, isPending: isPendingDestroy, error: errorDestroy } = useDestroyUserAgentSession();
     const sessions = data?.sessions;
     const [formError, setFormError] = useState<string | null>(null);
+    const dispatch = useDispatch();
 
     const handleCreate = async () => {
         try {
             const session = await mutateAsync({ title: new Date().toString() });
-            setSelectedSession(session);
-            setShowSessions(false);
+            dispatch(setSessionId(session._id));
         } catch (err) {
             setFormError(err as string);
         }
     }
-
-    const handleDestroy = async (_id: string) => {
-        try {
-            await destroySessionAsync(_id);
-            if (selectedSession?._id == _id) {
-                setSelectedSession(null);
-                setShowSessions(true);
-            }
-        } catch (err) {
-            setFormError(err as string);
-        }
-    }
-
-    useEffect(() => {
-        if (sessions && sessions.length > 0 && !selectedSession) {
-            setSelectedSession(sessions[0]);
-        }
-    }, [sessions, selectedSession]);
 
     const nextPage = () => { if (page < (data?.pages || 0)) setPage(page + 1); }
     const prevPage = () => { if (page > 1) setPage(page - 1); }
@@ -72,18 +49,11 @@ function ChatSessionsComponent(props: ChatShowComponentProps) {
 
     return (
         <div className="w-96 main-bgg text-white bottom-0 border-r border-color bg-gray-50 flex flex-col flex-1">
-            {/* Sessions Header */}
+
             <div className="p-3 border-b border-color h-12 flex items-center justify-between w-full">
                 <div className="flex items-center justify-between w-full">
                     <h2 className="text-sm font-bold highlight-color"><Computer className="w-4 h-4" /></h2>
                     <div className="flex gap-1">
-                        <button
-                            onClick={() => setIsHidden(true)}
-                            className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <ChevronLeft className='w-4 h-4 hidden lg:block' />
-                            <ChevronUp className='w-4 h-4 block lg:hidden' />
-                        </button>
                         <button
                             onClick={handleCreate}
                             disabled={isPendingCreate}
@@ -104,7 +74,6 @@ function ChatSessionsComponent(props: ChatShowComponentProps) {
                 </div>
             </div>
 
-            {/* Error Message */}
             {(errorCreate || formError) && (
                 <div className="px-4 py-2 bg-red-50 border-b border-red-200">
                     <div className="flex items-center">
@@ -118,58 +87,12 @@ function ChatSessionsComponent(props: ChatShowComponentProps) {
                 </div>
             )}
 
-            {/* Sessions List */}
             <div className="flex-1 overflow-y-auto">
                 {sessions?.map((session) => (
-                    <div className="flex" key={session._id}>
-                        <button
-                            onClick={() => {
-                                setSelectedSession(session)
-                                setShowSessions(false);
-                            }}
-                            className={`flex-1 overflow-hidden truncate p-2 text-left flex items-center space-x-3 cursor-pointer ${selectedSession?._id === session._id
-                                ? 'main-highlight text-indigo-100'
-                                : 'text-indigo-100 hover:bg-gray-700'
-                                }`}
-                        >
-                            <div className="flex-shrink-0">
-                                <div className={`h-10 w-10 rounded-full flex items-center justify-center ${selectedSession?._id === session._id
-                                    ? 'highlight-bgg'
-                                    : 'bg-black'
-                                    }`}>
-                                    <span className={`font-medium ${selectedSession?._id === session._id
-                                        ? 'text-white'
-                                        : 'text-gray-200'
-                                        }`}>
-                                        {session.title?.charAt(0) || 'C'}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate">
-                                    {session.title || 'Untitled Session'}
-                                </p>
-                                <p className="text-xs text-gray-200 truncate">
-                                    {new Date(session.created_at).toLocaleString()}
-                                </p>
-                            </div>
-                        </button>
-                        <button
-                            key={session._id}
-                            onClick={() => {
-                                handleDestroy(session._id)
-                            }}
-                            className={`px-4 py-3 text-left flex items-center space-x-3 hover:bg-gray-700 cursor-pointer`}
-                        >
-                            <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
+                    <SessionItemComponent session={session} sessionId={sessionId} />
                 ))}
             </div>
 
-            {/* Sessions Pagination */}
             {data && data.pages > 1 && (
                 <div className="px-4 py-3 border-t border-color main-bgg h-12">
                     <div className="flex items-center justify-between">
@@ -214,4 +137,4 @@ function ChatSessionsComponent(props: ChatShowComponentProps) {
     )
 }
 
-export default ChatSessionsComponent;
+export default SessionsComponent;
