@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { setFile } from "../../features/editor";
+import { setCurrentFile } from "../../features/hierarchy";
 
 function EditorTabsComponent() {
   const editor = useSelector((state: RootState) => state.editor);
@@ -12,7 +13,12 @@ function EditorTabsComponent() {
   const dispatch = useDispatch();
 
   const viewTab = (t: TabType) => {
-    dispatch(setFile(t.file));
+    dispatch(setFile(t.file))
+    dispatch(setCurrentFile({
+      name: t.file.name,
+      path: t.file.path,
+      isDirectory: false
+    }));
   };
 
   const removeTab = (t: TabType) => {
@@ -27,7 +33,7 @@ function EditorTabsComponent() {
     if (tabs.length === 0) {
       const dummyFile = {
         id: "",
-        name: "new_file",
+        name: "file",
         content: "",
         language: "javascript",
         path: "",
@@ -65,24 +71,24 @@ function EditorTabsComponent() {
   }, [editor.file]);
 
   return (
-    <div className="flex justify-start main-bgg border-b border-color text-sm h-12 overflow-hidden">
+    <div className="flex justify-start main-bgg border-b border-color text-sm h-8 overflow-hidden">
       <Scrollbar className="overflow-hidden w-full h-full hide-y-scrollbar">
         <div className="flex justify-start">
           {tabs &&
             tabs.map((t: TabType) => (
               <div
                 key={t.file.path}
-                className={`flex tab justify-center border-r ${
+                className={`flex tab justify-center h-8 border-r ${
                     editor.file.name === t.file.name ? "tab-active" : ""
                 }`}
               >
                 <button
                   onClick={() => viewTab(t)}
-                  className="px-3 py-2 cursor-pointer view-tab-button overflow-hidden truncate"
+                  className="px-4 py-1 cursor-pointer view-tab-button overflow-hidden truncate"
                 >
                   {t.file.name}
                 </button>
-                <div className="px-3 py-4 flex justify-center">
+                <div className="px-3 py-1 flex justify-center">
                   <button
                     onClick={() => removeTab(t)}
                     className="cursor-pointer rounded-md close-tab-button"

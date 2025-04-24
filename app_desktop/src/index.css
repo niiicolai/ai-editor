@@ -1,24 +1,29 @@
 @import "tailwindcss";
 
 :root {
-    --background-color: #151527;
+    --background-color: #1c1c1f;
     --secondary-color: #1f1f1f;
     --secondary-color: #1f1f1f;
     --input-color: #272727;
-    --text-color: #f3f3f3;
-    --highlight-color: #3c49f7;
+    --text-color: #777777;
+    --border-color: #141414;
+    --highlight-color: #777777;
+    --highlight-bgg-color: #3a3a3a;
     --highlight-color-hover: #113ed1;
+
+    --button-color: #a5a5a500;
+    --button-color-hover: #000000de;
 
     --tab-color: #d2d3da;
     --tab-bgg: #1d1d1d;
-    --tab-border: #3c49f7;
+    --tab-border: #777777;
 
     --tab-active-color: #d2d3da;
-    --tab-active-bgg: #3c49f7;
-    --tab-active-border: #3c49f7;
+    --tab-active-bgg: #464646;
+    --tab-active-border: #464646;
 
     --tab-color-hover: #d2d3da;
-    --tab-bgg-hover: #113ed1;
+    --tab-bgg-hover: #1d1d1d;
 }
 
 .hide-y-scrollbar {
@@ -56,13 +61,13 @@
 }
 
 .button-main {
-    background-color: var(--highlight-color);
+    background-color: var(--button-color);
     color: var(--text-color);
     cursor: pointer;
 }
 
 .button-main:hover {
-    background-color: var(--highlight-color-hover);
+    color: var(--button-color-hover);
 }
 
 .highlight-color {
@@ -70,7 +75,7 @@
 }
 
 .highlight-bgg {
-    background-color: var(--highlight-color);
+    background-color: var(--highlight-bgg-color);
     color: var(--text-color);
 }
 
@@ -80,5 +85,5 @@
 }
 
 .border-color {
-    color: var(--highlight-color);
+    color: var(--border-color);
 }

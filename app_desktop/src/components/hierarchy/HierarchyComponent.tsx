@@ -19,8 +19,10 @@ import { setCurrentFile, setDirectoryState } from "../../features/hierarchy";
 import { setFile } from "../../features/editor";
 import { RootState } from "../../store";
 import { editorSettingsActions } from "../../features/editorSettings";
+import { useGetLanguage } from "../../hooks/useGetLanguage";
 
 function HierarchyComponent() {
+  const { getLanguageFromFile } = useGetLanguage();
   const { useOpenFolder, readDirectory, readFile } = useFiles();
   const { refetch: openFolder, isFetching: isOpeningFolder } = useOpenFolder();
 
@@ -33,9 +35,7 @@ function HierarchyComponent() {
   );
   const hierarchy = useSelector((state: RootState) => state.hierarchy);
   const { currentFile, directoryState } = hierarchy;
-  const currentFolder = currentPath
-    ? currentPath.split("\\").pop() || "No Folder"
-    : "No Folder";
+  const currentFolder = currentPath ? currentPath.split("\\").pop() || "" : "";
   const hasFiles = currentPath && directoryState[currentPath]?.files.length > 0;
 
   const handleOpenFolder = async () => {
@@ -59,65 +59,6 @@ function HierarchyComponent() {
     dispatch(setDirectoryState(newDirectoryState));
   };
 
-  const getLanguageFromCurrentFile = (filename: string): string => {
-    const extension = filename.split(".").pop()?.toLowerCase();
-
-    switch (extension) {
-      case "mjs":
-        return "javascript";
-      case "cjs":
-        return "javascript";
-      case "js":
-        return "javascript";
-      case "ts":
-        return "typescript";
-      case "jsx":
-        return "javascript";
-      case "tsx":
-        return "typescript";
-      case "html":
-        return "html";
-      case "css":
-        return "css";
-      case "scss":
-      case "sass":
-        return "scss";
-      case "json":
-        return "json";
-      case "md":
-        return "markdown";
-      case "py":
-        return "python";
-      case "java":
-        return "java";
-      case "c":
-        return "c";
-      case "cpp":
-      case "cc":
-      case "cxx":
-        return "cpp";
-      case "cs":
-        return "csharp";
-      case "go":
-        return "go";
-      case "rs":
-        return "rust";
-      case "rb":
-        return "ruby";
-      case "php":
-        return "php";
-      case "sh":
-        return "shell";
-      case "yaml":
-      case "yml":
-        return "yaml";
-      case "xml":
-        return "xml";
-      default:
-        return "plaintext";
-    }
-  };
-
   const handleFileSelect = async (file: FileItemType) => {
     if (file.isDirectory) {
       const directoryExists = directoryState[file.path];
@@ -134,7 +75,7 @@ function HierarchyComponent() {
             path: file.path,
             name: file.name,
             content: content || "",
-            language: getLanguageFromCurrentFile(file.name),
+            language: getLanguageFromFile(file.name),
           })
         );
       } catch (error) {
@@ -172,7 +113,7 @@ function HierarchyComponent() {
 
   if (isMinimized) {
     return (
-      <div className="flex flex-col justify-center main-bgg text-white p-1">
+      <div className="h-full flex flex-col justify-center main-bgg text-white p-1">
         <button
           onClick={() =>
             dispatch(editorSettingsActions.setHierarchyMinimized(false))
@@ -187,7 +128,7 @@ function HierarchyComponent() {
   }
 
   return (
-    <div className="lg:h-screen h-64 lg:w-64 flex flex-col justify-between main-bgg text-white">
+    <div className="h-full h-64 lg:w-64 flex flex-col justify-between main-bgg text-white">
       <div className="flex items-center gap-3 hidden">
         <h2>Options</h2>
         <Plus className="w-4 h-4" />
@@ -196,12 +137,9 @@ function HierarchyComponent() {
 
       <Scrollbar className="w-full h-full">
         <div>
-          <div className="p-3 border-b border-color h-12">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-medium highlight-color">
-                {currentFolder}
-              </h2>
-              <div className="flex gap-1">
+          <div className="p-1 border-b border-color h-8">
+            <div className="flex items-center justify-end">
+              <div className="flex items-center gap-1">
                 <button
                   onClick={handleOpenFolder}
                   disabled={isOpeningFolder}
@@ -225,29 +163,39 @@ function HierarchyComponent() {
               </div>
             </div>
           </div>
-          <div className="p-2">
+          <div>
+            {currentFolder && (
+              <div className="border-color border-b p-1">
+                <h2 className="text-sm font-medium highlight-color text-left flex gap-2 items-center">
+                <ChevronRight className={`w-4 h-4 mt-1 transition-transform rotate-90`} /> <span>{currentFolder}</span>
+                </h2>
+              </div>
+            )}
             {isLoading && (
               <div className="flex items-center justify-center p-4">
                 <Loader2 className="w-4 h-4 animate-spin" />
               </div>
             )}
 
-            {hasFiles &&
-              hierarchy.directoryState[currentPath].files.map((file) => (
-                <HierarchyItemComponent
-                  key={file.path}
-                  file={file}
-                  level={0}
-                  currentFile={currentFile}
-                  getChildren={(file: FileItemType) =>
-                    hierarchy.directoryState[file.path]?.files || []
-                  }
-                  getIsOpen={(file: FileItemType) =>
-                    hierarchy.directoryState[file.path]?.isOpen
-                  }
-                  handleFileSelect={handleFileSelect}
-                />
-              ))}
+            {hasFiles && (
+              <div className="px-2 py-1">
+                {hierarchy.directoryState[currentPath].files.map((file) => (
+                  <HierarchyItemComponent
+                    key={file.path}
+                    file={file}
+                    level={0}
+                    currentFile={currentFile}
+                    getChildren={(file: FileItemType) =>
+                      hierarchy.directoryState[file.path]?.files || []
+                    }
+                    getIsOpen={(file: FileItemType) =>
+                      hierarchy.directoryState[file.path]?.isOpen
+                    }
+                    handleFileSelect={handleFileSelect}
+                  />
+                ))}
+              </div>
+            )}
 
             {!hasFiles && (
               <div className="text-center main-color p-4">No files found</div>

@@ -50,9 +50,8 @@ function SessionsComponent() {
     return (
         <div className="w-96 main-bgg text-white bottom-0 border-r border-color bg-gray-50 flex flex-col flex-1">
 
-            <div className="p-3 border-b border-color h-12 flex items-center justify-between w-full">
-                <div className="flex items-center justify-between w-full">
-                    <h2 className="text-sm font-bold highlight-color"><Computer className="w-4 h-4" /></h2>
+            <div className="p-1 border-b border-color h-8 flex items-center justify-between w-full">
+                <div className="flex items-center justify-end w-full">
                     <div className="flex gap-1">
                         <button
                             onClick={handleCreate}
@@ -89,12 +88,12 @@ function SessionsComponent() {
 
             <div className="flex-1 overflow-y-auto">
                 {sessions?.map((session) => (
-                    <SessionItemComponent session={session} sessionId={sessionId} />
+                    <SessionItemComponent session={session} sessionId={sessionId} key={session._id} />
                 ))}
             </div>
 
             {data && data.pages > 1 && (
-                <div className="px-4 py-3 border-t border-color main-bgg h-12">
+                <div className="px-4 py-1 border-t border-color main-bgg h-8">
                     <div className="flex items-center justify-between">
                         <button
                             onClick={prevPage}

@@ -22,6 +22,7 @@ async function createWindow() {
     height: 1080,
     resizable: true,
     autoHideMenuBar: true,
+    frame: false,
     webPreferences: {
       contextIsolation: true,
       enableRemoteModule: false,

@@ -62,9 +62,8 @@ function EditorCodeComponent() {
   }, [file]);
 
   return (
-    <div className="flex-1 overflow-auto bg-white">
+    <div className="flex-1">
       <Editor
-        height="100%"
         defaultLanguage={file.language.toLowerCase()}
         value={file.content}
         path={file.path}

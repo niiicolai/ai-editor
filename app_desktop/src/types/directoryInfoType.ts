@@ -17,11 +17,13 @@ export interface TabType {
     file: FileType;
 }
 
+export interface DirectoryStateFileType {
+    isOpen: boolean;
+    files: FileItemType[];
+}
+
 export interface DirectoryStateType {
-    [path: string]: {
-        isOpen: boolean;
-        files: FileItemType[];
-    };
+    [path: string]: DirectoryStateFileType;
 }
 
 export interface DirectoryInfoType {

@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronRight, Computer, User } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
+import { dracula } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 function ChatMessagesComponent() {
     const sessionId = useSelector((state: RootState) => state.userAgentSession.sessionId);
@@ -126,7 +127,9 @@ function ChatMessagesComponent() {
                                             </button>
                                             {expandedBlocks[`${message._id}-code`] && (
                                                 <div className="mt-2 rounded-lg shadow-sm">
-                                                    <SyntaxHighlighter>{message.code}</SyntaxHighlighter>
+                                                    <SyntaxHighlighter style={dracula}>
+                                                        {message.code}
+                                                    </SyntaxHighlighter>
                                                 </div>
                                             )}
                                         </div>
@@ -134,16 +137,16 @@ function ChatMessagesComponent() {
 
                                     {message.clientFn && (
                                         <div className="w-full">
-                                            <div className="rounded-lg bg-black highlight-bgg border-color border-1 p-1 shadow-sm flex gap-1 overflow-hidden">
+                                            <div className="rounded-lg  highlight-bgg border-color border-1 p-1 shadow-sm flex gap-1 overflow-hidden">
                                                 <div><ChevronRight className="w-4 h-4 main-color mt-0.5" /></div>
                                                 <div>
                                                     <div className="flex gap-1 main-color">
-                                                        <p className="font-bold">Function:</p>
-                                                        <p>{message.clientFn.name}</p>
+                                                        <p className="font-bold text-white">Function:</p>
+                                                        <p className="text-white">{message.clientFn.name}</p>
                                                     </div>
                                                     <div className="flex gap-1 main-color">
-                                                        <p className="font-bold">Args:</p>
-                                                        <p>{message.clientFn.args}</p>
+                                                        <p className="font-bold text-white">Args:</p>
+                                                        <p className="text-white">{message.clientFn.args}</p>
                                                     </div>
                                                 </div>
                                             </div>

@@ -18,7 +18,7 @@ function HierarchyItemComponent({ file, level, currentFile, handleFileSelect, ge
     return (
         <div>
             <div
-                className={`flex items-center justify-between p-1 hover:bg-gray-800 cursor-pointer text-sm ${currentFile?.path === file.path
+                className={`flex items-center justify-between highlight-color p-1 hover:bg-gray-800 cursor-pointer text-sm ${currentFile?.path === file.path
                     ? "bg-gray-800"
                     : ""
                     }`}

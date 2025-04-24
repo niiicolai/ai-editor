@@ -34,21 +34,21 @@ function ChatInputComponent(props: ChatMessagesComponentProps) {
     }
 
     return (
-        <div className="main-bgg border-t border-r border-color h-12">
+        <div className="main-bgg border-r border-color h-8">
             {formError && (
                 <div>{formError}</div>
             )}
-            <form onSubmit={handleSubmit} className="flex h-full">
+            <form onSubmit={handleSubmit} className="flex h-full p-1">
                 <input
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Type your message..."
-                    className="input-main flex-1 border-0 px-4 py-1 focus:outline-none focus:border-transparent"
+                    className="input-main flex-1 border-0 p-2 text-sm rounded-md focus:outline-none focus:border-transparent"
                 />
                 <button
                     type="submit"
-                    className="button-main px-4 py-2 cursor-pointer focus:outline-none"
+                    className="button-main px-2 py-1 cursor-pointer focus:outline-none"
                 >
                     <Check className="h-4 w-4" />
                 </button>
