@@ -23,6 +23,10 @@ declare global {
       onWriteDir: (callback: () => void) => void;
       search: (path: string, pattern: string) => void;
       onSearchComplete: (callback: () => void) => void;
+
+      minimizeWindow: () => void;
+      restoreWindow: () => void;
+      closeWindow: () => void;
     };
   }
 }

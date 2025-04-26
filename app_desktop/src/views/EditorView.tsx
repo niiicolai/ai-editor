@@ -10,7 +10,7 @@ import { RootState } from "../store";
 import { useSelector } from "react-redux";
 import { useIsAuthorized } from "../hooks/useUser";
 import { Link } from "react-router-dom";
-import { Unlock } from "lucide-react";
+import { Lock, Unlock } from "lucide-react";
 
 function EditorView() {
   const { data: isAuthorized } = useIsAuthorized();
@@ -27,8 +27,8 @@ function EditorView() {
         <HeaderComponent />
       </header>
       <div className="flex-1 flex flex-col lg:flex-row">
-        <div className="h-full w-96 relative main-bgg text-white">
-          <div className="h-full w-96 w-full flex-1 flex flex-col">
+        <div className={`h-full relative main-bgg text-white ${isAuthorized ? 'lg:w-96' : ''}`}>
+          <div className={`h-full flex-1 flex flex-col  ${isAuthorized ? 'lg:w-96' : ''}`}>
             {isAuthorized && sessionId && <ChatComponent />}
             {isAuthorized && !sessionId && <SessionsComponent />}
             {!isAuthorized && (
@@ -38,7 +38,7 @@ function EditorView() {
                   to="/user/login"
                   className="button-main p-1 text-sm rounded-md"
                 >
-                  <Unlock className="w-4 h-4" />
+                  <Lock className="w-4 h-4" />
                 </Link>
               </div>
             )}

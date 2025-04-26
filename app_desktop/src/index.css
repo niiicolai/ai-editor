@@ -30,6 +30,10 @@
     overflow-y: hidden;
 }
 
+.draggable-region {
+    -webkit-app-region: drag;
+}
+
 .main-bgg {
     background-color: var(--background-color);
 }

@@ -1,10 +1,9 @@
 import SessionItemComponent from "./SessionItemComponent";
 import { useGetUserAgentSessions, useCreateUserAgentSession } from "../../hooks/useUserAgentSession";
 import { useState } from "react";
-import { Computer } from "lucide-react";
 import { RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
-import { setSessionId } from "../../features/userAgentSession";
+import { clearMessages, setOperation, setSessionId } from "../../features/userAgentSession";
 
 function SessionsComponent() {
     const sessionId = useSelector((state: RootState) => state.userAgentSession.sessionId);
@@ -20,6 +19,8 @@ function SessionsComponent() {
         try {
             const session = await mutateAsync({ title: new Date().toString() });
             dispatch(setSessionId(session._id));
+            dispatch(clearMessages());
+            dispatch(setOperation(null));
         } catch (err) {
             setFormError(err as string);
         }
@@ -48,7 +49,7 @@ function SessionsComponent() {
     }
 
     return (
-        <div className="w-96 main-bgg text-white bottom-0 border-r border-color bg-gray-50 flex flex-col flex-1">
+        <div className="main-bgg text-white bottom-0 border-r border-color bg-gray-50 flex flex-col flex-1">
 
             <div className="p-1 border-b border-color h-8 flex items-center justify-between w-full">
                 <div className="flex items-center justify-end w-full">

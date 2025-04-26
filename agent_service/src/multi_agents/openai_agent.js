@@ -49,7 +49,7 @@ export default class OpenAIAgent extends Agent {
             response_format: this.response_format,
             max_tokens: this.max_tokens,
             temperature: this.temperature,
-            tools: this.tools
+            ...(this.tools && { tools: this.tools })
         });
         return response.choices[0].message;
     }

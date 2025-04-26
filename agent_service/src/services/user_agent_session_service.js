@@ -128,7 +128,7 @@ export default class UserAgentSessionService {
             userAgentSession.title = body.title;
             await userAgentSession.save();
 
-            return await this.find(userAgentSession._id.toString(), userId, fields);
+            return await this.find(userAgentSession._id.toString(), userId);
         } catch (error) {
             console.error("Error updating user agent session:", error);
             throw new Error("Error updating user agent session", error);

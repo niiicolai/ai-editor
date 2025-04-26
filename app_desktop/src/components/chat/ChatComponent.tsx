@@ -1,6 +1,5 @@
 import ChatMessagesComponent from "./ChatMessagesComponent";
 import ChatInputComponent from "./ChatInputComponent";
-import { Computer } from "lucide-react";
 import { useWebsocket } from "../../hooks/useWebsocket";
 import { RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";

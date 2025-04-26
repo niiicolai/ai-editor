@@ -1,9 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
-import TokenService from '../services/tokenService';
 import { useTerminal } from './useTerminal';
 import { useFiles } from './useFiles';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+import TokenService from '../services/tokenService';
+import { useDispatch } from 'react-redux';
+import { addMessage, setOperation } from '../features/userAgentSession';
+import { UserAgentSessionMessageType } from '../types/userAgentSessionMessageType';
+import { UserAgentSessionOperationType } from '../types/userAgentSessionOperationType';
+
 
 export const useWebsocket = (sessionId: string) => {
     const terminal = useTerminal();
@@ -11,13 +16,16 @@ export const useWebsocket = (sessionId: string) => {
     const [messageHistory, setMessageHistory] = useState<any>([]);
     const { sendMessage, lastMessage, readyState } = useWebSocket('ws://localhost:4001', { protocols: "echo-protocol" });
     const queryClient = useQueryClient();
+    const dispatch = useDispatch();
 
 
     useEffect(() => {
         if (lastMessage !== null) {
             const json = JSON.parse(lastMessage.data);
             if (json.event == "user_input_reply") {
-                if (json.payload?.response?.clientFn?.name == 'Search_File_Content') {
+                const clientFn = json.payload?.clientFn;
+
+                if (clientFn?.name == 'Search_File_Content') {
                     const parsedArgs = JSON.parse(JSON.parse(json.payload?.response?.clientFn?.args));
                     terminal.executeTerminalCommand(`powershell -Command "Get-ChildItem -Path '${parsedArgs.path}' -Recurse -Include *.js -File | Where-Object { -not $_.FullName.Contains('node_modules') } | Select-String -Pattern '${parsedArgs.pattern}'"`)
                         .then((resultContent: any) => {
@@ -32,8 +40,8 @@ export const useWebsocket = (sessionId: string) => {
                             }));
                         })
 
-                } else if (json.payload?.response?.clientFn?.name == 'Read_File') {
-                    const parsedArgs = JSON.parse(JSON.parse(json.payload?.response?.clientFn?.args));
+                } else if (clientFn?.name == 'Read_File') {
+                    const parsedArgs = JSON.parse(JSON.parse(clientFn?.args));
                     files.readFile(parsedArgs.path)
                         .then((resultContent: any) => {
                             console.log(resultContent)
@@ -46,8 +54,8 @@ export const useWebsocket = (sessionId: string) => {
                                 }
                             }));
                         })
-                } else if (json.payload?.response?.clientFn?.name == 'Write_File') {
-                    const parsedArgs = JSON.parse(JSON.parse(json.payload?.response?.clientFn?.args));
+                } else if (clientFn?.name == 'Write_File') {
+                    const parsedArgs = JSON.parse(JSON.parse(clientFn?.args));
                     files.writeFile(parsedArgs.path, parsedArgs.content)
                         .then((resultContent: any) => {
                             console.log(resultContent)
@@ -61,8 +69,8 @@ export const useWebsocket = (sessionId: string) => {
                             }));
                         })
 
-                } else if (json.payload?.response?.clientFn?.name == 'List_Directory') {
-                    const parsedArgs = JSON.parse(JSON.parse(json.payload?.response?.clientFn?.args));
+                } else if (clientFn?.name == 'List_Directory') {
+                    const parsedArgs = JSON.parse(JSON.parse(clientFn?.args));
                     terminal.executeTerminalCommand(
                         `powershell -Command "Get-ChildItem -Path '${parsedArgs.path}' -Recurse -File | Where-Object { -not $_.FullName.Contains('node_modules') } | Select-Object FullName"`
                     ).then((resultContent: any) => {
@@ -78,10 +86,11 @@ export const useWebsocket = (sessionId: string) => {
                     });
 
                 }
-                queryClient.invalidateQueries({ queryKey: ['user_agent_session_messages'] });
-                setMessageHistory((prev: any) => prev.concat(lastMessage));
+
+                dispatch(addMessage(json.payload as UserAgentSessionMessageType));
+            } else if (json.event == "session_operation") {
+                dispatch(setOperation(json.payload as UserAgentSessionOperationType));
             }
-            console.log(json)
         }
 
         sendMessage(JSON.stringify({ 'event': 'session_connect', 'data': { sessionId, token: TokenService.getToken() } }));

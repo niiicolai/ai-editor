@@ -17,4 +17,8 @@ contextBridge.exposeInMainWorld('electron', {
     terminalCmd: (cmd) => ipcRenderer.send('terminal-cmd', cmd),
     onTerminalCmd: (callback) => ipcRenderer.on('on-terminal-cmd', (event, content) => callback(content)),
     openExternalBrowser: (url) => ipcRenderer.send('open-external-browser', url),
+
+    minimizeWindow: () => ipcRenderer.send('minimize-window'),
+    restoreWindow: () => ipcRenderer.send('restore-window'),
+    closeWindow: () => ipcRenderer.send('close-window'),
 });

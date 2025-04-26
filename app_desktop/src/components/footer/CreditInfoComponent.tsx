@@ -1,7 +1,13 @@
+import { useIsAuthorized } from "../../hooks/useUser";
 import { useGetCreditInfo } from "../../hooks/useUserProduct";
 
 function CreditInfoComponent() {
+  const { data: isAuthorized } = useIsAuthorized();
   const { data: creditInfo, isLoading, error } = useGetCreditInfo();
+  if (!isAuthorized)
+  {
+    return (<div className="main-color text-sm">Unauthorized</div>)
+  }
 
   if (isLoading) {
     return (

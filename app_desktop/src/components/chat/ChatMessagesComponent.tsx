@@ -3,19 +3,19 @@ import Markdown from 'react-markdown';
 import Scrollbar from "react-scrollbars-custom";
 import { useGetUserAgentSessionMessages } from "../../hooks/useUserAgentSessionMessage"
 import { useState, useRef, useEffect } from "react";
-import { ChevronRight, Computer, User } from "lucide-react";
+import { ChevronRight, Computer, LoaderIcon, User } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 function ChatMessagesComponent() {
-    const sessionId = useSelector((state: RootState) => state.userAgentSession.sessionId);
+    const { sessionId, messages: sessionMessages, operation } = useSelector((state: RootState) => state.userAgentSession);
     const limit = 10;
     const [page, setPage] = useState(1);
     const [expandedBlocks, setExpandedBlocks] = useState<{ [key: string]: boolean }>({});
     const { data, isLoading, error } = useGetUserAgentSessionMessages(page, limit, sessionId || '');
-    const messages = data?.messages
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messages = [...sessionMessages, ...data?.messages || []]
 
     const nextPage = () => { if (page < (data?.pages || 0)) setPage(page + 1); }
     const prevPage = () => { if (page > 1) setPage(page - 1); }
@@ -77,13 +77,29 @@ function ChatMessagesComponent() {
                 </div>
             )}
 
+            {operation && operation.state == 'running' && (
+                <div className='p-3 border-color border-b flex gap-3'>
+                    <div>
+                        <LoaderIcon className='w-4 h-4 mt-0.5 text-indigo-500 animate-spin' />
+                    </div>
+                    <div className='flex flex-col gap-1'>
+                        <div className='flex justify-between gap-1'>
+                            <p className='text-white text-sm'>Working...</p>
+                            <p className='text-white text-xs'>{operation.iterations.length} out of {operation.max_iterations}</p>
+                        </div>
+                        <p className='text-white text-xs'>Goal: {operation.name}</p>
+                        
+                    </div>
+                </div>
+            )}
+
             {messages && messages?.length > 0 && (
                 <Scrollbar style={{ height: 250 }} className='flex-1 w-full border-b border-color h-full text-sm text-white'>
                     <div className='p-2 space-y-2'>
                         {messages?.map((message) => (
                             <div
                                 key={message._id}
-                                className={`flex`}
+                                className={`flex ${message.role == 'system' ? 'hidden' : ''}`}
                             >
                                 <div className={`flex flex-col gap-2 w-full whitespace-pre-wrap break-words max-w-full overflow-x-hidden`}>
                                     <div className={`rounded-lg px-4 py-2 w-full ${message.role === 'user'
@@ -162,7 +178,7 @@ function ChatMessagesComponent() {
 
             {/* Empty State */}
             {messages?.length === 0 && (
-                <div className="flex-1 flex items-center justify-center p-4">
+                <div className="flex-1 flex items-center justify-center p-4 border-b border-color">
                     <div className="text-center">
                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full highlight-bgg mb-4">
                             <span className="text-2xl">💬</span>

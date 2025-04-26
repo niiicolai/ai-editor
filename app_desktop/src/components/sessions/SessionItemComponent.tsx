@@ -2,7 +2,7 @@ import LoaderIcon from "../../icons/LoaderIcon";
 import { useDestroyUserAgentSession } from "../../hooks/useUserAgentSession";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { setSessionId } from "../../features/userAgentSession";
+import { clearMessages, setOperation, setSessionId } from "../../features/userAgentSession";
 import { UserAgentSessionType } from "../../types/userAgentSessionType";
 
 interface SessionItemComponentProps {
@@ -21,6 +21,7 @@ function SessionItemComponent(props: SessionItemComponentProps) {
       await mutateAsync(_id);
       if (session._id == _id) {
         dispatch(setSessionId(null));
+        dispatch(clearMessages());
       }
     } catch (err) {
       setFormError(err as string);
@@ -48,7 +49,11 @@ function SessionItemComponent(props: SessionItemComponentProps) {
       key={session._id}
     >
       <button
-        onClick={() => dispatch(setSessionId(session._id))}
+        onClick={() => {
+          dispatch(clearMessages());
+          dispatch(setOperation(null));
+          dispatch(setSessionId(session._id));
+        }}
         className={`flex-1 overflow-hidden truncate p-2 text-left flex items-center space-x-3 cursor-pointer hover:bg-gray-700`}
       >
         <div className="flex-1 min-w-0">

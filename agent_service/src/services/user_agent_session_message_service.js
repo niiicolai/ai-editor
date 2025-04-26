@@ -4,6 +4,7 @@ import UserAgentSessionOperation from "../mongodb/models/user_agent_session_oper
 import UserAgentSession from "../mongodb/models/user_agent_session_model.js";
 import User from "../mongodb/models/user_model.js";
 import dto from "../dto/user_agent_session_message_dto.js";
+import operationDto from "../dto/user_agent_session_operation_dto.js";
 import ClientError from '../errors/clientError.js';
 import RootAgent from "../multi_agents/root_agent.js";
 
@@ -108,93 +109,23 @@ export default class UserAgentSessionMessageService {
         const userAgentSession = await UserAgentSession.findOne({ _id: body.userAgentSessionId, user: userId });
         if (!userAgentSession) ClientError.notFound("user agent session not found");
 
-        const lastMessages = await UserAgentSessionMessage
-            .find({ user_agent_session: userAgentSession._id })
-            .limit(5)
-            .sort({ created_at: -1 });
-
         try {
             /**
-             * Setup session title
+             * Create message
              */
-            if (lastMessages.length == 0) {
-                const response = await rootAgent.call({
-                    content: `Based on the following input, select a chat title: ${body?.context?.content}; Output the response in the code field. Be creative. Do not put quotes around the title.`,
-                    role: "system",
-                    messages: [
-                        { role: "developer", content: `The current file is ${body?.context?.currentFile?.name}` },
-                        { role: "developer", content: `The directory state is ${JSON.stringify(body?.context?.directoryInfo)}` },
-                    ]
-                });
-                userAgentSession.title = response.code;
-                await userAgentSession.save();
-            }
-
-            /**
-             * Create user message
-             */
-            const userAgentSessionMessageUser = new UserAgentSessionMessage({
+            const userAgentSessionMessage = new UserAgentSessionMessage({
                 content: body?.context?.content,
+                clientFn: body?.context?.clientFn,
+                code: body?.context?.code,
                 role: body.role,
                 state: "completed",
                 user_files: body.user_files,
                 user_agent_session: userAgentSession._id,
                 user: user._id,
             });
-            await userAgentSessionMessageUser.save();
+            await userAgentSessionMessage.save();
 
-            /**
-             * Create response
-             */
-            const response = await rootAgent.call({
-                content: userAgentSessionMessageUser.content,
-                role: userAgentSessionMessageUser.role,
-                messages: [
-                    ...lastMessages.map(m => {
-                        return { role: m.role, content: m.content }
-                    }),
-                    { role: "developer", content: `The current file is ${body?.context?.currentFile?.name}` },
-                    { role: "developer", content: `The directory state is ${JSON.stringify(body?.context?.directoryInfo)}` },
-                ]
-            });
-
-            /**
-             * Save response
-             */
-            const userAgentSessionMessageAI = new UserAgentSessionMessage({
-                content: response.message,
-                code: response.code,
-                clientFn: response.clientFn,
-                role: "assistant",
-                state: "completed",
-                user_agent_session: userAgentSession._id,
-                user: user._id,
-            });
-            await userAgentSessionMessageAI.save();
-
-            /**
-             * Start operation if the response contains a client function
-             * or update the active operation if any are running.
-             */
-            let activeOperation = await UserAgentSessionOperation.findOne({ state: 'running' });
-            if (!activeOperation) {
-                if (response.clientFn) {
-                    activeOperation = await UserAgentSessionOperation.create({
-                        name: body?.context?.content,
-                        state: 'running',
-                        user_agent_session: userAgentSession._id,
-                        iterations: [{ user_agent_session_message: userAgentSessionMessageAI._id }]
-                    })
-                }
-            } else {
-                activeOperation.iterations.push({ user_agent_session_message: userAgentSessionMessageAI._id });
-                await activeOperation.save();
-            }
-
-            return {
-                msg: await this.find(userAgentSessionMessageUser._id.toString(), userId, fields),
-                response: await this.find(userAgentSessionMessageAI._id.toString(), userId, fields)
-            }
+            return await this.find(userAgentSessionMessage._id.toString(), userId, fields)
         } catch (error) {
             console.error("Error creating user agent session message", error);
             throw new Error("Error creating user agent session message", error);
@@ -287,7 +218,8 @@ export default class UserAgentSessionMessageService {
             }
 
             return {
-                response: await this.find(userAgentSessionMessageAI._id.toString(), userId, fields)
+                response: await this.find(userAgentSessionMessageAI._id.toString(), userId, fields),
+                operation: activeOperation ? operationDto(activeOperation) : null
             }
         } catch (error) {
             console.error("Error creating user agent session message", error);

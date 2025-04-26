@@ -6,8 +6,6 @@ import {
   Info,
   ShoppingBag,
   User,
-  Minimize,
-  ArchiveRestore,
   XIcon,
   Minus,
   Copy,
@@ -19,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useWriteFile } from "../../hooks/useFiles";
 import { setSearchVisible } from "../../features/editorSearch";
 import { useExternalBrowser } from "../../hooks/useExternalBrowser";
+import { useWindow } from "../../hooks/useWindow";
 
 import SearchComponent from "../search/SearchComponent";
 
@@ -26,13 +25,14 @@ function HeaderComponent() {
   const search = useSelector((state: RootState) => state.editorSettings.search);
   const editor = useSelector((state: RootState) => state.editor);
   const { openExternalBrowser } = useExternalBrowser();
+  const win = useWindow();
   const writeFile = useWriteFile();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   return (
     <div className="flex gap-3 justify-between items-center">
-      <div className="flex gap-1 justify-start items-center text-orange-500">
+      <div className="flex-1 flex gap-1 justify-start items-center text-orange-500 draggable-region">
         <Computer className="w-4 h-4" />
       </div>
 
@@ -93,21 +93,21 @@ function HeaderComponent() {
         </button>
         <button
           title="Minimize"
-          onClick={() => openExternalBrowser("http://localhost:5173/user")}
+          onClick={() => win.minimizeWindow()}
           className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm button-main disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Minus className="h-3 w-3" />
         </button>
         <button
           title="Restore"
-          onClick={() => openExternalBrowser("http://localhost:5173/user")}
+          onClick={() => win.restoreWindow()}
           className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm button-main disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Copy className="h-3 w-3" />
         </button>
         <button
           title="Close"
-          onClick={() => openExternalBrowser("http://localhost:5173/user")}
+          onClick={() => win.closeWindow()}
           className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm button-main disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <XIcon className="h-3 w-3" />
