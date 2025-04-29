@@ -11,7 +11,10 @@ const userAgentSessionMessageSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    clientFn: userAgentSessionMessageClientFunctionSchema,
+    clientFn: {
+        type: userAgentSessionMessageClientFunctionSchema,
+        required: false
+    },
     markdown: {
         type: String,
         required: false
@@ -20,11 +23,6 @@ const userAgentSessionMessageSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: ['user', 'assistant', 'system']
-    },
-    state: {
-        type: String,
-        required: true,
-        enum: ['pending', 'read', 'completed', 'error'],
     },
     user_files: [{
         type: mongoose.Schema.Types.ObjectId,

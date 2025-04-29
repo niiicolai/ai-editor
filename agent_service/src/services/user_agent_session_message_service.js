@@ -118,7 +118,6 @@ export default class UserAgentSessionMessageService {
                 clientFn: body?.context?.clientFn,
                 code: body?.context?.code,
                 role: body.role,
-                state: "completed",
                 user_files: body.user_files,
                 user_agent_session: userAgentSession._id,
                 user: user._id,
@@ -126,101 +125,6 @@ export default class UserAgentSessionMessageService {
             await userAgentSessionMessage.save();
 
             return await this.find(userAgentSessionMessage._id.toString(), userId, fields)
-        } catch (error) {
-            console.error("Error creating user agent session message", error);
-            throw new Error("Error creating user agent session message", error);
-        }
-    }
-
-    /**
-     * @function createAgentResponse
-     * @description Create a new user agent session message
-     * @param {object} body - Request body
-     * @param {string} userId - User id
-     * @param {array} fields - Fields to return
-     * @return {Promise<object>} - Created user agent session object
-     */
-    static async createAgentResponse(body, userId, fields = null) {
-        objectValidator(body, "body");
-        stringValidator(body.role, "role");
-        stringValidator(body?.context?.content, "context.content");
-        idValidator(body.userAgentSessionId, "userAgentSessionId");
-        idValidator(userId, "userId");
-
-        const user = await User.findOne({ _id: userId });
-        if (!user) ClientError.notFound("user not found");
-
-        const userAgentSession = await UserAgentSession.findOne({ _id: body.userAgentSessionId, user: userId });
-        if (!userAgentSession) ClientError.notFound("user agent session not found");
-
-        const lastMessages = await UserAgentSessionMessage
-            .find({ user_agent_session: userAgentSession._id })
-            .limit(5)
-            .sort({ created_at: -1 });
-
-        try {
-            const activeOperation = await UserAgentSessionOperation.findOne({ state: 'running' });
-            if (!activeOperation) {
-                return;
-            }
-
-            const userAgentSessionMessageSystem = new UserAgentSessionMessage({
-                content: body?.context?.content,
-                role: "system",
-                state: "completed",
-                user_agent_session: userAgentSession._id,
-                user: user._id,
-            });
-            await userAgentSessionMessageSystem.save();
-
-            const response = await rootAgent.call({
-                content: "You are working on this goal: " + activeOperation.name + "; " + body?.context?.content,
-                role: body.role,
-                messages: [
-                    ...lastMessages.map(m => {
-                        return { role: m.role, content: m.content }
-                    }),
-                    ...body?.context?.messages,
-                ]
-            });
-            console.log("You are working on this goal: " + activeOperation.name + "; " + body?.context?.content)
-
-            if (!response.clientFn) {
-                activeOperation.state = 'completed'
-                await activeOperation.save();
-            }
-
-            const userAgentSessionMessageAI = new UserAgentSessionMessage({
-                content: response.message,
-                code: response.code,
-                clientFn: response.clientFn,
-                role: "assistant",
-                state: "completed",
-                user_agent_session: userAgentSession._id,
-                user: user._id,
-            });
-            await userAgentSessionMessageAI.save();
-
-            activeOperation.iterations.push({ user_agent_session_message: userAgentSessionMessageAI._id });
-            await activeOperation.save();
-
-            if (activeOperation.iterations.length >= activeOperation.max_iterations) {
-                const userAgentSessionMessageAIResult2 = new UserAgentSessionMessage({
-                    content: "Reached active operation iteration max length. Please try again.",
-                    role: "assistant",
-                    state: "completed",
-                    user_agent_session: userAgentSession._id,
-                    user: user._id,
-                });
-                await userAgentSessionMessageAIResult2.save();
-                activeOperation.state = 'completed'
-                await activeOperation.save();
-            }
-
-            return {
-                response: await this.find(userAgentSessionMessageAI._id.toString(), userId, fields),
-                operation: activeOperation ? operationDto(activeOperation) : null
-            }
         } catch (error) {
             console.error("Error creating user agent session message", error);
             throw new Error("Error creating user agent session message", error);

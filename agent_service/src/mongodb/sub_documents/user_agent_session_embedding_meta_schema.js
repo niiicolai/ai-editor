@@ -1,18 +1,14 @@
 import mongoose from 'mongoose';
 
-export const userAgentSessionMessageClientFunctionSchema = new mongoose.Schema({
-    name: {
+export const userAgentSessionEmbeddingMetaSchema = new mongoose.Schema({
+    filename: {
         type: String,
         required: false
     },
-    args: {
+    filepath: {
         type: String,
         required: false
     },
-    result: {
-        type: String,
-        required: false
-    }
 }, {
     timestamps: {
         createdAt: 'created_at',

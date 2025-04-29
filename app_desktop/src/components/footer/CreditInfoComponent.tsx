@@ -6,12 +6,12 @@ function CreditInfoComponent() {
   const { data: creditInfo, isLoading, error } = useGetCreditInfo();
   if (!isAuthorized)
   {
-    return (<div className="main-color text-sm">Unauthorized</div>)
+    return (<div></div>)
   }
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center text-xs">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
     );
@@ -19,7 +19,7 @@ function CreditInfoComponent() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center text-xs">
         <div className="text-red-500 text-center">
           <p className="text-lg">Error loading credit info</p>
           <p className="text-sm mt-2">Please try again later</p>

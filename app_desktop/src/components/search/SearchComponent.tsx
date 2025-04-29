@@ -58,7 +58,7 @@ function SearchComponent() {
 
   return (
     <div className={`relative ${editorSearch.visible ? "" : "hidden"}`}>
-      <div className="fixed w-96 z-50 flex flex-col main-color border-color border-1 main-bgg shadow-md right-3 top-3 h-64">
+      <div className="fixed w-96 z-50 flex flex-col main-color border-color border-1 main-bgg shadow-md left-3 top-3 h-64">
         <div className="flex items-center justify-between gap-1 p-2 border-b border-color">
           <div className="flex-1">
             <form className="flex w-full" onSubmit={onSearch}>

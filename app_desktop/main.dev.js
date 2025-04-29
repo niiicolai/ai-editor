@@ -63,6 +63,13 @@ async function createWindow() {
     event.reply("on-open-folder", result.filePaths[0]);
   });
 
+  ipcMain.on("open-file", async (event) => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ["openFile"],
+    });
+    event.reply("on-open-file", result.filePaths[0]);
+  });
+
   ipcMain.on("read-directory", async (event, dirPath) => {
     try {
       const files = fs.readdirSync(dirPath);
@@ -103,13 +110,9 @@ async function createWindow() {
   });
 
   ipcMain.on("write-dir", async (event, dirPath) => {
-    try {
-      fs.mkdirSync(dirPath, { recursive: true });
-      event.reply("on-write-dir", dirPath);
-    } catch (error) {
-      console.error("Error writing dir:", error);
-      event.reply("on-write-dir", null);
-    }
+    fs.mkdirSync(dirPath, { recursive: true });
+    console.log(dirPath)
+    event.reply("on-write-dir", dirPath);
   });
 
   ipcMain.on("terminal-cmd", async (event, cmd) => {

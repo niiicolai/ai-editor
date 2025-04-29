@@ -10,7 +10,7 @@ import { RootState } from "../store";
 import { useSelector } from "react-redux";
 import { useIsAuthorized } from "../hooks/useUser";
 import { Link } from "react-router-dom";
-import { Lock, Unlock } from "lucide-react";
+import { Lock } from "lucide-react";
 
 function EditorView() {
   const { data: isAuthorized } = useIsAuthorized();
@@ -23,16 +23,15 @@ function EditorView() {
 
   return (
     <div className="flex flex-col justify-between h-screen">
-      <header className="p-2 border-color border-b main-bgg">
-        <HeaderComponent />
-      </header>
+      <HeaderComponent />
+      
       <div className="flex-1 flex flex-col lg:flex-row">
         <div className={`h-full relative main-bgg text-white ${isAuthorized ? 'lg:w-96' : ''}`}>
-          <div className={`h-full flex-1 flex flex-col  ${isAuthorized ? 'lg:w-96' : ''}`}>
+          <div className={`h-full flex-1 flex flex-col ${isAuthorized ? 'lg:w-96' : ''}`}>
             {isAuthorized && sessionId && <ChatComponent />}
             {isAuthorized && !sessionId && <SessionsComponent />}
             {!isAuthorized && (
-              <div className="h-full flex items-center justify-end">
+              <div className={`h-full flex items-center justify-end border-r border-color`}>
                 <Link
                   title="Login"
                   to="/user/login"
@@ -55,9 +54,8 @@ function EditorView() {
 
         <HierarchyComponent />
       </div>
-      <footer className="p-3 border-color border-t main-bgg">
-        <FooterComponent />
-      </footer>
+      
+      <FooterComponent />
     </div>
   );
 }

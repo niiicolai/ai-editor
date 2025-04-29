@@ -12,16 +12,10 @@ export const userSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
-    creditInfo: {
-      totalMaxCredits: {
-        type: Number,
-      },
-      totalUsedCredits: {
-        type: Number,
-      },
-      creditsLeft: {
-        type: Number,
-      },
+    deleted_at: {
+      type: Date,
+      required: false,
+      index: true,
     },
     incomplete_transactions: [
       {
@@ -32,11 +26,6 @@ export const userSchema = new mongoose.Schema(
         },
       },
     ],
-    deleted_at: {
-      type: Date,
-      required: false,
-      index: true,
-    },
   },
   {
     timestamps: {

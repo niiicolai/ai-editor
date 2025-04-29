@@ -1,59 +1,91 @@
-import { ChevronRight, Folder, File } from 'lucide-react';
+import { ChevronRight, Folder, File } from "lucide-react";
 import { FileItemType } from "../../types/directoryInfoType";
+import { useSelectFile } from "../../hooks/useSelectFile";
+import { useDispatch } from "react-redux";
+import { setInspectorMenu } from "../../features/hierarchy";
+import HierarchyNewComponent from "./HierarchyNewComponent";
 
 interface HierarchyComponentProps {
-    file: FileItemType;
-    level: number;
-    currentFile: FileItemType | null;
-    handleFileSelect: (file: FileItemType) => void;
-    getIsOpen: (file: FileItemType) => boolean;
-    getChildren: (file: FileItemType) => FileItemType[];
+  file: FileItemType;
+  level: number;
+  currentFile: FileItemType | null;
+  getIsOpen: (file: FileItemType) => boolean;
+  getChildren: (file: FileItemType) => FileItemType[];
 }
 
-function HierarchyItemComponent({ file, level, currentFile, handleFileSelect, getIsOpen, getChildren }: HierarchyComponentProps) {
-    const children = getChildren(file);
-    const isOpen = getIsOpen(file);
-    const hasChildren = children.length > 0;
+function HierarchyItemComponent({
+  file,
+  level,
+  currentFile,
+  getIsOpen,
+  getChildren,
+}: HierarchyComponentProps) {
+  const dispatch = useDispatch();
+  const selectFile = useSelectFile();
+  const children = getChildren(file);
+  const isOpen = getIsOpen(file);
+  const hasChildren = children.length > 0;
 
-    return (
-        <div>
-            <div
-                className={`flex items-center justify-between highlight-color p-1 hover:bg-gray-800 cursor-pointer text-sm ${currentFile?.path === file.path
-                    ? "bg-gray-800"
-                    : ""
-                    }`}
-                style={{ paddingLeft: `${level * 20}px` }}
-                onClick={() => handleFileSelect(file)}
-            >
-                <span className='flex items-center'>
-                    {file.isDirectory && (
-                        <>
-                            <ChevronRight className={`w-4 h-4 mr-2 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
-                            <Folder className="w-4 h-4 mr-2" />
-                        </>
-                    )}
-
-                    {!file.isDirectory && (<File className="w-4 h-4 mr-2" />)}
-
-                    <span>{file.name}</span>
-                </span>
-            </div>
-
-            {isOpen && hasChildren && (
-                <div>
-                    {children.map(child => <HierarchyItemComponent 
-                        key={child.path}
-                        file={child} 
-                        level={level + 1} 
-                        handleFileSelect={handleFileSelect}
-                        currentFile={currentFile} 
-                        getIsOpen={getIsOpen} 
-                        getChildren={getChildren} 
-                    />)}
-                </div>
-            )}
-        </div>
+  const handleContextMenu = (event: any) => {
+    event.preventDefault();
+    dispatch(
+      setInspectorMenu({
+        x: event.pageX - 150,
+        y: event.pageY,
+        file,
+      })
     );
+  };
+
+  return (
+    <div onContextMenu={handleContextMenu} className="file-item">
+      <div
+        className={`file-item flex items-center justify-between highlight-color p-1 hover:bg-gray-800 cursor-pointer text-sm ${
+          currentFile?.path === file.path ? "bg-gray-800" : ""
+        }`}
+        style={{ paddingLeft: `${level * 20}px` }}
+        onClick={() => selectFile.select(file)}
+      >
+        <span className="flex items-center file-item">
+          {file.isDirectory && (
+            <>
+              <ChevronRight
+                className={`w-4 h-4 mr-2 transition-transform file-item ${
+                  isOpen ? "rotate-90" : ""
+                }`}
+              />
+              <Folder className="w-4 h-4 mr-2 file-item" />
+            </>
+          )}
+
+          {!file.isDirectory && <File className="w-4 h-4 mr-2 file-item" />}
+
+          <span className="file-item">{file.name}</span>
+        </span>
+      </div>
+
+      {isOpen && (
+        <div>
+          <HierarchyNewComponent path={file.path} />
+
+          {hasChildren && (
+            <>
+              {children.map((child) => (
+                <HierarchyItemComponent
+                  key={child.path}
+                  file={child}
+                  level={level + 1}
+                  currentFile={currentFile}
+                  getIsOpen={getIsOpen}
+                  getChildren={getChildren}
+                />
+              ))}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default HierarchyItemComponent;
