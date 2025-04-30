@@ -3,31 +3,33 @@ import { Check } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 
-interface ChatMessagesComponentProps {
+function ChatInputComponent({
+    sendMessage
+}: {
     sendMessage: (content:string) => void;
-}
-
-function ChatInputComponent(props: ChatMessagesComponentProps) {
-    const sessionId = useSelector((state: RootState) => state.userAgentSession.sessionId);
-    const hierarchy = useSelector((state: RootState) => state.hierarchy);
+}) {
+    const { sessionId } = useSelector((state: RootState) => state.userAgentSession);
+    const { currentFile, directoryState } = useSelector((state: RootState) => state.hierarchy);
     const [formError, setFormError] = useState<string | null>(null);
-    const [newMessage, setNewMessage] = useState("");
+    const [content, setContent] = useState("");
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setFormError(null);
 
+        if (!content) return setFormError("message is required");
+
         try {
-            props.sendMessage(JSON.stringify({
+            sendMessage(JSON.stringify({
                 event: 'user_input',
                 data: {
-                    content: newMessage,
-                    currentFile: hierarchy.currentFile,
-                    directoryInfo: hierarchy.directoryState,
+                    content,
+                    currentFile,
+                    directoryInfo: directoryState,
                     user_agent_session_id: sessionId
                 }
             }));
-            setNewMessage("");
+            setContent("");
         } catch (err) {
             setFormError(err as string);
         }
@@ -41,8 +43,8 @@ function ChatInputComponent(props: ChatMessagesComponentProps) {
             <form onSubmit={handleSubmit} className="flex h-full p-1">
                 <input
                     type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
                     placeholder="Type your message..."
                     className="input-main flex-1 border-0 p-2 text-sm rounded-md focus:outline-none focus:border-transparent"
                 />

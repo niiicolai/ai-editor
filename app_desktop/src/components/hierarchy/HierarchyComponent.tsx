@@ -79,7 +79,9 @@ function HierarchyComponent() {
                     level={0}
                     currentFile={currentFile}
                     getChildren={(file: FileItemType) =>
-                      hierarchy.directoryState[file.path]?.files || []
+                      file.isDirectory 
+                      ? hierarchy.directoryState[file.path]?.files || []
+                      : []
                     }
                     getIsOpen={(file: FileItemType) =>
                       hierarchy.directoryState[file.path]?.isOpen

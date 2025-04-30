@@ -1,74 +1,10 @@
 import { XIcon } from "lucide-react";
-import { FileType, TabType } from "../../types/directoryInfoType";
+import { TabType } from "../../types/directoryInfoType";
+import { useTabs } from "../../hooks/useTabs";
 import Scrollbar from "react-scrollbars-custom";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { setFile } from "../../features/editor";
-import { setCurrentFile } from "../../features/hierarchy";
 
 function EditorTabsComponent() {
-  const editor = useSelector((state: RootState) => state.editor);
-  const [tabs, setTabs] = useState<TabType[]>([{ file: editor.file }]);
-  const dispatch = useDispatch();
-
-  const viewTab = (t: TabType) => {
-    dispatch(setFile(t.file))
-    dispatch(setCurrentFile({
-      name: t.file.name,
-      path: t.file.path,
-      isDirectory: false
-    }));
-  };
-
-  const removeTab = (t: TabType) => {
-    let i = 0;
-    for (const tab of tabs) {
-      if (tab.file.name === t.file.name) {
-        tabs.splice(i, 1); // Remove the tab at index i
-        break;
-      }
-      i++;
-    }
-    if (tabs.length === 0) {
-      const dummyFile = {
-        id: "",
-        name: "file",
-        content: "",
-        language: "javascript",
-        path: "",
-      };
-      dispatch(setFile(dummyFile));
-      setTabs([{ file: dummyFile }]);
-    } else {
-      if (editor.file.name === t.file.name) dispatch(setFile(tabs[0].file));
-      setTabs([...tabs]);
-    }
-  };
-
-  const updateTabsOnFileOpen = (file: FileType) => {
-    if (
-      tabs.length === 1 &&
-      tabs[0].file.name === "file" &&
-      tabs[0].file.content === ""
-    ) {
-      setTabs([{ file }]);
-      return;
-    }
-    for (const tab of tabs) {
-      if (tab.file.name === file.name) {
-        viewTab({ file });
-        return;
-      }
-    }
-    setTabs([{ file }, ...tabs]);
-  };
-
-  useEffect(() => {
-    if (editor.file) {
-      updateTabsOnFileOpen(editor.file);
-    }
-  }, [editor.file]);
+  const { tabs, viewTab, removeTab, isActiveTab } = useTabs();
 
   return (
     <div className="flex justify-start main-bgg border-b border-color text-sm h-8 overflow-hidden">
@@ -79,7 +15,7 @@ function EditorTabsComponent() {
               <div
                 key={t.file.id}
                 className={`flex tab justify-center border-r ${
-                    editor.file.name === t.file.name ? "tab-active" : ""
+                  isActiveTab(t) ? "tab-active" : ""
                 }`}
                 style={{ height: "2.2em" }}
               >

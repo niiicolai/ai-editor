@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import { userAgentSessionEmbeddingMetaSchema } from '../sub_documents/user_agent_session_embedding_meta_schema';
+import { userAgentSessionEmbeddingMetaSchema } from '../sub_documents/user_agent_session_embedding_meta_schema.js';
 
 const userAgentSessionEmbeddingSchema = new mongoose.Schema({
     content: {

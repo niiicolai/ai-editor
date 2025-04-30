@@ -7,11 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 
 function EditorCodeComponent() {
+  const { theme } = useSelector((state: RootState) => state.editorSettings);
+  const { file } = useSelector((state: RootState) => state.editor);
   const editorRef = useRef<EditorType.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<Monaco | null>(null);
-  const theme = useSelector((state: RootState) => state.editorSettings.theme);
-  const editorState = useSelector((state: RootState) => state.editor);
-  const file = editorState.file;
   const dispatch = useDispatch();
 
   const handleEditorDidMount: OnMount = (
@@ -33,6 +32,20 @@ function EditorCodeComponent() {
       typeRoots: ["node_modules/@types"],
       reactNamespace: "React",
     });
+
+    // Make the editor resizable on window resize
+    const handleResize = () => {
+      if (editorRef.current) {
+      editorRef.current.layout();
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
 
     // Optional: Add extra type definitions if needed
     // monaco.languages.typescript.typescriptDefaults.addExtraLib(`

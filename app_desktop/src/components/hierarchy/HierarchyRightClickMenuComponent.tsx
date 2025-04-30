@@ -91,8 +91,22 @@ function HierarchyRightClickMenuComponent() {
                 >
                   Edit
                 </button>
+                <button
+                  className="flex-1 w-full text-left p-1 button-main cursor-pointer"
+                  onClick={() => console.log('not implemented')}
+                >
+                  Rename
+                </button>
                 <button className="flex-1 w-full text-left p-1 button-main cursor-pointer">
                   Delete
+                </button>
+              </div>
+              <div className="flex flex-col justify-start items-start text-sm border-b border-color">
+                <button
+                  className="flex-1 w-full text-left p-1 button-main cursor-pointer"
+                  onClick={() => console.log('not implemented')}
+                >
+                  Reveal in explorer
                 </button>
               </div>
             </>

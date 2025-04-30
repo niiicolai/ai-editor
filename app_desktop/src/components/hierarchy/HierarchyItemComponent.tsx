@@ -38,8 +38,9 @@ function HierarchyItemComponent({
   };
 
   return (
-    <div onContextMenu={handleContextMenu} className="file-item">
+    <div>
       <div
+        onContextMenu={handleContextMenu} 
         className={`file-item flex items-center justify-between highlight-color p-1 hover:bg-gray-800 cursor-pointer text-sm ${
           currentFile?.path === file.path ? "bg-gray-800" : ""
         }`}

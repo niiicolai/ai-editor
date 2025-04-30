@@ -4,9 +4,9 @@ import { useGetCreditInfo } from "../../hooks/useUserProduct";
 function CreditInfoComponent() {
   const { data: isAuthorized } = useIsAuthorized();
   const { data: creditInfo, isLoading, error } = useGetCreditInfo();
-  if (!isAuthorized)
-  {
-    return (<div></div>)
+
+  if (!isAuthorized) {
+    return <></>
   }
 
   if (isLoading) {

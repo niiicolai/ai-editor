@@ -6,6 +6,7 @@ import HeaderComponent from "../components/header/HeaderComponent";
 import FooterComponent from "../components/footer/FooterComponent";
 import EditorCodeComponent from "../components/editor/EditorCodeComponent";
 import EditorTabsComponent from "../components/editor/EditorTabsComponent";
+import SearchComponent from "../components/search/SearchComponent";
 import { RootState } from "../store";
 import { useSelector } from "react-redux";
 import { useIsAuthorized } from "../hooks/useUser";
@@ -13,17 +14,13 @@ import { Link } from "react-router-dom";
 import { Lock } from "lucide-react";
 
 function EditorView() {
-  const { data: isAuthorized } = useIsAuthorized();
-  const terminalDisabled = useSelector(
-    (state: RootState) => state.editorSettings.terminal.disabled
-  );
-  const sessionId = useSelector(
-    (state: RootState) => state.userAgentSession.sessionId
-  );
+  const { data: isAuthorized } = useIsAuthorized();  
+  const { sessionId } = useSelector((state: RootState) => state.userAgentSession);
 
   return (
     <div className="flex flex-col justify-between h-screen">
       <HeaderComponent />
+      <SearchComponent />
       
       <div className="flex-1 flex flex-col lg:flex-row">
         <div className={`h-full relative main-bgg text-white ${isAuthorized ? 'lg:w-96' : ''}`}>
@@ -48,7 +45,7 @@ function EditorView() {
           <div className="h-full w-full flex-1 flex flex-col border-r border-color main-bgg">
             <EditorTabsComponent />
             <EditorCodeComponent />
-            {!terminalDisabled && <TerminalComponent />}
+            <TerminalComponent />
           </div>
         </div>
 

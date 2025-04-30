@@ -11,14 +11,18 @@ function UserLoginView() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError(null);
+
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
 
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    if (!email) return setFormError("email is required");
+    if (!password) return setFormError("password is required");
+
     try {
-      await mutateAsync({
-        email: formData.get("email") as string,
-        password: formData.get("password") as string,
-      });
+      await mutateAsync({ email, password });
       navigate("/");
     } catch (err) {
       setFormError("Invalid email or password");

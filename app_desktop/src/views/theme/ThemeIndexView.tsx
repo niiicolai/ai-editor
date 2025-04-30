@@ -4,18 +4,15 @@ import { editorSettingsActions } from "../../features/editorSettings";
 import { RootState } from "../../store";
 import { Check, XIcon } from "lucide-react";
 
-const themes = [
-  { id: "vs-light", name: "Light" },
-  { id: "vs-dark", name: "Dark" },
-  { id: "hc-light", name: "High Contrast Light" },
-  { id: "hc-black", name: "High Contrast Dark" },
-];
-
 function ThemeIndexView() {
   const dispatch = useDispatch();
-  const editorSettings = useSelector(
-    (state: RootState) => state.editorSettings
-  );
+  const editorSettings = useSelector((state: RootState) => state.editorSettings);
+  const themes = [
+    { id: "vs-light", name: "Light" },
+    { id: "vs-dark", name: "Dark" },
+    { id: "hc-light", name: "High Contrast Light" },
+    { id: "hc-black", name: "High Contrast Dark" },
+  ];
 
   return (
     <div className="flex min-h-screen main-bgg main-color p-6">

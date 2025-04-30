@@ -4,6 +4,7 @@ import { useWebsocket } from "../../hooks/useWebsocket";
 import { RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
 import { setSessionId } from "../../features/userAgentSession";
+import { LoaderIcon } from "lucide-react";
 
 function ChatComponent() {
     const sessionId = useSelector((state: RootState) => state.userAgentSession.sessionId);
@@ -39,7 +40,7 @@ function ChatComponent() {
 
             {connectionStatus == 'Connecting' && (
                 <div className="h-12 flex items-center justify-center border-r border-color">
-                    Connecting...
+                    <LoaderIcon className="w-4 h-4" />
                 </div>
             )}
 
