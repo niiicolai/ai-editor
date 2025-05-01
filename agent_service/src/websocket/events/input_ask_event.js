@@ -4,9 +4,9 @@ import UserAgentSessionMessageService from "../../services/user_agent_session_me
 import UserAgentSessionOperationService from "../../services/user_agent_session_operation_service.js";
 import AgentService from "../../services/agent_service.js";
 
-export default class UserInputEvent extends WebsocketEvent {
+export default class InputAskEvent extends WebsocketEvent {
   constructor() {
-    super("user_input");
+    super("input_ask");
   }
 
   async execute(connection, reply, data) {
@@ -19,10 +19,15 @@ export default class UserInputEvent extends WebsocketEvent {
       return;
     }
 
-    console.log(data)
-
     const sessionId = connection.userData.sessionId;
     const userId = connection.userData.user._id;
+
+    const content = data.content;
+    const currentFile = data.currentFile;
+    const focusFiles = data.focusFiles;
+    const directoryInfo = data.directoryInfo;
+
+    console.log(data)
 
     const lastMessages = await UserAgentSessionMessageService.findAll(
       sessionId,
@@ -34,7 +39,7 @@ export default class UserInputEvent extends WebsocketEvent {
     const userAgentSessionMessionInput =
       await UserAgentSessionMessageService.create(
         {
-          context: data,
+          context: { content, currentFile, focusFiles, directoryInfo },
           role: "user",
           userAgentSessionId: sessionId,
         },
@@ -48,7 +53,7 @@ export default class UserInputEvent extends WebsocketEvent {
      */
     if (lastMessages.messages.length == 0) {
       const titleResponse = await AgentService.noFuncPrompt(
-        `Based on the following input, select a chat title: ${data?.content}; Be creative. Do not put quotes around the title.`,
+        `Based on the following input, select a chat title: ${content}; Be creative. Do not put quotes around the title.`,
         "user",
         [
           ...lastMessages.messages.map((m) => {
@@ -56,18 +61,18 @@ export default class UserInputEvent extends WebsocketEvent {
           }),
           {
             role: "developer",
-            content: `The current file is ${data?.currentFile?.name}`,
+            content: `The current file is ${currentFile?.name}`,
           },
           {
             role: "developer",
             content: `The directory state is ${JSON.stringify(
-              data?.directoryInfo
+              directoryInfo
             )}`,
           },
           {
             role: "developer",
             content: `The user want you to focus on ${JSON.stringify(
-              data?.focusFiles
+              focusFiles
             )}`,
           },
         ]
@@ -84,24 +89,24 @@ export default class UserInputEvent extends WebsocketEvent {
     /**
      * Create agent message
      */
-    const agentResponse = await AgentService.prompt(data?.content, "user", [
+    const agentResponse = await AgentService.noFuncPrompt(content, "user", [
       ...lastMessages.messages.map((m) => {
         return { role: m.role, content: m.content };
       }),
       {
         role: "developer",
-        content: `The current file is ${data?.currentFile?.name}`,
+        content: `The current file is ${currentFile?.name}`,
       },
       {
         role: "developer",
         content: `The directory state is ${JSON.stringify(
-          data?.directoryInfo
+          directoryInfo
         )}`,
       },
       {
         role: "developer",
         content: `The user want you to focus on ${JSON.stringify(
-          data?.focusFiles
+          focusFiles
         )}`,
       },
     ]);
@@ -118,69 +123,6 @@ export default class UserInputEvent extends WebsocketEvent {
         },
         userId
       );
-
-    /**
-     * Start operation if the response contains a client function
-     * or update the active operation if any are running.
-     */
-    const operations = await UserAgentSessionOperationService.findAll(
-      1,
-      10,
-      sessionId,
-      userId,
-      "running"
-    );
-    let operation = operations.total > 0 ? operations.operations[0] : null;
-    if (operation) {
-      operation = await UserAgentSessionOperationService.update(
-        operation._id.toString(),
-        {
-          state:
-            operation.iterations.length + 1 >= operation.max_iterations
-              ? "completed"
-              : "running",
-          iterations: [
-            ...operation.iterations,
-            { user_agent_session_message: userAgentSessionMessionAgent._id },
-          ],
-        },
-        userId
-      );
-      reply("session_operation", operation);
-    } else if (agentResponse.clientFn) {
-        const goalResponse = await AgentService.noFuncPrompt(
-            `Make a very short description of my goal: ${data?.content}; Do not put quotes around the description.`,
-            "user",
-            [
-              ...lastMessages.messages.map((m) => {
-                return { role: m.role, content: m.content };
-              }),
-              {
-                role: "developer",
-                content: `The current file is ${data?.currentFile?.name}`,
-              },
-              {
-                role: "developer",
-                content: `The directory state is ${JSON.stringify(
-                  data?.directoryInfo
-                )}`,
-              },
-            ]
-          );
-      operation = await UserAgentSessionOperationService.create(
-        {
-          name: goalResponse.content,
-          state: "running",
-          max_iterations: 5,
-          iterations: [
-            { user_agent_session_message: userAgentSessionMessionAgent._id },
-          ],
-        },
-        sessionId,
-        userId
-      );
-      reply("session_operation", operation);
-    }
 
     reply("user_input_reply", userAgentSessionMessionAgent);
   }

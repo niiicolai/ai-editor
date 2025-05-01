@@ -10,6 +10,12 @@ import { setInspectorMenu } from "../../features/hierarchy";
 import editorNoFiles from "../../assets/editorNoFiles.png";
 import HierarchyRightClickMenuComponent from "./HierarchyRightClickMenuComponent";
 import HierarchyRenameComponent from "./HierarchyRenameComponent";
+import { useEffect } from "react";
+import { setIsLoading as setIsLoadingIndex, setItems, setMeta } from "../../features/projectIndex";
+import { useReadFile } from "../../hooks/useReadFile";
+import { ProjectIndexItemClassType, ProjectIndexItemFunctionType, ProjectIndexItemType, ProjectIndexItemVarType } from "../../types/projectIndexType";
+import { useParseFileContent } from "../../hooks/useParseFileContent";
+import { useHash } from "../../hooks/useHash";
 
 function HierarchyComponent() {
   const dispatch = useDispatch();
@@ -17,10 +23,14 @@ function HierarchyComponent() {
     (state: RootState) => state.editorSettings
   );
   const hierarchy = useSelector((state: RootState) => state.hierarchy);
+  const projectIndex = useSelector((state: RootState) => state.projectIndex);
   const { minimized: isMinimized } = editorSettings.hierarchy;
   const { currentFile, currentPath, directoryState } = hierarchy;
   const currentFolder = currentPath ? currentPath.split("\\").pop() || "" : "";
   const hasFiles = currentPath && directoryState[currentPath]?.files.length > 0;
+  const readFile = useReadFile();
+  const parseFile = useParseFileContent();
+  const hash = useHash();
 
   const handleContextMenu = (event: any) => {
     event.preventDefault();
@@ -33,6 +43,51 @@ function HierarchyComponent() {
       })
     );
   };
+
+  const handleIndexing = async () => {
+    dispatch(setIsLoadingIndex(true))
+    if (currentPath && projectIndex.meta?.name != currentPath) {      
+      dispatch(setMeta({ name: currentPath, _id: null }))
+    }
+
+    const newItems = {} as ProjectIndexItemType;
+    for (const key in hierarchy.directoryState) {
+      const files = hierarchy.directoryState[key]
+        .files
+        .filter((f:FileItemType) => !f.isDirectory);
+
+      for (const f of files) {
+        if (projectIndex.items[f.path]) continue;
+        const data = await readFile.read(f);
+        const parsedData = await parseFile.parse(data?.content || '', data?.language || '')
+        const hashCode = hash.hash(data?.content || '', 'sha256')
+        newItems[f.path] = {
+          _id: "",
+          name: f.name,
+          lines: parsedData?.lines || 0,
+          language: data?.language || "",
+          hashCode: hashCode,
+          description: parsedData?.description || "",
+          functions: parsedData?.functions as ProjectIndexItemFunctionType[] ?? [],
+          classes: parsedData?.classes as ProjectIndexItemClassType[] ?? [],
+          vars: parsedData?.vars as ProjectIndexItemVarType[] ?? [],
+        }
+      }
+    }
+    dispatch(setItems({
+      ...projectIndex.items,
+      ...newItems
+    }))
+    dispatch(setIsLoadingIndex(false))
+  }
+
+  useEffect(() => {
+    if (currentPath && Object.entries(directoryState).length > 0) {
+      handleIndexing();
+    }
+  }, [currentPath, directoryState])
+
+  console.log(projectIndex, hierarchy)
 
   if (isMinimized) {
     return (
@@ -49,6 +104,7 @@ function HierarchyComponent() {
       </div>
     );
   }
+  
 
   return (
     <div className="h-full h-64 lg:w-64 flex flex-col justify-between main-bgg text-white">

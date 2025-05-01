@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { editorSettingsActions } from "../../features/editorSettings";
 import { RootState } from "../../store";
 import { Check, XIcon } from "lucide-react";
+import Scrollbar from "react-scrollbars-custom";
 
 function ThemeIndexView() {
   const dispatch = useDispatch();
@@ -15,8 +16,8 @@ function ThemeIndexView() {
   ];
 
   return (
-    <div className="flex min-h-screen main-bgg main-color p-6">
-      <div className="w-full">
+    <Scrollbar className="flex min-h-screen main-bgg main-color">
+      <div className="w-full p-6">
         <div className="secondary-bgg border border-color shadow overflow-hidden sm:rounded-lg">
           <div className="px-4 py-5 sm:px-6">
             <div className="flex justify-between items-center">
@@ -54,7 +55,7 @@ function ThemeIndexView() {
           ))}
         </div>
       </div>
-    </div>
+    </Scrollbar>
   );
 }
 

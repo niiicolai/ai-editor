@@ -4,9 +4,9 @@ import UserAgentSessionMessageService from "../../services/user_agent_session_me
 import UserAgentSessionOperationService from "../../services/user_agent_session_operation_service.js";
 import AgentService from "../../services/agent_service.js";
 
-export default class UserInputEvent extends WebsocketEvent {
+export default class InputDeepResearchEvent extends WebsocketEvent {
   constructor() {
-    super("user_input");
+    super("input_deep_research");
   }
 
   async execute(connection, reply, data) {

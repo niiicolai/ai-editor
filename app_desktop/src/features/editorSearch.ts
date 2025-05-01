@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const editorSearchSlice = createSlice({
-  name: "editor",
+  name: "editorSearch",
   initialState: {
     visible: false,
   },

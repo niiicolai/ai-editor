@@ -3,6 +3,7 @@ import TabSizeOptionsComponent from "./TabSizeOptionsComponent";
 import LanguageOptionsComponent from "./LanguageOptionsComponent";
 import FolderOptionComponent from "./FolderOptionComponent";
 import ThemeOptionComponent from "./ThemeOptionComponent";
+import IndexingComponent from "./IndexingComponent";
 
 function FooterComponent() {
 
@@ -14,6 +15,7 @@ function FooterComponent() {
         </div>
         
         <div className="flex flex-row justify-start items-center gap-3 text-xs highlight-color">
+          <IndexingComponent />
           <FolderOptionComponent />
           <TabSizeOptionsComponent />
           <LanguageOptionsComponent />

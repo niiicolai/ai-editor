@@ -1,21 +1,19 @@
-import { useQueryClient } from '@tanstack/react-query';
+
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+import TokenService from '../services/tokenService';
 import { useState, useEffect } from 'react';
 import { useTerminal } from './useTerminal';
 import { useFiles } from './useFiles';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
-import TokenService from '../services/tokenService';
 import { useDispatch } from 'react-redux';
 import { addMessage, setOperation } from '../features/userAgentSession';
 import { UserAgentSessionMessageType } from '../types/userAgentSessionMessageType';
 import { UserAgentSessionOperationType } from '../types/userAgentSessionOperationType';
 
-
 export const useWebsocket = (sessionId: string) => {
     const terminal = useTerminal();
     const files = useFiles();
-    const [messageHistory, setMessageHistory] = useState<any>([]);
+    const [messageHistory] = useState<any>([]);
     const { sendMessage, lastMessage, readyState } = useWebSocket('ws://localhost:4001', { protocols: "echo-protocol" });
-    const queryClient = useQueryClient();
     const dispatch = useDispatch();
 
 

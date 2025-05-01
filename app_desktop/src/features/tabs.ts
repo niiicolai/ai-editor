@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { TabType, TabMenuType } from '../types/directoryInfoType';
+import { TabType, TabMenuType } from '../types/fileTabType';
 
 export interface Tabs {
     tabs: TabType[];

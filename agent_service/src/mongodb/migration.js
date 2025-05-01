@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 import fs from "fs";
 import path from "path";
 
-import MigrationModel from "./models/migration.js";
+import MigrationModel from "./models/migration_model.js";
 
 const migrationTemplate = (name) => `import { Migration } from "../migration.js";
 

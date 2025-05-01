@@ -18,9 +18,11 @@ import editor from './features/editor';
 import terminals from './features/terminals';
 import terminalSettings from './features/terminalSettings';
 import tabs from './features/tabs';
+import projectIndex from './features/projectIndex';
 
 const store = configureStore({
     reducer: {
+        projectIndex,
         userAgentSession,
         shortcuts,
         editorSearch,

@@ -1,10 +1,10 @@
 import { XIcon } from "lucide-react";
-import { TabType } from "../../types/directoryInfoType";
+import { TabType } from "../../types/fileTabType";
 import { useFileTabs } from "../../hooks/useFileTabs";
-import Scrollbar from "react-scrollbars-custom";
 import { setInspectorMenu } from "../../features/tabs";
 import { useDispatch } from "react-redux";
 import EditorTabsRightClickMenuComponent from "./EditorTabsRightClickMenuComponent";
+import Scrollbar from "react-scrollbars-custom";
 
 function EditorTabsComponent() {
   const { tabs, viewTab, removeTab, isActiveTab, useEffectUpdateTabs } = useFileTabs();

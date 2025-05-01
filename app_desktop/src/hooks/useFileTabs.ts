@@ -2,9 +2,10 @@ import { useEffect } from "react";
 import { setFile } from "../features/editor";
 import { setCurrentFile } from "../features/hierarchy";
 import { useDispatch, useSelector } from "react-redux";
-import { FileType, TabType } from "../types/directoryInfoType";
+import { TabType } from "../types/fileTabType";
 import { RootState } from "../store";
 import { setTabs } from "../features/tabs";
+import { FileType } from "../types/editorFileType";
 
 export const useFileTabs = () => {
   const { tabs } = useSelector((state: RootState) => state.tabs);

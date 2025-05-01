@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { FileType } from "../types/directoryInfoType";
+import { FileType } from "../types/editorFileType";
 
 export interface Editor {
   file: FileType;

@@ -163,6 +163,12 @@ function HierarchyRightClickMenuComponent() {
             >
               Add directory
             </button>
+            <button
+              className="flex-1 w-full text-left p-1 button-main cursor-pointer"
+              onClick={() => console.log('not implemented')}
+            >
+              Add AI Ignore File
+            </button>
           </div>
         </div>
       )}
