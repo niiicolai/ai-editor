@@ -1,18 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { setFile } from "../features/editor";
 import { setCurrentFile } from "../features/hierarchy";
 import { useDispatch, useSelector } from "react-redux";
 import { FileType, TabType } from "../types/directoryInfoType";
 import { RootState } from "../store";
+import { setTabs } from "../features/tabs";
 
-export const useTabs = () => {
+export const useFileTabs = () => {
+  const { tabs } = useSelector((state: RootState) => state.tabs);
   const editor = useSelector((state: RootState) => state.editor);
-  const [tabs, setTabs] = useState<TabType[]>([{ file: editor.file }]);
   const dispatch = useDispatch();
 
   const isActiveTab = (t: TabType) => {
     return editor.file.name === t.file.name;
   }
+
+  const closeActiveTab = () => {
+    const activeTab = tabs.find((t) => isActiveTab(t));
+    if (activeTab) {
+      removeTab(activeTab);
+    }
+  };
 
   const viewTab = (t: TabType) => {
     dispatch(setFile(t.file));
@@ -27,14 +35,15 @@ export const useTabs = () => {
 
   const removeTab = (t: TabType) => {
     let i = 0;
-    for (const tab of tabs) {
+    const newTabs = [...tabs];
+    for (const tab of newTabs) {
       if (tab.file.name === t.file.name) {
-        tabs.splice(i, 1); // Remove the tab at index i
+        newTabs.splice(i, 1); // Remove the tab at index i
         break;
       }
       i++;
     }
-    if (tabs.length === 0) {
+    if (newTabs.length === 0) {
       const dummyFile = {
         id: "",
         name: "file",
@@ -43,10 +52,10 @@ export const useTabs = () => {
         path: "",
       };
       dispatch(setFile(dummyFile));
-      setTabs([{ file: dummyFile }]);
+      dispatch(setTabs([{ file: dummyFile }]));
     } else {
-      if (editor.file.name === t.file.name) dispatch(setFile(tabs[0].file));
-      setTabs([...tabs]);
+      if (editor.file.name === t.file.name) dispatch(setFile(newTabs[0].file));
+      dispatch(setTabs([...newTabs]));
     }
   };
 
@@ -56,7 +65,7 @@ export const useTabs = () => {
       tabs[0].file.name === "file" &&
       tabs[0].file.content === ""
     ) {
-      setTabs([{ file }]);
+      dispatch(setTabs([{ file }]));
       return;
     }
     for (const tab of tabs) {
@@ -65,14 +74,16 @@ export const useTabs = () => {
         return;
       }
     }
-    setTabs([{ file }, ...tabs]);
+    dispatch(setTabs([{ file }, ...tabs]));
   };
 
-  useEffect(() => {
-    if (editor.file) {
-      updateTabsOnFileOpen(editor.file);
-    }
-  }, [editor.file]);
+  const useEffectUpdateTabs = () => {
+    useEffect(() => {
+      if (editor.file) {
+        updateTabsOnFileOpen(editor.file);
+      }
+    }, [editor.file]);
+  }
 
-  return { viewTab, removeTab, isActiveTab, tabs }
+  return { viewTab, removeTab, isActiveTab, useEffectUpdateTabs, closeActiveTab, tabs }
 };

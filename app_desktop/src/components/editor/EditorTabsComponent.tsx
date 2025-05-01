@@ -1,13 +1,32 @@
 import { XIcon } from "lucide-react";
 import { TabType } from "../../types/directoryInfoType";
-import { useTabs } from "../../hooks/useTabs";
+import { useFileTabs } from "../../hooks/useFileTabs";
 import Scrollbar from "react-scrollbars-custom";
+import { setInspectorMenu } from "../../features/tabs";
+import { useDispatch } from "react-redux";
+import EditorTabsRightClickMenuComponent from "./EditorTabsRightClickMenuComponent";
 
 function EditorTabsComponent() {
-  const { tabs, viewTab, removeTab, isActiveTab } = useTabs();
+  const { tabs, viewTab, removeTab, isActiveTab, useEffectUpdateTabs } = useFileTabs();
+  const dispatch = useDispatch();
+
+  const handleContextMenu = (event: any, tab: TabType) => {
+    event.preventDefault();
+    dispatch(
+      setInspectorMenu({
+        x: event.pageX,
+        y: event.pageY,
+        tab,
+      })
+    );
+  };
+
+  useEffectUpdateTabs();
 
   return (
     <div className="flex justify-start main-bgg border-b border-color text-sm h-8 overflow-hidden">
+      <EditorTabsRightClickMenuComponent />
+      
       <Scrollbar className="overflow-hidden w-full h-full hide-y-scrollbar">
         <div className="flex justify-start h-full hide-y-scrollbar">
           {tabs &&
@@ -18,6 +37,7 @@ function EditorTabsComponent() {
                   isActiveTab(t) ? "tab-active" : ""
                 }`}
                 style={{ height: "2.2em" }}
+                onContextMenu={(e: any) => handleContextMenu(e, t)}
               >
                 <button
                   title={t.file.path}

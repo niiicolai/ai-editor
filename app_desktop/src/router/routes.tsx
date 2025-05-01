@@ -1,9 +1,13 @@
 
 import EditorView from '../views/EditorView';
 import ThemeIndexView from '../views/theme/ThemeIndexView';
+import ShortcutIndexView from '../views/shortcut/ShortcutIndexView';
+import ExtensionIndexView from '../views/extensions/ExtensionIndexView';
 
 import UserLoginView from '../views/user/UserLoginView';
 import UserCreateView from '../views/user/UserCreateView';
+
+import NotFoundView from '../views/error/NotFoundView';
 
 export const routes = [
   {
@@ -11,8 +15,24 @@ export const routes = [
     element: <EditorView />,
   },
   {
+    path: "*",
+    element: <NotFoundView />,
+  },
+  {
     path: "/themes",
     element: <ThemeIndexView />,
+  },
+  {
+    path: "/shortcuts",
+    element: <ShortcutIndexView />,
+  },
+
+  /**
+   * Extension routes
+   */
+  {
+    path: "/extensions",
+    element: <ExtensionIndexView />,
   },
 
   /**

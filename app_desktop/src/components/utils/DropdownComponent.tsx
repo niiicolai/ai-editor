@@ -33,11 +33,11 @@ export default function DropdownComponent({
 
   return (
     <div id={`drop-down-${id}`} className="relative">
-      <button className="p-1 button-main" id={`drop-down-button-${id}`} onClick={() => setIsOpen(!isOpen)}>
+      <button className="button-main" id={`drop-down-button-${id}`} onClick={() => setIsOpen(!isOpen)}>
         {buttonText}
       </button>
       {isOpen && (
-        <div id={`drop-down-slot-${id}`} className={`fixed main-bgg text-sm main-color text-white shadow-md rounded-md top-10 border border-color z-50  ${className}`}>
+        <div id={`drop-down-slot-${id}`} className={`fixed main-bgg text-sm main-color text-white shadow-md rounded-md border border-color z-50 ${className}`}>
           {slot}
         </div>
       )}

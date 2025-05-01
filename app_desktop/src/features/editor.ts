@@ -3,6 +3,8 @@ import { FileType } from "../types/directoryInfoType";
 
 export interface Editor {
   file: FileType;
+  tabSize: number;
+  nextEditorCommand: string | null;
 }
 
 const editorSlice = createSlice({
@@ -15,13 +17,21 @@ const editorSlice = createSlice({
       language: "javascript",
       path: "",
     },
+    tabSize: 4,
+    nextEditorCommand: null,
   } as Editor,
   reducers: {
     setFile: (state: any, action: PayloadAction<FileType>) => {
       state.file = action.payload;
     },
+    setTabSize: (state: any, action: PayloadAction<number>) => {
+      state.tabSize = action.payload;
+    },
+    setNextEditorCommand: (state: any, action: PayloadAction<string | null>) => {
+      state.nextEditorCommand = action.payload;
+    },
   },
 });
 
-export const { setFile } = editorSlice.actions;
+export const { setFile, setTabSize, setNextEditorCommand } = editorSlice.actions;
 export default editorSlice.reducer;

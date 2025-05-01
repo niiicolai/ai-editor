@@ -1,9 +1,22 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSearchVisible } from "../../features/editorSearch";
 import DropdownComponent from "../utils/DropdownComponent";
+import { RootState } from "../../store";
+import { useHotkeys } from "react-hotkeys-hook";
+import { setNextEditorCommand } from "../../features/editor";
 
 function EditOptionsComponent() {
+  const shortcuts = useSelector((state: RootState) => state.shortcuts);
   const dispatch = useDispatch();
+  const handleFind = () => dispatch(setSearchVisible(true));
+  const exeEditorCmd = (cmd:string) => dispatch(setNextEditorCommand(cmd));
+  useHotkeys(shortcuts.find.join('+'), () => handleFind(), {}, [handleFind])
+  //useHotkeys(shortcuts.copy.join('+'), () => exeEditorCmd('copy'), {}, [exeEditorCmd])
+  //useHotkeys(shortcuts.paste.join('+'), () => exeEditorCmd('paste'), {}, [exeEditorCmd])
+  //useHotkeys(shortcuts.cut.join('+'), () => exeEditorCmd('cut'), {}, [exeEditorCmd])
+  //useHotkeys(shortcuts.undo.join('+'), () => exeEditorCmd('undo'), {}, [exeEditorCmd])
+  //useHotkeys(shortcuts.redo.join('+'), () => exeEditorCmd('redo'), {}, [exeEditorCmd])
+  //useHotkeys(shortcuts.select_all.join('+'), () => exeEditorCmd('select-all'), {}, [exeEditorCmd])
 
   return (
     <DropdownComponent
@@ -13,42 +26,48 @@ function EditOptionsComponent() {
       slot={
         <>
           <button
-            onClick={() => console.log("not implemented")}
-            className="button-main w-full text-left px-2 py-1"
+            onClick={() => exeEditorCmd('undo')}
+            className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
-            Undo
+            <span>Undo</span>
+            <span>{shortcuts.undo.join(' + ')}</span>
           </button>
           <button
-            onClick={() => console.log("not implemented")}
-            className="button-main w-full text-left px-2 py-1"
+            onClick={() => exeEditorCmd('redo')}
+            className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
-            Redo
-          </button>
-          <hr className="border-color" />
-          <button
-            onClick={() => console.log("not implemented")}
-            className="button-main w-full text-left px-2 py-1"
-          >
-            Cut
-          </button>
-          <button
-            onClick={() => console.log("not implemented")}
-            className="button-main w-full text-left px-2 py-1"
-          >
-            Copy
-          </button>
-          <button
-            onClick={() => console.log("not implemented")}
-            className="button-main w-full text-left px-2 py-1"
-          >
-            Paste
+            <span>Redo</span>
+            <span>{shortcuts.redo.join(' + ')}</span>
           </button>
           <hr className="border-color" />
           <button
-            onClick={() => dispatch(setSearchVisible(true))}
-            className="button-main w-full text-left px-2 py-1"
+            onClick={() => exeEditorCmd('cut')}
+            className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
-            Find
+            <span>Cut</span>
+            <span>{shortcuts.cut.join(' + ')}</span>
+          </button>
+          <button
+            onClick={() => exeEditorCmd('copy')}
+            className="button-main w-full text-left px-2 py-1 flex justify-between"
+          >
+            <span>Copy</span>
+            <span>{shortcuts.copy.join(' + ')}</span>
+          </button>
+          <button
+            onClick={() => exeEditorCmd('paste')}
+            className="button-main w-full text-left px-2 py-1 flex justify-between"
+          >
+            <span>Paste</span>
+            <span>{shortcuts.paste.join(' + ')}</span>
+          </button>
+          <hr className="border-color" />
+          <button
+            onClick={() => handleFind()}
+            className="button-main w-full text-left px-2 py-1 flex justify-between"
+          >
+            <span>Find</span>
+            <span>{shortcuts.find.join(' + ')}</span>
           </button>
         </>
       }

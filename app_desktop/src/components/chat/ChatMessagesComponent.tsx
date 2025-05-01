@@ -1,5 +1,6 @@
 import Scrollbar from "react-scrollbars-custom";
 import ChatMessageItemComponent from "./ChatMessageItemComponent";
+import editorNoMessages from "../../assets/editorNoMessages.png";
 import { useGetUserAgentSessionMessages as useGetMessages } from "../../hooks/useUserAgentSessionMessage";
 import { useRef, useEffect } from "react";
 import { LoaderIcon } from "lucide-react";
@@ -101,14 +102,13 @@ function ChatMessagesComponent() {
 
       {messages?.length === 0 && (
         <div className="flex-1 flex items-center justify-center p-4 border-b border-color">
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full highlight-bgg mb-4">
-              <span className="text-2xl">💬</span>
-            </div>
-            <h3 className="text-lg font-medium text-gray-100 mb-2">
+          <div className="text-center flex flex-col justify-center items-center">
+            <img src={editorNoMessages} className="w-36" />
+
+            <h3 className="text-lg font-medium main-color mb-2">
               No messages yet
             </h3>
-            <p className="text-sm text-gray-200">
+            <p className="text-sm main-color">
               Start a conversation with the AI assistant
             </p>
           </div>

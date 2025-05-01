@@ -17,10 +17,17 @@ import FeaturesIndexView from '../views/features/FeaturesIndexView';
 
 import PricingIndexView from '../views/pricing/PricingIndexView';
 
+import NotFoundView from '../views/error/NotFoundView';
+
 export const routes = [
   {
     path: "/",
     element: <HomeView />,
+  },
+
+  {
+    path: "*",
+    element: <NotFoundView />,
   },
 
   /**

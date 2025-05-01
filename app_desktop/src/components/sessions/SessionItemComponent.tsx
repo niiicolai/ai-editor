@@ -1,7 +1,7 @@
 import { useDestroyUserAgentSession } from "../../hooks/useUserAgentSession";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { clearMessages, setOperation, setSessionId } from "../../features/userAgentSession";
+import { clearMessages, setOperation, setSessionId, setSessionTitle } from "../../features/userAgentSession";
 import { UserAgentSessionType } from "../../types/userAgentSessionType";
 import { XIcon, LoaderIcon } from "lucide-react";
 
@@ -21,6 +21,7 @@ function SessionItemComponent({
       await mutateAsync(_id);
       if (session._id == _id) {
         dispatch(setSessionId(null));
+        dispatch(setSessionTitle(null));
         dispatch(clearMessages());
       }
     } catch (err) {
@@ -32,6 +33,7 @@ function SessionItemComponent({
     dispatch(clearMessages());
     dispatch(setOperation(null));
     dispatch(setSessionId(session._id));
+    dispatch(setSessionTitle(session.title));
   };
 
   if (formError || error) {

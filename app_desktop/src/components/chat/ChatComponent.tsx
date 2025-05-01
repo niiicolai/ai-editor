@@ -3,23 +3,27 @@ import ChatInputComponent from "./ChatInputComponent";
 import { useWebsocket } from "../../hooks/useWebsocket";
 import { RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
-import { setSessionId } from "../../features/userAgentSession";
+import { setSessionId, setSessionTitle } from "../../features/userAgentSession";
 import { LoaderIcon } from "lucide-react";
 
 function ChatComponent() {
-    const sessionId = useSelector((state: RootState) => state.userAgentSession.sessionId);
+    const { sessionId, sessionTitle } = useSelector((state: RootState) => state.userAgentSession);
     const { leaveSession, connectionStatus, sendMessage } = useWebsocket(sessionId || '');
     const dispatch = useDispatch();
     const handleToggleSessions = () => {
         dispatch(setSessionId(null));
+        dispatch(setSessionTitle(null));
         leaveSession();
     }
 
     return (
         <>
-            {/* Header */}
             <div className="border-b border-r border-color main-bgg text-white h-8">
-                <div className="flex items-center justify-end p-1.5">
+                <div className="flex items-center justify-between p-1.5">
+                    <div className="text-xs main-color pl-1 w-64 overflow-hidden truncate ... flex-1">
+                        {sessionTitle}
+                    </div>
+
                     <div className="flex gap-1 items-center justify-center">
                         <button
                             onClick={() => handleToggleSessions()}

@@ -1,6 +1,6 @@
+import HierarchyComponent from "../components/hierarchy/HierarchyComponent";
 import ChatComponent from "../components/chat/ChatComponent";
 import SessionsComponent from "../components/sessions/SessionsComponent";
-import HierarchyComponent from "../components/hierarchy/HierarchyComponent";
 import TerminalComponent from "../components/terminal/TerminalComponent";
 import HeaderComponent from "../components/header/HeaderComponent";
 import FooterComponent from "../components/footer/FooterComponent";

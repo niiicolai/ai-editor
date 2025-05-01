@@ -6,12 +6,20 @@ import {
   setDirectoryState,
   setInspectorMenu,
   setNewFileItem,
+  setRenameFileItem,
 } from "../../features/hierarchy";
+import { File, Folder } from "lucide-react";
+import { FileItemType } from "../../types/directoryInfoType";
+import { useFocusFiles } from "../../hooks/useFocusFiles";
 
 function HierarchyRightClickMenuComponent() {
   const hierarchy = useSelector((state: RootState) => state.hierarchy);
+  const { sessionId } = useSelector(
+    (state: RootState) => state.userAgentSession
+  );
   const selectFile = useSelectFile();
   const dispatch = useDispatch();
+  const focusFiles = useFocusFiles();
 
   const handleClickOutside = () => {
     dispatch(setInspectorMenu(null));
@@ -55,6 +63,10 @@ function HierarchyRightClickMenuComponent() {
     }
   };
 
+  const onSetRenameFileItem = (file: FileItemType | null) => {
+    dispatch(setRenameFileItem(file));
+  };
+
   useEffect(() => {
     if (hierarchy.inspectorMenu) {
       document.addEventListener("click", handleClickOutside);
@@ -81,22 +93,33 @@ function HierarchyRightClickMenuComponent() {
         >
           {hierarchy.inspectorMenu?.file && (
             <>
-              <p className="main-color p-1 border-b border-color text-sm overflow-hidden truncate">
-                {hierarchy.inspectorMenu.file.name}
+              <p className="flex gap-1 items-center main-color p-1 border-b border-color text-sm overflow-hidden truncate">
+                {hierarchy.inspectorMenu.file.isDirectory ? (
+                  <Folder className="w-4 h-4" />
+                ) : (
+                  <File className="w-4 h-4" />
+                )}
+                <span>{hierarchy.inspectorMenu.file.name}</span>
               </p>
               <div className="flex flex-col justify-start items-start text-sm border-b border-color">
-                <button
-                  className="flex-1 w-full text-left p-1 button-main cursor-pointer"
-                  onClick={onEdit}
-                >
-                  Edit
-                </button>
-                <button
-                  className="flex-1 w-full text-left p-1 button-main cursor-pointer"
-                  onClick={() => console.log('not implemented')}
-                >
-                  Rename
-                </button>
+                {!hierarchy.inspectorMenu?.file?.isDirectory && (
+                  <button
+                    className="flex-1 w-full text-left p-1 button-main cursor-pointer"
+                    onClick={onEdit}
+                  >
+                    Edit
+                  </button>
+                )}
+                {hierarchy.inspectorMenu?.file && (
+                  <button
+                    className="flex-1 w-full text-left p-1 button-main cursor-pointer"
+                    onClick={() =>
+                      onSetRenameFileItem(hierarchy.inspectorMenu?.file ?? null)
+                    }
+                  >
+                    Rename
+                  </button>
+                )}
                 <button className="flex-1 w-full text-left p-1 button-main cursor-pointer">
                   Delete
                 </button>
@@ -104,13 +127,29 @@ function HierarchyRightClickMenuComponent() {
               <div className="flex flex-col justify-start items-start text-sm border-b border-color">
                 <button
                   className="flex-1 w-full text-left p-1 button-main cursor-pointer"
-                  onClick={() => console.log('not implemented')}
+                  onClick={() => console.log("not implemented")}
                 >
                   Reveal in explorer
                 </button>
               </div>
+              {sessionId && (
+                <div className="flex flex-col justify-start items-start text-sm border-b border-color">
+                  <button
+                    className="flex-1 w-full text-left p-1 button-main cursor-pointer"
+                    onClick={() =>
+                      focusFiles.addFile(
+                        hierarchy?.inspectorMenu?.file ?? null,
+                        null
+                      )
+                    }
+                  >
+                    Add to chat
+                  </button>
+                </div>
+              )}
             </>
           )}
+
           <div className="flex flex-col justify-start items-start text-sm  border-color">
             <button
               className="flex-1 w-full text-left p-1 button-main cursor-pointer"

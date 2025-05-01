@@ -1,9 +1,10 @@
 import SyntaxHighlighter from "react-syntax-highlighter";
 import Markdown from "react-markdown";
-import { ChevronRight, Computer, User } from "lucide-react";
+import { ChevronRight, User } from "lucide-react";
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { UserAgentSessionMessageType } from "../../types/userAgentSessionMessageType";
 import { useState } from "react";
+import editorAvatarImage from '../../assets/editorNoMessages.png';
 
 function ChatMessageItemComponent({
   message,
@@ -41,7 +42,7 @@ function ChatMessageItemComponent({
               ) : (
                 <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
                   <span className="text-gray-600 font-medium">
-                    <Computer className="w-4 h-4" />
+                    <img src={editorAvatarImage} className="w-6" />
                   </span>
                 </div>
               )}

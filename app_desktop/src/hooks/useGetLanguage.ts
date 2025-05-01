@@ -4,15 +4,11 @@ export const useGetLanguage = () => {
 
     switch (extension) {
       case "mjs":
-        return "javascript";
       case "cjs":
-        return "javascript";
       case "js":
-        return "javascript";
-      case "ts":
-        return "typescript";
       case "jsx":
         return "javascript";
+      case "ts":
       case "tsx":
         return "typescript";
       case "html":
@@ -58,5 +54,30 @@ export const useGetLanguage = () => {
     }
   };
 
-  return { getLanguageFromFile };
+  const getAllLanguages = () => {
+    return [
+      "javascript",
+      "typescript",
+      "html",
+      "css",
+      "scss",
+      "json",
+      "markdown",
+      "python",
+      "java",
+      "c",
+      "cpp",
+      "csharp",
+      "go",
+      "rust",
+      "ruby",
+      "php",
+      "shell",
+      "yaml",
+      "xml",
+      "plaintext",
+    ];
+  };
+
+  return { getLanguageFromFile, getAllLanguages };
 };

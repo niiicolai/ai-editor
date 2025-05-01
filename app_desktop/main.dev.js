@@ -6,6 +6,7 @@ import fs from "fs";
 import path from "path";
 import unzipper from "unzipper";
 import { exec } from "child_process";
+import { Worker } from "worker_threads";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -17,12 +18,15 @@ async function createWindow() {
 
   await vite.listen();
 
+  let mainWindowSize = { width: 1200, height: 800 };
+
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: mainWindowSize.width,
+    height: mainWindowSize.height,
     resizable: true,
     autoHideMenuBar: true,
     frame: false,
+    icon: path.join(__dirname, "src", "assets", "editorAvatar.png"), // Set the icon here
     webPreferences: {
       contextIsolation: true,
       enableRemoteModule: false,
@@ -34,23 +38,25 @@ async function createWindow() {
   // Load the Vite app URL
   mainWindow.loadURL(`http://localhost:${vite.config.server.port}`);
 
-  // IPC Handlers
   ipcMain.on("minimize-window", async (event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     if (window) window.minimize();
   });
+
   ipcMain.on("restore-window", async (event) => {
     const window =
       BrowserWindow.getFocusedWindow() ||
       BrowserWindow.fromWebContents(event.sender);
     if (window) {
       if (window.isMaximized()) {
-        window.unmaximize(); // goes back to previous size before maximize
+        window.unmaximize(mainWindowSize); // goes back to previous size before maximize
       } else {
+        mainWindowSize = { width: window.width, height: window.height }
         window.maximize(); // fills the screen
       }
     }
   });
+
   ipcMain.on("close-window", async (event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     if (window) window.close();
@@ -70,97 +76,177 @@ async function createWindow() {
     event.reply("on-open-file", result.filePaths[0]);
   });
 
-  ipcMain.on("read-directory", async (event, dirPath) => {
-    try {
-      const files = fs.readdirSync(dirPath);
-      const fileInfo = files.map((file) => {
-        const fullPath = path.join(dirPath, file);
-        const stats = fs.statSync(fullPath);
-        return {
-          name: file,
-          path: fullPath,
-          isDirectory: stats.isDirectory(),
-        };
-      });
-      event.reply("on-read-directory", fileInfo);
-    } catch (error) {
-      console.error("Error reading directory:", error);
-      event.reply("on-read-directory", []);
+  ipcMain.on("save-as", async (event, defaultPath, content) => {
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: "Save As",
+      defaultPath,
+      filters: [
+        { name: "Text Files", extensions: ["txt"] },
+        { name: "All Files", extensions: ["*"] },
+      ],
+    });
+
+    if (!result.canceled && result.filePath) {
+        const worker = new Worker(path.join(__dirname, "./src/workers/writeFileWorker.js"), {
+          workerData: { filePath: result.filePath, content },
+        });
+      
+        worker.on("message", (msg) => {
+          event.reply("on-save-as", { success: true, filePath: result.filePath });
+        });
+      
+        worker.on("error", (err) => {
+          console.error("Worker error:", err);
+          event.reply("on-save-as", { success: false, error: err.message });
+        });
+      
+        worker.on("exit", (code) => {
+          if (code !== 0)
+            console.error(`Worker stopped with exit code ${code}`);
+        });
+    } else {
+      event.reply("on-save-as", { success: false, canceled: true });
     }
+  });
+
+  ipcMain.on("read-directory", async (event, dirPath) => {
+    const worker = new Worker(path.join(__dirname, "./src/workers/readDirectoryWorker.js"), {
+      workerData: { dirPath },
+    });
+  
+    worker.on("message", (msg) => {
+      event.reply("on-read-directory", msg.data);
+    });
+  
+    worker.on("error", (err) => {
+      console.error("Worker error:", err);
+      event.reply("on-read-directory", []);
+    });
+  
+    worker.on("exit", (code) => {
+      if (code !== 0)
+        console.error(`Worker stopped with exit code ${code}`);
+    });
   });
 
   ipcMain.on("read-file", async (event, filePath) => {
-    try {
-      const content = fs.readFileSync(filePath, "utf8");
-      event.reply("on-read-file", content);
-    } catch (error) {
-      console.error("Error reading file:", error);
-      event.reply("on-read-file", null);
-    }
+    const worker = new Worker(path.join(__dirname, "./src/workers/readFileWorker.js"), {
+      workerData: { filePath },
+    });
+  
+    worker.on("message", (msg) => {
+      event.reply("on-read-file", msg.data);
+    });
+  
+    worker.on("error", (err) => {
+      console.error("Worker error:", err);
+      event.reply("on-read-file", "");
+    });
+  
+    worker.on("exit", (code) => {
+      if (code !== 0)
+        console.error(`Worker stopped with exit code ${code}`);
+    });
   });
 
   ipcMain.on("write-file", async (event, filePath, content) => {
-    try {
-      const result = fs.writeFileSync(filePath, content, "utf8");
-      event.reply("on-write-file", result);
-    } catch (error) {
-      console.error("Error writing file:", error);
-      event.reply("on-write-file", null);
-    }
+    const worker = new Worker(path.join(__dirname, "./src/workers/writeFileWorker.js"), {
+      workerData: { filePath, content },
+    });
+  
+    worker.on("message", (msg) => {
+      event.reply("on-write-file", msg.data);
+    });
+  
+    worker.on("error", (err) => {
+      console.error("Worker error:", err);
+      event.reply("on-write-file", {});
+    });
+  
+    worker.on("exit", (code) => {
+      if (code !== 0)
+        console.error(`Worker stopped with exit code ${code}`);
+    });
   });
 
   ipcMain.on("write-dir", async (event, dirPath) => {
-    fs.mkdirSync(dirPath, { recursive: true });
-    console.log(dirPath)
-    event.reply("on-write-dir", dirPath);
+    const worker = new Worker(path.join(__dirname, "./src/workers/writeDirWorker.js"), {
+      workerData: { dirPath },
+    });
+  
+    worker.on("message", (msg) => {
+      event.reply("on-write-dir", msg.data);
+    });
+  
+    worker.on("error", (err) => {
+      console.error("Worker error:", err);
+      event.reply("on-write-dir", "");
+    });
+  
+    worker.on("exit", (code) => {
+      if (code !== 0)
+        console.error(`Worker stopped with exit code ${code}`);
+    });
+  });
+
+  ipcMain.on("rename-dir", async (event, dirPath, newName) => {
+    const worker = new Worker(path.join(__dirname, "./src/workers/renameDirWorker.js"), {
+      workerData: { dirPath, newName },
+    });
+  
+    worker.on("message", (msg) => {
+      event.reply("on-rename-dir", msg.data);
+    });
+  
+    worker.on("error", (err) => {
+      console.error("Worker error:", err);
+      event.reply("on-rename-dir", err);
+    });
+  
+    worker.on("exit", (code) => {
+      if (code !== 0)
+        console.error(`Worker stopped with exit code ${code}`);
+    });
+  });
+
+  ipcMain.on("rename-file", async (event, dirPath, newName) => {
+    const worker = new Worker(path.join(__dirname, "./src/workers/renameFileWorker.js"), {
+      workerData: { dirPath, newName },
+    });
+  
+    worker.on("message", (msg) => {
+      event.reply("on-rename-file", msg.data);
+    });
+  
+    worker.on("error", (err) => {
+      console.error("Worker error:", err);
+      event.reply("on-rename-file", err);
+    });
+  
+    worker.on("exit", (code) => {
+      if (code !== 0)
+        console.error(`Worker stopped with exit code ${code}`);
+    });
   });
 
   ipcMain.on("terminal-cmd", async (event, cmd) => {
-    // Validate the command is safe to execute
-    if (!cmd || typeof cmd !== "string") {
-      event.reply("on-terminal-cmd", "Invalid command");
-      return;
-    }
-
-    // List of allowed commands or patterns
-    const allowedCommands = [
-      /^git\s+/,
-      /^npm\s+/,
-      /^yarn\s+/,
-      /^cd\s+/,
-      /^ls\s*/,
-      /^dir\s*/,
-      /^pwd\s*/,
-      /^grep\s*/,
-      /^powershell\s*/,
-    ];
-
-    // Check if the command matches any allowed pattern
-    const isAllowed = allowedCommands.some((pattern) => pattern.test(cmd));
-    if (!isAllowed) {
-      event.reply("on-terminal-cmd", "Command not allowed");
-      return;
-    }
-
-    try {
-      const content = await new Promise((resolve, reject) => {
-        exec(cmd, (error, stdout, stderr) => {
-          if (error) {
-            reject({ message: error.message, code: error.code });
-            return;
-          }
-          resolve(`${stdout} ${stderr}`);
-        });
-      });
-
-      event.reply("on-terminal-cmd", content);
-    } catch (error) {
-      console.error("Error executing terminal cmd:", error);
-      event.reply(
-        "on-terminal-cmd",
-        error.message || "Command execution failed"
-      );
-    }
+    const worker = new Worker(path.join(__dirname, "./src/workers/executeTerminalCmdWorker.js"), {
+      workerData: { cmd },
+    });
+  
+    worker.on("message", (msg) => {
+      event.reply("on-terminal-cmd", msg.data);
+    });
+  
+    worker.on("error", (err) => {
+      console.error("Worker error:", err);
+      event.reply("on-terminal-cmd", err);
+    });
+  
+    worker.on("exit", (code) => {
+      if (code !== 0)
+        console.error(`Worker stopped with exit code ${code}`);
+    });
   });
 
   ipcMain.on("open-external-browser", async (event, url) => {

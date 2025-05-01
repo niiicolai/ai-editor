@@ -62,6 +62,12 @@ export default class UserInputEvent extends WebsocketEvent {
               data?.directoryInfo
             )}`,
           },
+          {
+            role: "developer",
+            content: `The user want you to focus on ${JSON.stringify(
+              data?.focusFiles
+            )}`,
+          },
         ]
       );
       console.log(titleResponse)
@@ -88,6 +94,12 @@ export default class UserInputEvent extends WebsocketEvent {
         role: "developer",
         content: `The directory state is ${JSON.stringify(
           data?.directoryInfo
+        )}`,
+      },
+      {
+        role: "developer",
+        content: `The user want you to focus on ${JSON.stringify(
+          data?.focusFiles
         )}`,
       },
     ]);

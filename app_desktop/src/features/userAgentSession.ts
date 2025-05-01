@@ -3,6 +3,7 @@ import { UserAgentSessionMessageType } from "../types/userAgentSessionMessageTyp
 import { UserAgentSessionOperationType } from "../types/userAgentSessionOperationType";
 
 interface UserAgentSession {
+  sessionTitle: string | null;
   sessionId: string | null;
   operation: UserAgentSessionOperationType | null;
   messages: UserAgentSessionMessageType[];
@@ -11,11 +12,15 @@ interface UserAgentSession {
 const userAgentSessionSlice = createSlice({
   name: "user_agent_session",
   initialState: {
+    sessionTitle: null,
     sessionId: null,
     operation: null,
     messages: [],
   } as UserAgentSession,
   reducers: {
+    setSessionTitle: (state: any, action: PayloadAction<string | null>) => {
+      state.sessionTitle = action.payload;
+    },
     setSessionId: (state: any, action: PayloadAction<string | null>) => {
       state.sessionId = action.payload;
     },
@@ -31,5 +36,5 @@ const userAgentSessionSlice = createSlice({
   },
 });
 
-export const { setSessionId, addMessage, clearMessages, setOperation } = userAgentSessionSlice.actions;
+export const { setSessionId, setSessionTitle, addMessage, clearMessages, setOperation } = userAgentSessionSlice.actions;
 export default userAgentSessionSlice.reducer;

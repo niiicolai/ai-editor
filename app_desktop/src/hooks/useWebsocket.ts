@@ -27,7 +27,7 @@ export const useWebsocket = (sessionId: string) => {
 
                 if (clientFn?.name == 'Search_File_Content') {
                     const parsedArgs = JSON.parse(JSON.parse(json.payload?.response?.clientFn?.args));
-                    terminal.executeTerminalCommand(`powershell -Command "Get-ChildItem -Path '${parsedArgs.path}' -Recurse -Include *.js -File | Where-Object { -not $_.FullName.Contains('node_modules') } | Select-String -Pattern '${parsedArgs.pattern}'"`)
+                    terminal.executeString(`powershell -Command "Get-ChildItem -Path '${parsedArgs.path}' -Recurse -Include *.js -File | Where-Object { -not $_.FullName.Contains('node_modules') } | Select-String -Pattern '${parsedArgs.pattern}'"`)
                         .then((resultContent: any) => {
                             console.log(resultContent)
                             sendMessage(JSON.stringify({
@@ -71,7 +71,7 @@ export const useWebsocket = (sessionId: string) => {
 
                 } else if (clientFn?.name == 'List_Directory') {
                     const parsedArgs = JSON.parse(JSON.parse(clientFn?.args));
-                    terminal.executeTerminalCommand(
+                    terminal.executeString(
                         `powershell -Command "Get-ChildItem -Path '${parsedArgs.path}' -Recurse -File | Where-Object { -not $_.FullName.Contains('node_modules') } | Select-Object FullName"`
                     ).then((resultContent: any) => {
                         console.log(resultContent);

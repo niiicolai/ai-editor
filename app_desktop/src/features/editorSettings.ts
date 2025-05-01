@@ -16,7 +16,6 @@ const editorSettingsSlice = createSlice({
     name: "editorSettings",
     initialState: {
         theme: { id: 'vs-dark', name: 'Dark' } as Theme,
-        terminal: { disabled: false, minimized: false },
         hierarchy: { minimized: false },
         search: { disabled: false },
     },
@@ -26,12 +25,6 @@ const editorSettingsSlice = createSlice({
         },
         setSearchDisabled: (state: any, action: PayloadAction<boolean>) => {
             state.search.disabled = action.payload;
-        },
-        setTerminalDisabled: (state: any, action: PayloadAction<boolean>) => {
-            state.terminal.disabled = action.payload;
-        },
-        setTerminalMinimized: (state: any, action: PayloadAction<boolean>) => {
-            state.terminal.minimized = action.payload;
         },
         setHierarchyMinimized: (state: any, action: PayloadAction<boolean>) => {
             state.hierarchy.minimized = action.payload;

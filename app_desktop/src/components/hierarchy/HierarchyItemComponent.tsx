@@ -4,6 +4,7 @@ import { useSelectFile } from "../../hooks/useSelectFile";
 import { useDispatch } from "react-redux";
 import { setInspectorMenu } from "../../features/hierarchy";
 import HierarchyNewComponent from "./HierarchyNewComponent";
+import HierarchyRenameComponent from "./HierarchyRenameComponent";
 
 interface HierarchyComponentProps {
   file: FileItemType;
@@ -68,6 +69,7 @@ function HierarchyItemComponent({
       {isOpen && (
         <div>
           <HierarchyNewComponent path={file.path} />
+          <HierarchyRenameComponent path={file.path} />
 
           {hasChildren && (
             <>

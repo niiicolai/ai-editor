@@ -18,8 +18,19 @@ export interface FileItemType {
   isDirectory: boolean;
 }
 
+export interface FocusFileItemType {
+  file: FileItemType;
+  lines: string | null;
+}
+
 export interface TabType {
   file: FileType;
+}
+
+export interface TabMenuType {
+  x: number;
+  y: number;
+  tab: TabType | null;
 }
 
 export interface DirectoryStateFileType {

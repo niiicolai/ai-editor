@@ -1,6 +1,7 @@
 import { useIsAuthorized } from "../hooks/useUser";
 import { Link } from "react-router-dom";
 import { JSX } from "react";
+import editorAvatar from "../assets/editorAvatar.png"
 
 interface LayoutComponentProps {
     pageName: string;
@@ -12,9 +13,14 @@ function LayoutComponent(props: LayoutComponentProps) {
 
     return (
         <>
-            <div className="flex justify-between gap-3 bg-slate-800 text-white px-2">
-                <div>
-                    <h1 className="p-2 font-bold">AI Editor</h1>
+            <div className="flex justify-between gap-3 text-black px-2" style={{
+                background: "linear-gradient(135deg, #FFD700, #FF8C00, #FF4500)",
+                backgroundSize: "400% 400%",
+                animation: "gradientAnimation 10s ease infinite",
+            }}>
+                <div className="flex gap-2 items-center">
+                    <img src={editorAvatar} className="w-8 h-8" />
+                    <h1 className="font-bold">Palm Editor</h1>
                 </div>
                 <div>
                     <nav className="flex gap-1">
@@ -31,7 +37,7 @@ function LayoutComponent(props: LayoutComponentProps) {
                         {isAuthorized && (
                                 <Link to="/user" className="p-2 hover:underline">Profile</Link>
                         )}
-                        <Link to="/download" className="p-2 hover:underline bg-blue-500 text-white">Download</Link>
+                        <Link to="/download" className="p-2 hover:underline bg-yellow-500 border-l border-r border-black text-black">Download</Link>
                     </nav>
                 </div>
             </div>
