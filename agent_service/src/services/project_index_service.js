@@ -74,7 +74,7 @@ export default class ProjectIndexService {
    * @return {Promise<object>} - project index exist
    */
   static async existByName(name, userId, fields = null) {
-    idValidator(name, "name");
+    stringValidator(name, "name");
     idValidator(userId, "userId");
     fields = fieldsValidator(fields, allowedFields);
 

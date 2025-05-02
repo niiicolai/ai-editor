@@ -37,7 +37,7 @@ export default class ProjectIndexService {
     }
 
     static async existByName(name: string): Promise<{ exist: boolean; }> {
-        const response = await fetch(`${API_URL}/exist_index_by_name/${name}`, {
+        const response = await fetch(`${API_URL}/project_index_exist_by_name/${name.replace(/\\|:/g, '')}`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }

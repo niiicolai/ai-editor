@@ -9,8 +9,8 @@ export const useGetProjectIndexByName = (name: string) => {
     return useQuery({ queryKey: ['project_index_by_name', name], queryFn: () => ProjectIndexService.getByName(name) });
 }
 
-export const useGetProjectIndexExistByName = (name: string) => {
-    return useQuery({ queryKey: ['project_index_exist_by_name', name], queryFn: () => ProjectIndexService.existByName(name) });
+export const useGetProjectIndexExistByName = async () => {
+    return { exists: async (name: string) => await ProjectIndexService.existByName(name) }
 }
 
 export const useGetProjectIndexes = (page: number, limit: number) => {

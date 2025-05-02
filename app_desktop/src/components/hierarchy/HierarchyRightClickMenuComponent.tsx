@@ -11,6 +11,7 @@ import {
 import { File, Folder } from "lucide-react";
 import { FileItemType } from "../../types/directoryInfoType";
 import { useFocusFiles } from "../../hooks/useFocusFiles";
+import { useIgnoreAi } from "../../hooks/useIgnoreAi";
 
 function HierarchyRightClickMenuComponent() {
   const hierarchy = useSelector((state: RootState) => state.hierarchy);
@@ -20,6 +21,7 @@ function HierarchyRightClickMenuComponent() {
   const selectFile = useSelectFile();
   const dispatch = useDispatch();
   const focusFiles = useFocusFiles();
+  const ignoreAi = useIgnoreAi();
 
   const handleClickOutside = () => {
     dispatch(setInspectorMenu(null));
@@ -66,6 +68,21 @@ function HierarchyRightClickMenuComponent() {
   const onSetRenameFileItem = (file: FileItemType | null) => {
     dispatch(setRenameFileItem(file));
   };
+
+  const onAddIgnoreAi = async () => {
+    const path = hierarchy.currentPath;
+    if (!path) return;
+
+    let file = null;
+    try {
+      file = await ignoreAi.read(path);
+    } catch {
+    }
+
+    if (!file) {
+      file = await ignoreAi.write(path)
+    }
+  }
 
   useEffect(() => {
     if (hierarchy.inspectorMenu) {
@@ -165,7 +182,7 @@ function HierarchyRightClickMenuComponent() {
             </button>
             <button
               className="flex-1 w-full text-left p-1 button-main cursor-pointer"
-              onClick={() => console.log('not implemented')}
+              onClick={() => onAddIgnoreAi()}
             >
               Add AI Ignore File
             </button>

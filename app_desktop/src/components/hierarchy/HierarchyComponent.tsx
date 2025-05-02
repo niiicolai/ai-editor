@@ -16,6 +16,9 @@ import { useReadFile } from "../../hooks/useReadFile";
 import { ProjectIndexItemClassType, ProjectIndexItemFunctionType, ProjectIndexItemType, ProjectIndexItemVarType } from "../../types/projectIndexType";
 import { useParseFileContent } from "../../hooks/useParseFileContent";
 import { useHash } from "../../hooks/useHash";
+import { useCreateProjectIndex, useGetProjectIndexExistByName } from "../../hooks/useProjectIndex";
+import { useWriteFile } from "../../hooks/useWriteFile";
+import { useProjectIndexFile } from "../../hooks/useProjectIndexFile";
 
 function HierarchyComponent() {
   const dispatch = useDispatch();
@@ -29,8 +32,10 @@ function HierarchyComponent() {
   const currentFolder = currentPath ? currentPath.split("\\").pop() || "" : "";
   const hasFiles = currentPath && directoryState[currentPath]?.files.length > 0;
   const readFile = useReadFile();
+  const writeFile = useWriteFile();
   const parseFile = useParseFileContent();
   const hash = useHash();
+  const projectIndexFile = useProjectIndexFile();
 
   const handleContextMenu = (event: any) => {
     event.preventDefault();
@@ -46,8 +51,23 @@ function HierarchyComponent() {
 
   const handleIndexing = async () => {
     dispatch(setIsLoadingIndex(true))
-    if (currentPath && projectIndex.meta?.name != currentPath) {      
-      dispatch(setMeta({ name: currentPath, _id: null }))
+
+    const name = currentPath || '';
+
+    if (!currentPath) {
+      dispatch(setIsLoadingIndex(false))
+      return;
+    }
+
+    let currentProjectIndexFile = await projectIndexFile.read(currentPath);
+    if (!currentProjectIndexFile) {
+      currentProjectIndexFile = await projectIndexFile.write(currentPath);
+    }
+
+    console.log(currentProjectIndexFile)
+
+    if (projectIndex.meta?.name != currentPath) {      
+      dispatch(setMeta({ name, _id: currentProjectIndexFile._id }))
     }
 
     const newItems = {} as ProjectIndexItemType;
