@@ -9,9 +9,9 @@ import { setupWebsocket } from "./src/websocket/index.js";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-
+import ProjectIndexItemService from "./src/services/project_index_item_service.js";
 mongoConnect()
-  .then(() => {
+  .then(async () => {
     const app = express();
     const PORT = process.env.WEB_PORT || 3001;
     const limiter = rateLimit({

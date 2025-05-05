@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import ClientError from '../errors/clientError.js';
+import ClientError from "../errors/clientError";
 
 export default class PwdService {
 
@@ -8,9 +8,8 @@ export default class PwdService {
      * @param {String} password
      * @returns {Promise<String>}
      */
-    static async hashPassword(password) {
+    static async hashPassword(password: string): Promise<string> {
         if (!password) ClientError.badRequest("Password is required");
-        if (typeof password !== "string") ClientError.badRequest("Password must be a string");
         if (password.includes(" ")) ClientError.badRequest("Password must not contain spaces");
         if (password.length < 8) ClientError.badRequest("Password must be at least 8 characters long");
         if (password.length > 100) ClientError.badRequest("Password must be at most 100 characters long");
@@ -25,15 +24,13 @@ export default class PwdService {
     /**
      * @function comparePassword
      * @param {String} password
-     * @param {String} hash
+     * @param {String} hashedPassword
      * @returns {Promise<Boolean>}
      */
-    static async comparePassword(password, hash) {
+    static async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
         if (!password) throw new Error("Password is required");
-        if (typeof password !== "string") throw new Error("Password must be a string");
-        if (!hash) throw new Error("Hash is required");
-        if (typeof hash !== "string") throw new Error("Hash must be a string");
+        if (!hashedPassword) throw new Error("HashedPassword is required");
 
-        return bcrypt.compare(password, hash);
+        return bcrypt.compare(password, hashedPassword);
     }
 }

@@ -1,5 +1,5 @@
 export default {
-  userAgentSessionMessageResponse: {
+  projectIndexResponse: {
     type: "object",
     properties: {
       _id: {

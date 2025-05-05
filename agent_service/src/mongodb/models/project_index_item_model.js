@@ -27,7 +27,7 @@ const projectIndexItemSchema = new mongoose.Schema(
       required: true,
     },
     language: {
-      type: Number,
+      type: String,
       required: true,
     },
     embedding: {

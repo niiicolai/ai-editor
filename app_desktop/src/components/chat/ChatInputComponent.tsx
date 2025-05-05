@@ -18,6 +18,7 @@ function ChatInputComponent({
 }: {
     sendMessage: (content:string) => void;
 }) {
+    const projectIndex = useSelector((state: RootState) => state.projectIndex);
     const { sessionId } = useSelector((state: RootState) => state.userAgentSession);
     const { currentFile, directoryState, currentPath } = useSelector((state: RootState) => state.hierarchy);
     const { focusFiles, removeFocusFile } = useFocusFiles();
@@ -43,6 +44,7 @@ function ChatInputComponent({
                     directoryInfo: directoryState,
                     user_agent_session_id: sessionId,
                     selected_llm: selectedLlm,
+                    ...(projectIndex?.meta?._id && { projectIndexId: projectIndex?.meta?._id })
                 }
             }));
             setContent("");

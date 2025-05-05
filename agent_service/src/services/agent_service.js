@@ -21,6 +21,7 @@ export default class AgentService {
   }
 
   static async noFuncPrompt(content, role, messages = []) {
+    console.log(content)
     const response = await noFuncAgent.call({
       content,
       role,

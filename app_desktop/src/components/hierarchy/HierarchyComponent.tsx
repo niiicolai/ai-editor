@@ -49,66 +49,6 @@ function HierarchyComponent() {
     );
   };
 
-  const handleIndexing = async () => {
-    dispatch(setIsLoadingIndex(true))
-
-    const name = currentPath || '';
-
-    if (!currentPath) {
-      dispatch(setIsLoadingIndex(false))
-      return;
-    }
-
-    let currentProjectIndexFile = await projectIndexFile.read(currentPath);
-    if (!currentProjectIndexFile) {
-      currentProjectIndexFile = await projectIndexFile.write(currentPath);
-    }
-
-    console.log(currentProjectIndexFile)
-
-    if (projectIndex.meta?.name != currentPath) {      
-      dispatch(setMeta({ name, _id: currentProjectIndexFile._id }))
-    }
-
-    const newItems = {} as ProjectIndexItemType;
-    for (const key in hierarchy.directoryState) {
-      const files = hierarchy.directoryState[key]
-        .files
-        .filter((f:FileItemType) => !f.isDirectory);
-
-      for (const f of files) {
-        if (projectIndex.items[f.path]) continue;
-        const data = await readFile.read(f);
-        const parsedData = await parseFile.parse(data?.content || '', data?.language || '')
-        const hashCode = hash.hash(data?.content || '', 'sha256')
-        newItems[f.path] = {
-          _id: "",
-          name: f.name,
-          lines: parsedData?.lines || 0,
-          language: data?.language || "",
-          hashCode: hashCode,
-          description: parsedData?.description || "",
-          functions: parsedData?.functions as ProjectIndexItemFunctionType[] ?? [],
-          classes: parsedData?.classes as ProjectIndexItemClassType[] ?? [],
-          vars: parsedData?.vars as ProjectIndexItemVarType[] ?? [],
-        }
-      }
-    }
-    dispatch(setItems({
-      ...projectIndex.items,
-      ...newItems
-    }))
-    dispatch(setIsLoadingIndex(false))
-  }
-
-  useEffect(() => {
-    if (currentPath && Object.entries(directoryState).length > 0) {
-      handleIndexing();
-    }
-  }, [currentPath, directoryState])
-
-  console.log(projectIndex, hierarchy)
-
   if (isMinimized) {
     return (
       <div className="h-full flex flex-col justify-center main-bgg text-white p-1">

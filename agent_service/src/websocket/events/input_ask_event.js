@@ -3,6 +3,7 @@ import UserAgentSessionService from "../../services/user_agent_session_service.j
 import UserAgentSessionMessageService from "../../services/user_agent_session_message_service.js";
 import UserAgentSessionOperationService from "../../services/user_agent_session_operation_service.js";
 import AgentService from "../../services/agent_service.js";
+import ProjectIndexItemService from "../../services/project_index_item_service.js";
 
 export default class InputAskEvent extends WebsocketEvent {
   constructor() {
@@ -27,7 +28,7 @@ export default class InputAskEvent extends WebsocketEvent {
     const focusFiles = data.focusFiles;
     const directoryInfo = data.directoryInfo;
 
-    console.log(data)
+    console.log(data);
 
     const lastMessages = await UserAgentSessionMessageService.findAll(
       sessionId,
@@ -65,9 +66,7 @@ export default class InputAskEvent extends WebsocketEvent {
           },
           {
             role: "developer",
-            content: `The directory state is ${JSON.stringify(
-              directoryInfo
-            )}`,
+            content: `The directory state is ${JSON.stringify(directoryInfo)}`,
           },
           {
             role: "developer",
@@ -77,7 +76,7 @@ export default class InputAskEvent extends WebsocketEvent {
           },
         ]
       );
-      console.log(titleResponse)
+      console.log(titleResponse);
       await UserAgentSessionService.update(
         sessionId,
         { title: titleResponse.content },
@@ -87,29 +86,63 @@ export default class InputAskEvent extends WebsocketEvent {
     }
 
     /**
+     * Semantic search
+     */
+    let codebaseDocs = [];
+    if (data.projectIndexId) {
+      codebaseDocs = (
+        await ProjectIndexItemService.search(
+          `${focusFiles && focusFiles.length > 0
+            ? `${JSON.stringify(focusFiles)}`
+            : ""} ${content}`,
+          data.projectIndexId,
+          userId,
+          2
+        )
+      ).map((item) => item.description);
+    }
+
+    /**
      * Create agent message
      */
-    const agentResponse = await AgentService.noFuncPrompt(content, "user", [
-      ...lastMessages.messages.map((m) => {
-        return { role: m.role, content: m.content };
-      }),
-      {
-        role: "developer",
-        content: `The current file is ${currentFile?.name}`,
-      },
-      {
-        role: "developer",
-        content: `The directory state is ${JSON.stringify(
-          directoryInfo
-        )}`,
-      },
-      {
-        role: "developer",
-        content: `The user want you to focus on ${JSON.stringify(
-          focusFiles
-        )}`,
-      },
-    ]);
+    const agentResponse = await AgentService.noFuncPrompt(content,
+      "user",
+      [
+        ...lastMessages.messages.map((m) => {
+          return { role: m.role, content: m.content };
+        }),
+        {
+          role: 'developer', content: `${
+            codebaseDocs && codebaseDocs.length > 0
+              ? `You may use the following information for your answer if it's relevant: ${JSON.stringify(
+                  codebaseDocs
+                )}`
+              : ""
+          }
+                  
+          ${
+            currentFile
+              ? `The user is currently looking at file: ${currentFile?.name}`
+              : ""
+          }
+    
+          ${
+            directoryInfo
+              ? `The structure of the project is: ${JSON.stringify(directoryInfo)}`
+              : ""
+          }
+    
+          ${
+            focusFiles && focusFiles.length > 0
+              ? `Focus on the following files: ${JSON.stringify(focusFiles)}`
+              : ""
+          }
+    
+          Example answer:
+            Thanks for the answer. It is ...`
+        }
+      ]
+    );
     const userAgentSessionMessionAgent =
       await UserAgentSessionMessageService.create(
         {

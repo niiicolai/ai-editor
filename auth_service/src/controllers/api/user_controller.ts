@@ -1,10 +1,11 @@
 import express from "express";
-import UserService from "../../services/user_service.js";
-import { authentication } from "../middleware/authentication.js";
-import { hateoas } from "../middleware/hateoas.js";
-import { respond } from "../respond.js";
+import UserService from "../../services/user_service";
+import { authentication } from "../middleware/authentication";
+import { hateoas } from "../middleware/hateoas";
+import { respond } from "../respond";
 
 const router = express.Router();
+
 export const links = {
   get: { rel: "get user", method: "GET", href: "/user" },
   create: { rel: "create user", method: "POST", href: "/user" },
@@ -56,10 +57,10 @@ export const links = {
  *     500:
  *      $ref: '#/components/internalServerErrorResponse'
  */
-router.get("/user", [authentication, hateoas(links, links.get, [links.create])], async (req, res) => {
+router.get("/user", [authentication, hateoas(links, links.get, [links.create])], async (req: any, res: any) => {
   respond(req, res, async () => {
     const user_id = req.user._id;
-    const fields = req.query.fields?.split(",") || null;
+    const fields = typeof req.query.fields === "string" ? req.query.fields.split(",") : [];
     return await UserService.find(user_id, fields);
   });
 });
@@ -114,9 +115,9 @@ router.get("/user", [authentication, hateoas(links, links.get, [links.create])],
  *     500:
  *      $ref: '#/components/internalServerErrorResponse'
  */
-router.post("/user", hateoas(links, links.create, []), async (req, res) => {
+router.post("/user", hateoas(links, links.create, []), async (req: any, res: any) => {
   respond(req, res, async () => {
-    const fields = req.query.fields?.split(",") || null;
+    const fields = typeof req.query.fields === "string" ? req.query.fields.split(",") : [];
     return await UserService.create(req.body, fields);
   });
 });
@@ -170,10 +171,10 @@ router.post("/user", hateoas(links, links.create, []), async (req, res) => {
  *     500:
  *      $ref: '#/components/internalServerErrorResponse'
  */
-router.patch("/user", [authentication, hateoas(links, links.update, [links.create])], async (req, res) => {
+router.patch("/user", [authentication, hateoas(links, links.update, [links.create])], async (req: any, res: any) => {
   respond(req, res, async () => {
     const user_id = req.user._id;
-    const fields = req.query.fields?.split(",") || null;
+    const fields = typeof req.query.fields === "string" ? req.query.fields.split(",") : [];
     return await UserService.update(user_id, req.body, fields);
   });
 });
@@ -201,7 +202,7 @@ router.patch("/user", [authentication, hateoas(links, links.update, [links.creat
  *     500:
  *      $ref: '#/components/internalServerErrorResponse'
  */
-router.delete("/user", [authentication], async (req, res) => {
+router.delete("/user", [authentication], async (req: any, res: any) => {
   try {
     const user_id = req.user._id;
     await UserService.destroy(user_id);

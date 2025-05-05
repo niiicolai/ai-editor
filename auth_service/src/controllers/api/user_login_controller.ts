@@ -1,8 +1,8 @@
 import express from "express";
-import UserLoginService from "../../services/user_login_service.js";
-import { hateoas } from "../middleware/hateoas.js";
-import { respond } from "../respond.js";
-import { links } from "./user_controller.js";
+import UserLoginService from "../../services/user_login_service";
+import { hateoas } from "../middleware/hateoas";
+import { respond } from "../respond";
+import { links } from "./user_controller";
 
 const router = express.Router();
 
@@ -53,7 +53,7 @@ const router = express.Router();
  *     500:
  *      $ref: '#/components/internalServerErrorResponse'
  */
-router.post("/user/login", hateoas(links, links.login, [links.create]), async (req, res) => {
+router.post("/user/login", hateoas(links, links.login, [links.create]), async (req: any, res: any) => {
   respond(req, res, async () => {
     return await UserLoginService.login(req.body);
   });

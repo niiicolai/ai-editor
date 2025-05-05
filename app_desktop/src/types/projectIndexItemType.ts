@@ -21,6 +21,7 @@ export interface ProjectIndexItemsType {
 
 export interface ProjectIndexItemCreateType {
     name: string;
+    path: string;
     description: string;
     hashCode: string;
     lines: number;

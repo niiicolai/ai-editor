@@ -11,7 +11,7 @@ import helmet from "helmet";
 
 mongoConnect()
   .then(() => {
-    const app = express();
+    const app: express.Express = express();
     const PORT = process.env.WEB_PORT || 3000;
     const limiter = rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
@@ -39,6 +39,3 @@ mongoConnect()
   .catch((error) => {
     console.error("ERROR: MongoDB connection failed", error);
   });
-
-
- 
