@@ -34,6 +34,7 @@
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
     "tailwindcss": "^4.1.4",
+    "trash": "^9.0.0",
     "unzipper": "^0.12.3"
   },
   "devDependencies": {

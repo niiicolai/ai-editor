@@ -3,6 +3,7 @@ import EditorView from '../views/EditorView';
 import ThemeIndexView from '../views/theme/ThemeIndexView';
 import ShortcutIndexView from '../views/shortcut/ShortcutIndexView';
 import ExtensionIndexView from '../views/extensions/ExtensionIndexView';
+import ProjectIndexIndexView from '../views/projectIndex/ProjectIndexIndexView';
 
 import UserLoginView from '../views/user/UserLoginView';
 import UserCreateView from '../views/user/UserCreateView';
@@ -33,6 +34,14 @@ export const routes = [
   {
     path: "/extensions",
     element: <ExtensionIndexView />,
+  },
+
+  /**
+   * Project Index routes
+   */
+  {
+    path: "/project-index",
+    element: <ProjectIndexIndexView />,
   },
 
   /**

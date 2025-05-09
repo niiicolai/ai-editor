@@ -8,7 +8,6 @@ try {
     // Get the directory of the file and construct the new file path
     const directory = path.dirname(filePath);
     const newFilePath = path.join(directory, newName);
-
     // Rename the file
     fs.renameSync(filePath, newFilePath);
 

@@ -12,6 +12,7 @@ interface HierarchyComponentProps {
   currentFile: FileItemType | null;
   getIsOpen: (file: FileItemType) => boolean;
   getChildren: (file: FileItemType) => FileItemType[];
+  renameFileItem: FileItemType | null;
 }
 
 function HierarchyItemComponent({
@@ -20,12 +21,14 @@ function HierarchyItemComponent({
   currentFile,
   getIsOpen,
   getChildren,
+  renameFileItem,
 }: HierarchyComponentProps) {
   const dispatch = useDispatch();
   const selectFile = useSelectFile();
   const children = getChildren(file);
   const isOpen = getIsOpen(file);
   const hasChildren = children.length > 0;
+  const isEditing = renameFileItem?.path === file.path;
 
   const handleContextMenu = (event: any) => {
     event.preventDefault();
@@ -40,36 +43,38 @@ function HierarchyItemComponent({
 
   return (
     <div>
-      <div
-        onContextMenu={handleContextMenu} 
-        className={`file-item flex items-center justify-between highlight-color p-1 hover:bg-gray-800 cursor-pointer text-sm ${
-          currentFile?.path === file.path ? "bg-gray-800" : ""
-        }`}
-        style={{ paddingLeft: `${level * 20}px` }}
-        onClick={() => selectFile.select(file)}
-      >
-        <span className="flex items-center file-item">
-          {file.isDirectory && (
-            <>
-              <ChevronRight
-                className={`w-4 h-4 mr-2 transition-transform file-item ${
-                  isOpen ? "rotate-90" : ""
-                }`}
-              />
-              <Folder className="w-4 h-4 mr-2 file-item" />
-            </>
-          )}
+      {isEditing && <HierarchyRenameComponent path={file.path} name={file.name} />}
+      {!isEditing && (
+        <div
+          onContextMenu={handleContextMenu}
+          className={`file-item flex items-center justify-between highlight-color p-1 hover:bg-gray-800 cursor-pointer text-sm ${
+            currentFile?.path === file.path ? "bg-gray-800" : ""
+          }`}
+          style={{ paddingLeft: `${level * 20}px` }}
+          onClick={() => selectFile.select(file)}
+        >
+          <span className="flex items-center file-item">
+            {file.isDirectory && (
+              <>
+                <ChevronRight
+                  className={`w-4 h-4 mr-2 transition-transform file-item ${
+                    isOpen ? "rotate-90" : ""
+                  }`}
+                />
+                <Folder className="w-4 h-4 mr-2 file-item" />
+              </>
+            )}
 
-          {!file.isDirectory && <File className="w-4 h-4 mr-2 file-item" />}
+            {!file.isDirectory && <File className="w-4 h-4 mr-2 file-item" />}
 
-          <span className="file-item">{file.name}</span>
-        </span>
-      </div>
+            <span className="file-item">{file.name}</span>
+          </span>
+        </div>
+      )}
 
       {isOpen && (
         <div>
           <HierarchyNewComponent path={file.path} />
-          <HierarchyRenameComponent path={file.path} />
 
           {hasChildren && (
             <>
@@ -78,6 +83,7 @@ function HierarchyItemComponent({
                   key={child.path}
                   file={child}
                   level={level + 1}
+                  renameFileItem={renameFileItem}
                   currentFile={currentFile}
                   getIsOpen={getIsOpen}
                   getChildren={getChildren}

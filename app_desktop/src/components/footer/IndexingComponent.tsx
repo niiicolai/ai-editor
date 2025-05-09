@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { Clipboard, Loader2Icon } from "lucide-react";
-import { useWriteFile } from "../../hooks/useWriteFile";
 import { useParseFileContent } from "../../hooks/useParseFileContent";
 import { useHash } from "../../hooks/useHash";
 import { useProjectIndexFile } from "../../hooks/useProjectIndexFile";
@@ -20,6 +19,7 @@ import {
 import { useReadFile } from "../../hooks/useReadFile";
 import { FileItemType } from "../../types/directoryInfoType";
 import { useCreateProjectIndexItem } from "../../hooks/useProjectIndexItem";
+import { useNavigate } from "react-router-dom";
 
 export default function IndexingComponent() {
   const projectIndex = useSelector((state: RootState) => state.projectIndex);
@@ -32,26 +32,90 @@ export default function IndexingComponent() {
   const projectIndexFile = useProjectIndexFile();
   const createProjectIndexItem = useCreateProjectIndexItem();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleIndexing = async () => {
-    dispatch(setIsLoadingIndex(true));
-
-    const name = currentPath || "";
-
+  const backendIndexing = async () => {
     if (!currentPath) {
-      dispatch(setIsLoadingIndex(false));
+      return;
+    }
+    let currentProjectIndexFile = null;
+    try {
+      currentProjectIndexFile = await projectIndexFile.read(currentPath);
+      if (!currentProjectIndexFile?._id) {
+        currentProjectIndexFile = await projectIndexFile.write(currentPath);
+      }
+    } catch {
       return;
     }
 
-    let currentProjectIndexFile = await projectIndexFile.read(currentPath);
     if (!currentProjectIndexFile?._id) {
-      currentProjectIndexFile = await projectIndexFile.write(currentPath);
+      return;
+    }
+    try {
+      if (projectIndex.meta?.name != currentPath) {
+        dispatch(
+          setMeta({
+            name: projectIndex.meta?.name ?? "",
+            _id: currentProjectIndexFile._id,
+          })
+        );
+      }
+
+      const newItems = {} as ProjectIndexItemType;
+      for (const key in projectIndex.items) {
+        if (projectIndex.items[key]._id) {
+          newItems[key] = projectIndex.items[key];
+          continue;
+        }
+
+        const item = projectIndex.items[key];
+        const data = await readFile.read({
+          name: item.name,
+          path: item.path,
+          isDirectory: false,
+        });
+
+        const savedItem = await createProjectIndexItem.mutateAsync({
+          name: item.name,
+          path: item.path,
+          content: data?.content || "",
+          lines: item.lines,
+          language: item.language,
+          hashCode: item.hashCode,
+          description: item.description,
+          functions: JSON.stringify(
+            (item.functions as ProjectIndexItemFunctionType[]) ?? []
+          ),
+          classes: JSON.stringify(
+            (item.classes as ProjectIndexItemClassType[]) ?? []
+          ),
+          vars: JSON.stringify((item.vars as ProjectIndexItemVarType[]) ?? []),
+          projectIndexId: currentProjectIndexFile._id,
+        });
+
+        newItems[item.path] = {
+          ...item,
+          _id: savedItem._id,
+        };
+      }
+
+      dispatch(
+        setItems({
+          ...newItems,
+        })
+      );
+    } catch {}
+  };
+
+  const clientIndexing = async () => {
+    if (!currentPath) {
+      return;
     }
 
-    console.log(currentProjectIndexFile);
-
     if (projectIndex.meta?.name != currentPath) {
-      dispatch(setMeta({ name, _id: currentProjectIndexFile._id }));
+      dispatch(
+        setMeta({ name: currentPath, _id: projectIndex.meta?._id ?? null })
+      );
     }
 
     const newItems = {} as ProjectIndexItemType;
@@ -68,37 +132,19 @@ export default function IndexingComponent() {
           data?.language || ""
         );
         const hashCode = hash.hash(data?.content || "", "sha256");
-        const newItem = {
+        newItems[f.path] = {
           _id: "",
           name: f.name,
+          path: f.path,
           lines: parsedData?.lines || 0,
           language: data?.language || "",
           hashCode: hashCode,
           description: parsedData?.description || "",
-          functions: JSON.stringify((parsedData?.functions as ProjectIndexItemFunctionType[]) ?? []),
-          classes: JSON.stringify((parsedData?.classes as ProjectIndexItemClassType[]) ?? []),
-          vars: JSON.stringify((parsedData?.vars as ProjectIndexItemVarType[]) ?? []),
-        };
-        const savedItem = await createProjectIndexItem.mutateAsync({
-          name: newItem.name,
-          path: f.path,
-          content: data?.content || "",
-          lines: newItem.lines,
-          language: newItem.language,
-          hashCode: newItem.hashCode,
-          description: newItem.description,
-          functions: newItem.functions,
-          classes: newItem.classes,
-          vars: newItem.vars,
-          projectIndexId: currentProjectIndexFile._id
-        });
-        newItems[f.path] = {
-          ...newItem,
-          _id: savedItem._id,
-          functions: (parsedData?.functions as ProjectIndexItemFunctionType[]) ?? [],
+          functions:
+            (parsedData?.functions as ProjectIndexItemFunctionType[]) ?? [],
           classes: (parsedData?.classes as ProjectIndexItemClassType[]) ?? [],
           vars: (parsedData?.vars as ProjectIndexItemVarType[]) ?? [],
-        }
+        };
       }
     }
     dispatch(
@@ -107,6 +153,15 @@ export default function IndexingComponent() {
         ...newItems,
       })
     );
+  };
+
+  const handleIndexing = async () => {
+    if (!currentPath) {
+      return;
+    }
+    dispatch(setIsLoadingIndex(true));
+    await clientIndexing();
+    //await backendIndexing();
     dispatch(setIsLoadingIndex(false));
   };
 
@@ -129,7 +184,7 @@ export default function IndexingComponent() {
           )}
           <button
             className="text-xs button-main flex justify-between gap-1"
-            onClick={() => console.log("not implemented")}
+            onClick={() => navigate("/project-index")}
           >
             <span>Project Index</span>
           </button>

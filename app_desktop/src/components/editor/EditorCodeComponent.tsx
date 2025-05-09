@@ -38,30 +38,7 @@ function EditorCodeComponent() {
       moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
       typeRoots: ["node_modules/@types"],
       reactNamespace: "React",
-    });
-  
-    // Override Ctrl+S (or Cmd+S on macOS)
-    //const keys = shortcuts.save;
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-      const currentFile = { ...file }; // Get the latest file state
-      if (!currentFile.id) saveAs.saveAs(currentFile.name, currentFile.content);
-      else writeFile.mutateAsync(currentFile.path, currentFile.content);
-    });
-
-    // Override Ctrl+M (or Cmd+M on macOS)
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyM, () => {
-      const currentFile = { ...file }; // Get the latest file state
-      const selection = editor.getSelection();
-      const startLine = selection?.getStartPosition().lineNumber;
-      const endLine = selection?.getEndPosition().lineNumber;
-      const ln = startLine && endLine ? `${startLine}-${endLine}` : null;
-      focusFiles.addFile({
-      name: currentFile.name,
-      path: currentFile.path,
-      isDirectory: false
-      }, ln);
-    });
-    
+    });    
   
     // Handle Ctrl + Click
     editor.onMouseDown((event) => {
@@ -145,6 +122,36 @@ function EditorCodeComponent() {
     }
   };
 
+  const updateEditorCommands = () => {
+    if (!editorRef.current) return;
+    if (!monacoRef.current) return;
+    if (!file) return;
+
+    const editor = editorRef.current;
+    const monaco = monacoRef.current;
+    // Override Ctrl+S (or Cmd+S on macOS)
+    //const keys = shortcuts.save;
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+      const currentFile = { ...file }; // Get the latest file state
+      if (!currentFile.id) saveAs.saveAs(currentFile.name, currentFile.content);
+      else writeFile.mutateAsync(currentFile.path, currentFile.content);
+    });
+
+    // Override Ctrl+M (or Cmd+M on macOS)
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyM, () => {
+      const currentFile = { ...file }; // Get the latest file state
+      const selection = editor.getSelection();
+      const startLine = selection?.getStartPosition().lineNumber;
+      const endLine = selection?.getEndPosition().lineNumber;
+      const ln = startLine && endLine ? `${startLine}-${endLine}` : null;
+      focusFiles.addFile({
+      name: currentFile.name,
+      path: currentFile.path,
+      isDirectory: false
+      }, ln);
+    });
+  }
+
   useEffect(() => {
     if (nextEditorCommand) {
       executeEditorCommand(nextEditorCommand);
@@ -160,6 +167,8 @@ function EditorCodeComponent() {
         const model = editor.getModel();
         if (model) {
           monaco.editor.setModelLanguage(model, file.language.toLowerCase());
+
+          updateEditorCommands();
         }
       }
     }

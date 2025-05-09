@@ -29,6 +29,9 @@ contextBridge.exposeInMainWorld('electron', {
     renameFile: (filePath, newName) => ipcRenderer.send('rename-file', filePath, newName),
     onRenameFile: (callback) => ipcRenderer.on('on-rename-file', (event, result) => callback(result)),
 
+    moveItemToTrash: (path) => ipcRenderer.send('move-item-to-trash', path),
+    onMoveItemToTrash: (callback) => ipcRenderer.on('on-move-item-to-trash', (event, result) => callback(result)),
+
     search: (path, pattern) => ipcRenderer.send('search', path, pattern),
     onSearchComplete: (callback) => ipcRenderer.send('on-search-complete', (event, content) => callback(content)),
     
@@ -36,6 +39,8 @@ contextBridge.exposeInMainWorld('electron', {
     onTerminalCmd: (callback) => ipcRenderer.on('on-terminal-cmd', (event, content) => callback(content)),
     
     openExternalBrowser: (url) => ipcRenderer.send('open-external-browser', url),
+
+    revealInExplorer: (path) => ipcRenderer.send('reveal-in-explorer', path),
 
     minimizeWindow: () => ipcRenderer.send('minimize-window'),
     restoreWindow: () => ipcRenderer.send('restore-window'),

@@ -4,6 +4,7 @@ import { RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
 import { setInspectorMenu } from "../../features/tabs";
 import { useFileTabs } from "../../hooks/useFileTabs";
+import { setDeleteFileItem, setRenameFileItem } from "../../features/hierarchy";
 
 function EditorTabsRightClickMenuComponent() {
   const { removeTab, isActiveTab } = useFileTabs();
@@ -20,6 +21,26 @@ function EditorTabsRightClickMenuComponent() {
       const { name, path } = inspectorMenu?.tab?.file;
       selectFile.select({ name, path, isDirectory: false });
     }
+  };
+
+  const onDelete = () => {
+    if (inspectorMenu?.tab?.file) {
+      dispatch(
+        setDeleteFileItem({
+          ...inspectorMenu.tab.file,
+          isDirectory: false,
+        })
+      );
+    }
+  };
+
+  const onSetRenameFileItem = () => {
+    const file = inspectorMenu?.tab?.file;
+    if (!file) return;
+    dispatch(setRenameFileItem({
+      ...file,
+      isDirectory: false,
+    }));
   };
 
   useEffect(() => {
@@ -46,7 +67,7 @@ function EditorTabsRightClickMenuComponent() {
             width: "150px",
           }}
         >
-          {inspectorMenu?.tab?.file && (
+          {inspectorMenu?.tab?.file && inspectorMenu?.tab?.file?.id && (
             <>
               <p className="main-color p-1 border-b border-color text-sm overflow-hidden truncate">
                 {inspectorMenu.tab.file.name}
@@ -62,12 +83,12 @@ function EditorTabsRightClickMenuComponent() {
                 )}
                 <button
                   className="flex-1 w-full text-left p-1 button-main cursor-pointer"
-                  onClick={() => console.log("not implemented")}
+                  onClick={onSetRenameFileItem}
                 >
                   Rename
                 </button>
-                <button className="flex-1 w-full text-left p-1 button-main cursor-pointer">
-                  Delete
+                <button className="flex-1 w-full text-left p-1 button-main cursor-pointer" onClick={onDelete}>
+                  Move to trash
                 </button>
               </div>
             </>

@@ -39,6 +39,11 @@ declare global {
 
         search: (path: string, pattern: string) => void;
         onSearchComplete: (callback: () => void) => void;
+
+        revealInExplorer: (path: string) => void;
+
+        moveItemToTrash: (path: string) => void;
+        onMoveItemToTrash: (callback: () => void) => void;
   
         minimizeWindow: () => void;
         restoreWindow: () => void;

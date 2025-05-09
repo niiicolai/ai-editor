@@ -1,6 +1,7 @@
 import Scrollbar from "react-scrollbars-custom";
 import HierarchyItemComponent from "./HierarchyItemComponent";
 import HierarchyNewComponent from "./HierarchyNewComponent";
+import HierarchyDeleteComponent from "./HierarchyDeleteComponent";
 import { ChevronRight, ChevronDown, ChevronLeft } from "lucide-react";
 import { FileItemType } from "../../types/directoryInfoType";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,16 +10,7 @@ import { editorSettingsActions } from "../../features/editorSettings";
 import { setInspectorMenu } from "../../features/hierarchy";
 import editorNoFiles from "../../assets/editorNoFiles.png";
 import HierarchyRightClickMenuComponent from "./HierarchyRightClickMenuComponent";
-import HierarchyRenameComponent from "./HierarchyRenameComponent";
-import { useEffect } from "react";
-import { setIsLoading as setIsLoadingIndex, setItems, setMeta } from "../../features/projectIndex";
-import { useReadFile } from "../../hooks/useReadFile";
-import { ProjectIndexItemClassType, ProjectIndexItemFunctionType, ProjectIndexItemType, ProjectIndexItemVarType } from "../../types/projectIndexType";
-import { useParseFileContent } from "../../hooks/useParseFileContent";
-import { useHash } from "../../hooks/useHash";
-import { useCreateProjectIndex, useGetProjectIndexExistByName } from "../../hooks/useProjectIndex";
-import { useWriteFile } from "../../hooks/useWriteFile";
-import { useProjectIndexFile } from "../../hooks/useProjectIndexFile";
+
 
 function HierarchyComponent() {
   const dispatch = useDispatch();
@@ -26,16 +18,11 @@ function HierarchyComponent() {
     (state: RootState) => state.editorSettings
   );
   const hierarchy = useSelector((state: RootState) => state.hierarchy);
-  const projectIndex = useSelector((state: RootState) => state.projectIndex);
   const { minimized: isMinimized } = editorSettings.hierarchy;
   const { currentFile, currentPath, directoryState } = hierarchy;
   const currentFolder = currentPath ? currentPath.split("\\").pop() || "" : "";
   const hasFiles = currentPath && directoryState[currentPath]?.files.length > 0;
-  const readFile = useReadFile();
-  const writeFile = useWriteFile();
-  const parseFile = useParseFileContent();
-  const hash = useHash();
-  const projectIndexFile = useProjectIndexFile();
+  const renameFileItem = hierarchy?.renameFileItem;
 
   const handleContextMenu = (event: any) => {
     event.preventDefault();
@@ -64,11 +51,11 @@ function HierarchyComponent() {
       </div>
     );
   }
-  
 
   return (
     <div className="h-full h-64 lg:w-64 flex flex-col justify-between main-bgg text-white">
       <HierarchyRightClickMenuComponent />
+      <HierarchyDeleteComponent />
 
       {currentPath && (
         <Scrollbar className="w-full h-full" onContextMenu={handleContextMenu}>
@@ -87,7 +74,6 @@ function HierarchyComponent() {
             </div>
             <div>
               {currentPath && <HierarchyNewComponent path={currentPath} />}
-              {currentPath && <HierarchyRenameComponent path={currentPath} />}
 
               {hasFiles && (
                 <div className="px-2 py-1">
@@ -96,6 +82,7 @@ function HierarchyComponent() {
                       key={file.path}
                       file={file}
                       level={0}
+                      renameFileItem={renameFileItem}
                       currentFile={currentFile}
                       getChildren={(file: FileItemType) =>
                         file.isDirectory

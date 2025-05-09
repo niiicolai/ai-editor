@@ -3,6 +3,7 @@ import { useSelectFile } from "../../hooks/useSelectFile";
 import { RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  setDeleteFileItem,
   setDirectoryState,
   setInspectorMenu,
   setNewFileItem,
@@ -12,6 +13,7 @@ import { File, Folder } from "lucide-react";
 import { FileItemType } from "../../types/directoryInfoType";
 import { useFocusFiles } from "../../hooks/useFocusFiles";
 import { useIgnoreAi } from "../../hooks/useIgnoreAi";
+import { useRevealInExplorer } from "../../hooks/useRevealInExplorer";
 
 function HierarchyRightClickMenuComponent() {
   const hierarchy = useSelector((state: RootState) => state.hierarchy);
@@ -22,6 +24,7 @@ function HierarchyRightClickMenuComponent() {
   const dispatch = useDispatch();
   const focusFiles = useFocusFiles();
   const ignoreAi = useIgnoreAi();
+  const revealInExplorer = useRevealInExplorer();
 
   const handleClickOutside = () => {
     dispatch(setInspectorMenu(null));
@@ -84,6 +87,19 @@ function HierarchyRightClickMenuComponent() {
     }
   }
 
+  const onRevealInExplorer = () => {
+    if (hierarchy.inspectorMenu?.file) {
+      const file = hierarchy.inspectorMenu?.file;
+      revealInExplorer.reveal(file.path);
+    }
+  };
+
+  const onDelete = () => {
+    if (hierarchy.inspectorMenu?.file) {
+      dispatch(setDeleteFileItem(hierarchy.inspectorMenu.file));
+    }
+  };
+
   useEffect(() => {
     if (hierarchy.inspectorMenu) {
       document.addEventListener("click", handleClickOutside);
@@ -137,14 +153,19 @@ function HierarchyRightClickMenuComponent() {
                     Rename
                   </button>
                 )}
-                <button className="flex-1 w-full text-left p-1 button-main cursor-pointer">
-                  Delete
-                </button>
+                {hierarchy.inspectorMenu?.file && (
+                  <button
+                    className="flex-1 w-full text-left p-1 button-main cursor-pointer"
+                    onClick={onDelete}
+                  >
+                    Move to trash
+                  </button>
+                )}
               </div>
               <div className="flex flex-col justify-start items-start text-sm border-b border-color">
                 <button
                   className="flex-1 w-full text-left p-1 button-main cursor-pointer"
-                  onClick={() => console.log("not implemented")}
+                  onClick={() => onRevealInExplorer()}
                 >
                   Reveal in explorer
                 </button>

@@ -42,7 +42,7 @@ function FileOptionsComponent() {
   const handleNewFile = () => {
     dispatch(
       setFile({
-        id: `temp-file-${new Date().getTime()}`,
+        id: ``,
         name: `temp-file-${new Date().getTime()}`,
         content: "",
         language: "text",

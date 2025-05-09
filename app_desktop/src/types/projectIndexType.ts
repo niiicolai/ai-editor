@@ -13,6 +13,7 @@ export interface ProjectIndexItemType {
   [path: string]: {
     _id: string;
     name: string;
+    path: string;
     language: string;
     description: string;
     lines: number;

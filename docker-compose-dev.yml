@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mongodb_editor:
+    container_name: mongodb_editor
+    image: mongo
+    ports:
+      - "127.0.0.1:27018:27017"
+    volumes:
+      - mongodb-volume:/data/db
+    networks:
+      - editor-network
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+
+networks:
+  editor-network:
+
+volumes:
+  mongodb-volume:

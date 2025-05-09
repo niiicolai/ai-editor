@@ -189,18 +189,18 @@ async function createWindow() {
     });
   });
 
-  ipcMain.on("rename-dir", async (event, dirPath, newName) => {
+  ipcMain.on("rename-directory", async (event, dirPath, newName) => {
     const worker = new Worker(path.join(__dirname, "./src/workers/renameDirWorker.js"), {
       workerData: { dirPath, newName },
     });
   
     worker.on("message", (msg) => {
-      event.reply("on-rename-dir", msg.data);
+      event.reply("on-rename-directory", msg.data);
     });
   
     worker.on("error", (err) => {
       console.error("Worker error:", err);
-      event.reply("on-rename-dir", err);
+      event.reply("on-rename-directory", err);
     });
   
     worker.on("exit", (code) => {
@@ -209,9 +209,9 @@ async function createWindow() {
     });
   });
 
-  ipcMain.on("rename-file", async (event, dirPath, newName) => {
+  ipcMain.on("rename-file", async (event, filePath, newName) => {
     const worker = new Worker(path.join(__dirname, "./src/workers/renameFileWorker.js"), {
-      workerData: { dirPath, newName },
+      workerData: { filePath, newName },
     });
   
     worker.on("message", (msg) => {
@@ -254,6 +254,38 @@ async function createWindow() {
       shell.openExternal(url);
     } catch (error) {
       console.error("Error opening external browser:", error);
+    }
+  });
+
+  ipcMain.on("reveal-in-explorer", async (event, filePath) => {
+    try {
+      shell.showItemInFolder(filePath);
+    } catch (error) {
+      console.error("Error revealing in explorer:", error);
+    }
+  });
+
+  ipcMain.on("move-item-to-trash", async (event, _path) => {
+    try {
+      const worker = new Worker(path.join(__dirname, "./src/workers/moveItemToTrashWorker.js"), {
+        workerData: { path: _path },
+      });
+    
+      worker.on("message", (msg) => {
+        event.reply("on-move-item-to-trash", msg.data);
+      });
+    
+      worker.on("error", (err) => {
+        console.error("Worker error:", err);
+        event.reply("on-move-item-to-trash", err);
+      });
+    
+      worker.on("exit", (code) => {
+        if (code !== 0)
+          console.error(`Worker stopped with exit code ${code}`);
+      });
+    } catch (error) {
+      console.error("Error moving item to trash:", error);
     }
   });
 

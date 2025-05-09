@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useRenameDir } from "../../hooks/useRenameDir";
 import { useRenameFile } from "../../hooks/useRenameFile";
 
-function HierarchyRenameComponent({ path }: { path: string }) {
+function HierarchyRenameComponent({ path, name }: { path: string, name: string }) {
   const [error, setError] = useState("");
   const hierarchy = useSelector((state: RootState) => state.hierarchy);
   const isActive = hierarchy?.renameFileItem?.path == path;
@@ -42,7 +42,7 @@ function HierarchyRenameComponent({ path }: { path: string }) {
                 </div>
             )}
           <div className="px-2 py-1 flex">
-            {hierarchy?.newFileItem?.isDirectory
+            {hierarchy?.renameFileItem?.isDirectory
                 ? <Folder className="w-4 h-4" />
                 : <File className="w-4 h-4" />
             }
@@ -52,6 +52,8 @@ function HierarchyRenameComponent({ path }: { path: string }) {
             <input
                 type="text"
                 name="name"
+                defaultValue={name}
+                autoFocus
                 className="px-3 w-full text-sm focus:outline-none secondary-bgg"
             />
             <button className="p-1 button-main" type="submit">
