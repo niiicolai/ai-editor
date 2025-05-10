@@ -2,93 +2,24 @@
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import TokenService from '../services/tokenService';
 import { useState, useEffect } from 'react';
-import { useTerminal } from './useTerminal';
-import { useFiles } from './useFiles';
-import { useDispatch } from 'react-redux';
-import { addMessage, setOperation } from '../features/userAgentSession';
-import { UserAgentSessionMessageType } from '../types/userAgentSessionMessageType';
-import { UserAgentSessionOperationType } from '../types/userAgentSessionOperationType';
+
+import userInputReplyEvent from '../websocket_events/user_input_reply';
+import userInputReplyUpdateEvent from '../websocket_events/user_input_reply_update';
+import sessionOperationEvent from '../websocket_events/session_operation';
 
 export const useWebsocket = (sessionId: string) => {
-    const terminal = useTerminal();
-    const files = useFiles();
     const [messageHistory] = useState<any>([]);
     const { sendMessage, lastMessage, readyState } = useWebSocket('ws://localhost:4001', { protocols: "echo-protocol" });
-    const dispatch = useDispatch();
-
+    const userInputReply = userInputReplyEvent();
+    const userInputReplyUpdate = userInputReplyUpdateEvent();
+    const sessionOperation = sessionOperationEvent();    
 
     useEffect(() => {
         if (lastMessage !== null) {
             const json = JSON.parse(lastMessage.data);
-            if (json.event == "user_input_reply") {
-                const clientFn = json.payload?.clientFn;
-
-                if (clientFn?.name == 'Search_File_Content') {
-                    const parsedArgs = JSON.parse(JSON.parse(json.payload?.response?.clientFn?.args));
-                    terminal.executeString(`powershell -Command "Get-ChildItem -Path '${parsedArgs.path}' -Recurse -Include *.js -File | Where-Object { -not $_.FullName.Contains('node_modules') } | Select-String -Pattern '${parsedArgs.pattern}'"`)
-                        .then((resultContent: any) => {
-                            console.log(resultContent)
-                            sendMessage(JSON.stringify({
-                                event: 'client_function_result',
-                                data: {
-                                    content: resultContent?.trim()?.length > 0
-                                        ? 'The function result is: ' + resultContent
-                                        : 'The search gave no result. Please try another pattern.',
-                                }
-                            }));
-                        })
-
-                } else if (clientFn?.name == 'Read_File') {
-                    const parsedArgs = JSON.parse(JSON.parse(clientFn?.args));
-                    files.readFile(parsedArgs.path)
-                        .then((resultContent: any) => {
-                            console.log(resultContent)
-                            sendMessage(JSON.stringify({
-                                event: 'client_function_result',
-                                data: {
-                                    content: resultContent?.trim()?.length > 0
-                                        ? 'The function result is: ' + resultContent
-                                        : 'The read file gave no result. Please try another path.',
-                                }
-                            }));
-                        })
-                } else if (clientFn?.name == 'Write_File') {
-                    const parsedArgs = JSON.parse(JSON.parse(clientFn?.args));
-                    files.writeFile(parsedArgs.path, parsedArgs.content)
-                        .then((resultContent: any) => {
-                            console.log(resultContent)
-                            sendMessage(JSON.stringify({
-                                event: 'client_function_result',
-                                data: {
-                                    content: resultContent?.trim()?.length > 0
-                                        ? 'The function result is: ' + resultContent
-                                        : 'The write file gave no result. Please try another path.',
-                                }
-                            }));
-                        })
-
-                } else if (clientFn?.name == 'List_Directory') {
-                    const parsedArgs = JSON.parse(JSON.parse(clientFn?.args));
-                    terminal.executeString(
-                        `powershell -Command "Get-ChildItem -Path '${parsedArgs.path}' -Recurse -File | Where-Object { -not $_.FullName.Contains('node_modules') } | Select-Object FullName"`
-                    ).then((resultContent: any) => {
-                        console.log(resultContent);
-                        sendMessage(JSON.stringify({
-                            event: 'client_function_result',
-                            data: {
-                                content: resultContent?.trim()?.length > 0
-                                    ? 'The function result is:\n' + resultContent
-                                    : 'No files were found. Please check the path or try another directory.',
-                            }
-                        }));
-                    });
-
-                }
-
-                dispatch(addMessage(json.payload as UserAgentSessionMessageType));
-            } else if (json.event == "session_operation") {
-                dispatch(setOperation(json.payload as UserAgentSessionOperationType));
-            }
+            if (json.event == "user_input_reply") userInputReply.execute(json);
+            if (json.event == "user_input_reply_update") userInputReplyUpdate.execute(json, (m: string) => sendMessage(m));
+            else if (json.event == "session_operation") sessionOperation.execute(json);
         }
 
         sendMessage(JSON.stringify({ 'event': 'session_connect', 'data': { sessionId, token: TokenService.getToken() } }));

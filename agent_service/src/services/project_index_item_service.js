@@ -1,71 +1,21 @@
-import ProjectIndexItemModel from "../mongodb/models/project_index_item_model.js";
 import ProjectIndexModel from "../mongodb/models/project_index_model.js";
 import AgentService from "./agent_service.js";
-import EmbeddingService from "./embedding_service.js";
 import User from "../mongodb/models/user_model.js";
 import dto from "../dto/project_index_item_dto.js";
 import ClientError from "../errors/clientError.js";
-import mongoose from "mongoose";
 
+import { createVectorEmbeddings } from "../embedding/index.js";
 import { objectValidator } from "../validators/object_validator.js";
 import { stringValidator } from "../validators/string_validator.js";
 import { numberValidator } from "../validators/number_validator.js";
 import { idValidator } from "../validators/id_validator.js";
-import { fieldsValidator } from "../validators/fields_validator.js";
-import { paginatorValidator } from "../validators/paginator_validator.js";
 
 import { v4 as uuidV4 } from "uuid";
 import {
   upsert,
   query,
-  deleteMany
+  deleteMany,
 } from "../qdrant/collections/project_index_item_collection.js";
-
-
-const summarizeReponse = async (body) => {
-  const preContent = `
-      You are documenting a file, analyze the content and give a description of the file's content
-
-      file:
-        name: ${body?.name};
-        path: ${body?.path};
-        language: ${body?.language};  
-        content: ${body?.content};
-
-      output:
-        summary of the file and code: <insert summary>
-        intent of the file and code: <insert intent>
-        keywords to search the file and code: <insert keywords>
-    `;
-
-  const response = await AgentService.noFuncPrompt(preContent, "user", []);
-  return response?.content;
-};
-
-const createContentEmbeddings = async (body, response) => {
-  const content = `
-      file:
-        name: ${body?.name};
-        path: ${body?.path};
-        description: ${body?.description};
-        hashCode: ${body?.hashCode};
-        lines: ${body?.lines};
-        language: ${body?.language};
-        functions: ${body?.functions};
-        classes: ${body?.classes};
-        vars: ${body?.vars};
-
-      content:
-        summary: ${response};
-    `;
-
-  const embeddings = await EmbeddingService.createChunksAndVectorEmbeddings(
-    content,
-    2000
-  );
-
-  return { embeddings };
-};
 
 export default class ProjectIndexItemService {
   /**
@@ -106,7 +56,7 @@ export default class ProjectIndexItemService {
   static async findAll(projectIndexId, limit, userId) {
     numberValidator(limit, "limit", {
       min: { enabled: true, value: 1 },
-      max: { enabled: true, value: 100 }
+      max: { enabled: true, value: 100 },
     });
     idValidator(projectIndexId, "projectIndexId");
     idValidator(userId, "userId");
@@ -129,9 +79,10 @@ export default class ProjectIndexItemService {
   }
 
   static async search(queryInput, projectIndexId, userId, limit = 3) {
-    const queryEmbedding = await EmbeddingService.createVectorEmbeddings([
-      queryInput,
-    ]);
+    const queryEmbedding = await createVectorEmbeddings(queryInput, {
+      model: "Xenova/all-MiniLM-L6-v2",
+      chunkSize: 2000,
+    });
     const results = await query(queryEmbedding[0].embedding, limit, {
       must: [
         { key: "project_index", match: { value: projectIndexId } },
@@ -161,7 +112,6 @@ export default class ProjectIndexItemService {
     stringValidator(body?.hashCode, "hashCode");
     numberValidator(body?.lines, "lines");
     stringValidator(body?.language, "language");
-    //stringValidator(body?.content, "content");
     idValidator(body.projectIndexId, "projectIndexId");
     idValidator(userId, "userId");
 
@@ -188,6 +138,7 @@ export default class ProjectIndexItemService {
 
     if (existingItems.length > 0) {
       if (existingItems[0].hashCode == body?.hashCode) {
+        console.log("Item is identical, skipping creation");
         return existingItems.map(dto);
       } else {
         await deleteMany(existingItems.map((e) => e._id));
@@ -195,8 +146,26 @@ export default class ProjectIndexItemService {
     }
 
     try {
-      const response = await summarizeReponse(body);
-      const { embeddings } = await createContentEmbeddings(body, response);
+      const content = `
+          file:
+            name: ${body?.name};
+            path: ${body?.path};
+            description: ${body?.description};
+            hashCode: ${body?.hashCode};
+            lines: ${body?.lines};
+            language: ${body?.language};
+            functions: ${body?.functions};
+            classes: ${body?.classes};
+            vars: ${body?.vars};
+
+          content:
+            summary: ${response};
+        `;
+
+      const embeddings = await createVectorEmbeddings(content, {
+        model: "Xenova/all-MiniLM-L6-v2",
+        chunkSize: 2000,
+      });
       const { points } = await upsert(
         embeddings.map((e, i) => {
           return {
@@ -241,11 +210,16 @@ export default class ProjectIndexItemService {
     idValidator(_id, "_id");
     idValidator(userId, "userId");
 
-    const projectIndexItemModel = await ProjectIndexItemModel.findOne({
-      _id,
-      user: userId,
+    const results = await query(null, 1, {
+      must: [
+        { key: "_id", match: { value: _id } },
+        { key: "user", match: { value: userId } },
+      ],
     });
-    if (!projectIndexItemModel)
+    const projectIndexItemModels = results?.points?.map((res) => {
+      return { _id: res.id, ...res.payload };
+    });
+    if (!projectIndexItemModels || projectIndexItemModels.length == 0)
       ClientError.notFound("project index item not found");
 
     try {

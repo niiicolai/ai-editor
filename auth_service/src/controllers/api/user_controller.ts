@@ -118,7 +118,7 @@ router.get("/user", [authentication, hateoas(links, links.get, [links.create])],
 router.post("/user", hateoas(links, links.create, []), async (req: any, res: any) => {
   respond(req, res, async () => {
     const fields = typeof req.query.fields === "string" ? req.query.fields.split(",") : [];
-    return await UserService.create(req.body, fields);
+    return await UserService.create({ ...req.body, role: 'member' }, fields);
   });
 });
 

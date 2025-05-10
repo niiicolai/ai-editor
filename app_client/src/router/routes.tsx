@@ -19,6 +19,9 @@ import PricingIndexView from '../views/pricing/PricingIndexView';
 
 import NotFoundView from '../views/error/NotFoundView';
 
+import JobIndexView from '../views/job/JobIndexView';
+import TransactionIndexView from '../views/transaction/TransactionIndexView';
+
 export const routes = [
   {
     path: "/",
@@ -28,6 +31,22 @@ export const routes = [
   {
     path: "*",
     element: <NotFoundView />,
+  },
+
+  /**
+   * Jobs routes
+   */
+  {
+    path: "/admin/jobs",
+    element: <JobIndexView />,
+  },
+
+  /**
+   * Transaction routes
+   */
+  {
+    path: "/admin/transactions",
+    element: <TransactionIndexView />,
   },
 
   /**

@@ -5,7 +5,6 @@ export default (doc) => {
         user: doc.user,
         credit: doc.credit ? {
             noOfCredits: credit.noOfCredits,
-            creditsUsed: credit.creditsUsed
         } : null,
         created_at: doc.created_at,
         updated_at: doc.updated_at,

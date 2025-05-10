@@ -1,6 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import UserService from "../services/userService";
-import { UserType } from "../types/userType";
 
 const key = ['user'];
 
@@ -10,6 +9,10 @@ export const useGetUser = () => {
 
 export const useIsAuthorized = () => {
     return useQuery({ queryKey: ['user_auth_state'], queryFn: UserService.isAuthorized });
+}
+
+export const useGetUserCreditLeft = () => {
+    return useQuery({ queryKey: ['user_credit_left'], queryFn: UserService.creditLeft });
 }
 
 export const useLoginUser = () => {

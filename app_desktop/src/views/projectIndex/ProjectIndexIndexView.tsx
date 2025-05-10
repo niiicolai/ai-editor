@@ -35,10 +35,16 @@ function ProjectIndexIndexView() {
                   <h4 className="text-sm font-medium main-color">{key}</h4>
                   <p className="text-sm text-gray-500">{value.name}</p>
                 </div>
-                <p className="text-xs text-gray-400">
-                  Description: {value.description}
-                </p>
                 <div className="flex flex-col gap-1">
+                  <p className="text-xs text-gray-400">
+                    Description: {value.description}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Embedded ID: {value._id || "No embedded ID found"}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Ignore Embedding: {value.ignore ? "Yes" : "No"}
+                  </p>
                   <p className="text-xs text-gray-400">
                     Language: {value.language}
                   </p>
@@ -56,7 +62,9 @@ function ProjectIndexIndexView() {
                     {value.vars.length > 0 && (
                       <ul className="list-disc list-inside pl-4">
                         {value.vars.map((variable, index) => (
-                          <li key={index}>{variable.name}: {variable.line}</li>
+                          <li key={index}>
+                            {variable.name}: {variable.line}
+                          </li>
                         ))}
                       </ul>
                     )}
@@ -73,7 +81,9 @@ function ProjectIndexIndexView() {
                     {value.functions.length > 0 && (
                       <ul className="list-disc list-inside pl-4">
                         {value.functions.map((fn, index) => (
-                          <li key={index}>{fn.name}: {fn.line}</li>
+                          <li key={index}>
+                            {fn.name}: {fn.line}
+                          </li>
                         ))}
                       </ul>
                     )}
@@ -90,7 +100,9 @@ function ProjectIndexIndexView() {
                     {value.classes.length > 0 && (
                       <ul className="list-disc list-inside pl-4">
                         {value.classes.map((cls, index) => (
-                          <li key={index}>{cls.name}: {cls.line}</li>
+                          <li key={index}>
+                            {cls.name}: {cls.line}
+                          </li>
                         ))}
                       </ul>
                     )}

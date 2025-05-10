@@ -1,17 +1,19 @@
 import SyntaxHighlighter from "react-syntax-highlighter";
 import Markdown from "react-markdown";
-import { ChevronRight, User } from "lucide-react";
+import { ChevronRight, Loader, User } from "lucide-react";
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { UserAgentSessionMessageType } from "../../types/userAgentSessionMessageType";
 import { useState } from "react";
-import editorAvatarImage from '../../assets/editorNoMessages.png';
+import editorAvatarImage from "../../assets/editorNoMessages.png";
 
 function ChatMessageItemComponent({
   message,
 }: {
   message: UserAgentSessionMessageType;
 }) {
-  const [expandedBlocks, setExpandedBlocks] = useState<{[key: string]: boolean;}>({});
+  const [expandedBlocks, setExpandedBlocks] = useState<{
+    [key: string]: boolean;
+  }>({});
   const toggleBlock = (messageId: string, blockType: string) => {
     const key = `${messageId}-${blockType}`;
     setExpandedBlocks((prev) => ({
@@ -20,27 +22,42 @@ function ChatMessageItemComponent({
     }));
   };
   return (
-    <div className={`flex ${message.role == "system" ? "hidden" : ""}`}>
+    <div className={`flex ${message.role == "system" ? "" : ""}`}>
+      {message.state == "pending" && (
+        <div className="chat-msg-assistant rounded-lg px-4 py-2 w-full shadow-sm main-color border-1 border-color">
+          <div className="flex items-center space-x-2">
+            <div className="h-8 w-8 rounded-full chat-msg-assistant-bubble border-1 flex items-center justify-center">
+              <span className="text-gray-600 font-medium">
+                <img src={editorAvatarImage} className="w-6" />
+              </span>
+            </div>
+            <div className="flex-1 flex items-center justify-between gap-1">
+              <span className="text-xs">Thinking...</span>
+              <Loader className="w-4 h-4 animate-spin text-gray-500" />
+            </div>
+          </div>
+        </div>
+      )}
       <div
-        className={`flex flex-col gap-2 w-full whitespace-pre-wrap break-words max-w-full overflow-x-hidden`}
+        className={`flex flex-col gap-2 w-full whitespace-pre-wrap break-words max-w-full overflow-x-hidden ${
+          message.state == "completed" ? "" : "hidden"
+        }`}
       >
         <div
-          className={`rounded-lg px-4 py-2 w-full ${
-            message.role === "user"
-              ? "bg-gray-600 text-white"
-              : "secondary-bgg text-gray-100 shadow-sm"
+          className={`rounded-lg px-4 py-2 w-full shadow-sm main-color border-1 border-color ${
+            message.role === "user" ? "chat-msg-user" : "chat-msg-assistant"
           }`}
         >
           <div className="flex items-start space-x-2">
             <div className="flex-shrink-0">
               {message.role === "user" ? (
-                <div className="h-8 w-8 rounded-full highlight-bgg flex items-center justify-center">
+                <div className="h-8 w-8 rounded-full chat-msg-user-bubble border-1 flex items-center justify-center">
                   <span className="text-white font-medium">
-                    <User className="w-4 h-4" />
+                    <User className="w-4 h-4 chat-msg-user-bubble" />
                   </span>
                 </div>
               ) : (
-                <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <div className="h-8 w-8 rounded-full chat-msg-assistant-bubble border-1 flex items-center justify-center">
                   <span className="text-gray-600 font-medium">
                     <img src={editorAvatarImage} className="w-6" />
                   </span>
@@ -53,7 +70,9 @@ function ChatMessageItemComponent({
               </div>
               <p
                 className={`text-xs mt-1 ${
-                  message.role === "user" ? "text-indigo-200" : "text-gray-200"
+                  message.role === "user"
+                    ? "chat-msg-user-small"
+                    : "chat-msg-assistant-small"
                 }`}
               >
                 {new Date(message.created_at).toLocaleString()}

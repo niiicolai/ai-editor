@@ -8,10 +8,13 @@ import { RootState } from "../../store";
 import { useWriteFile } from "../../hooks/useFiles";
 import { useSaveAs } from "../../hooks/useSaveAs";
 import { useFocusFiles } from "../../hooks/useFocusFiles";
+import themesJson from "../../assets/themes.json";
 
 function EditorCodeComponent() {
-  const { theme } = useSelector((state: RootState) => state.editorSettings);
+  const { name: themeName } = useSelector((state: RootState) => state.theme);
   const { file, tabSize, nextEditorCommand } = useSelector((state: RootState) => state.editor);
+  const theme = themesJson.find((t) => t.name === themeName)?.editor;
+
   //const shortcuts = useSelector((state: RootState) => state.shortcuts);
   const editorRef = useRef<EditorType.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<Monaco | null>(null);
@@ -183,7 +186,7 @@ function EditorCodeComponent() {
         value={file.content}
         path={file.path}
         onChange={handleEditorChange}
-        theme={theme.id}
+        theme={theme?.id}
         onMount={handleEditorDidMount}
         options={{
           minimap: { enabled: false },

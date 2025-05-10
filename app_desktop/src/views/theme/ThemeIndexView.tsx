@@ -1,19 +1,14 @@
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { editorSettingsActions } from "../../features/editorSettings";
+import { setTheme } from "../../features/theme";
 import { RootState } from "../../store";
 import { Check, XIcon } from "lucide-react";
 import Scrollbar from "react-scrollbars-custom";
+import themesJson from "../../assets/themes.json";
 
 function ThemeIndexView() {
   const dispatch = useDispatch();
-  const editorSettings = useSelector((state: RootState) => state.editorSettings);
-  const themes = [
-    { id: "vs-light", name: "Light" },
-    { id: "vs-dark", name: "Dark" },
-    { id: "hc-light", name: "High Contrast Light" },
-    { id: "hc-black", name: "High Contrast Dark" },
-  ];
+  const theme = useSelector((state: RootState) => state.theme);
 
   return (
     <Scrollbar className="flex min-h-screen main-bgg main-color">
@@ -34,19 +29,19 @@ function ThemeIndexView() {
               </div>
             </div>
           </div>
-          {themes.map((t: any) => (
-            <div key={t.id} className="px-4 py-5 border-t border-color flex items-center justify-between w-full">
+          {themesJson.map((t: any) => (
+            <div key={t.name} className="px-4 py-5 border-t border-color flex items-center justify-between w-full">
                 <div className="flex gap-3 items-center">
                     {t.name}
                 </div>
                 <div>
-                    {editorSettings.theme.name === t.name && (
+                    {theme.name === t.name && (
                         <Check className="w-4 h-4" />
                     )}
-                    {editorSettings.theme.name !== t.name && (
+                    {theme.name !== t.name && (
                         <button
-                        disabled={editorSettings.theme.name == t.name} 
-                        className="button-main" onClick={() => dispatch(editorSettingsActions.setTheme(t))}>
+                        disabled={theme.name == t.name} 
+                        className="button-main" onClick={() => dispatch(setTheme(t.name))}>
                             Select
                         </button>
                     )} 

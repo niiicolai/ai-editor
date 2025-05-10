@@ -6,7 +6,7 @@ import ClientError from '../errors/clientError.js';
 import Stripe from 'stripe';
 import mongoose from 'mongoose';
 
-import { updateCreditSaga } from '../rabbitmq/sagas/update_credit_saga.js';
+import { produceUserCreditModificationSaga } from '../rabbitmq/sagas/user_credit_modification_saga.js';
 
 import { idValidator } from "../validators/id_validator.js";
 import { stringValidator } from "../validators/string_validator.js";
@@ -219,51 +219,7 @@ export default class CheckoutService {
      */
     static async successCheckout(sessionId) {
         stringValidator(sessionId, "sessionId");
-
-        const checkout = await CheckoutModel
-            .findOne({ sessionId }).populate('products.product')
-        if (!checkout) ClientError.notFound("checkout not found");
-        if (checkout.state !== "pending") ClientError.badRequest("a checkout can only complete if its state is 'pending'.")
-
-        const session = await mongoose.startSession();
-        session.startTransaction();
-
-        try {
-            // Update checkout state
-            checkout.state = "purchased";
-            await checkout.save({ session });
-
-            // Create user products in a transaction
-            for (const product of checkout.products) {
-                const params = { user: checkout.user };
-                if (product.product.noOfCredits) {
-                    params.credit = {
-                        noOfCredits: product.product.noOfCredits,
-                        creditsUsed: 0
-                    };
-                }
-
-                const products = [];
-                for (let i = 0; i < product.quantity; i++) {
-                    products.push({ ...params });
-                }
-
-                await UserProductModel.create(products, { session, ordered: true });
-            }
-
-            // If everything is successful, commit the transaction
-            await session.commitTransaction();
-        } catch (error) {
-            // If any error occurs, abort the transaction
-            await session.abortTransaction();
-            console.error("Error in checkout success transaction:", error);
-            throw new Error("Error processing checkout: " + error.message);
-        } finally {
-            // End the session
-            session.endSession();
-        }
-
-        await updateCreditSaga(checkout.user._id.toString());
+        await produceUserCreditModificationSaga(sessionId.toString());
     }
 
     /**

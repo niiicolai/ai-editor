@@ -1,9 +1,8 @@
-import { useIsAuthorized } from "../../hooks/useUser";
-import { useGetCreditInfo } from "../../hooks/useUserProduct";
+import { useIsAuthorized, useGetUserCreditLeft } from "../../hooks/useUser";
 
 function CreditInfoComponent() {
   const { data: isAuthorized } = useIsAuthorized();
-  const { data: creditInfo, isLoading, error } = useGetCreditInfo();
+  const { data: creditLeft, isLoading, error } = useGetUserCreditLeft();
 
   if (!isAuthorized) {
     return <></>
@@ -32,23 +31,11 @@ function CreditInfoComponent() {
     <div>
       <div className="flex items-center gap-1 justify-start highlight-color">
         <span className="text-xs font-semibold inline-block">
-          Credits Used
+          Credit Left:
         </span>
         <span className="text-xs font-semibold inline-block">
-          {creditInfo?.totalUsedCredits} / {creditInfo?.totalMaxCredits}
+          {creditLeft?.credit}
         </span>
-      </div>
-      <div className="hidden h-2 text-xs flex rounded bg-indigo-200">
-        <div
-          style={{
-            width: `${
-              ((creditInfo?.totalUsedCredits || 0) /
-                (creditInfo?.totalMaxCredits || 1)) *
-              100
-            }%`,
-          }}
-          className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-500 transition-all duration-500"
-        ></div>
       </div>
     </div>
   );

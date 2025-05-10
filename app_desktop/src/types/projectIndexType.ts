@@ -21,6 +21,7 @@ export interface ProjectIndexItemType {
     functions: ProjectIndexItemFunctionType[];
     classes: ProjectIndexItemClassType[];
     vars: ProjectIndexItemVarType[];
+    ignore: boolean;
   };
 }
 

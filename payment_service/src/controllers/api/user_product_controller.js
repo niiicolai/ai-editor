@@ -7,8 +7,8 @@ import { respond } from "../respond.js";
 const router = express.Router();
 export const links = {
     get: { rel: "get user product", method: "GET", href: "/user_product/{_id}" },
-    getAll: { reg: "get all user products", method: "GET", href: "/user_products" },
-    getCreditsInfo: { reg: "get credit info", method: "GET", href: "/credit_info" },
+    getAll: { rel: "get all user products", method: "GET", href: "/user_products" },
+    getCreditsInfo: { rel: "get credit info", method: "GET", href: "/credit_info" },
 };
 
 /**
@@ -127,54 +127,5 @@ router.get(
         });
     }
 );
-
-/**
- * @openapi
- * '/api/v1/credit_info':
- *  get:
- *    tags:
- *     - User Product Controller
- *    summary: Get user credit information
- *    security:
- *     - bearerAuth: []
- *    parameters:
- *     - name: discover
- *       in: query
- *       description: HATEOAS
- *       required: false
- *       schema:
- *        type: boolean
- *        default: false
- *    responses:
- *     200:
- *      description: OK
- *      content:
- *       application/json:
- *        schema:
- *         type: object
- *         properties:
- *          data:
- *           $ref: '#/components/userCreditInfoResponse'
- *          _links:
- *           $ref: '#/components/linksResponse'
- *      headers:
- *        $ref: '#/components/responseHeaders'
- *     400:
- *      $ref: '#/components/badRequestResponse'
- *     401:
- *      $ref: '#/components/unauthorizedResponse'
- *     404:
- *      $ref: '#/components/notFoundResponse'
- *     500:
- *      $ref: '#/components/internalServerErrorResponse'
- */
-router.get(
-    "/credit_info",
-    [authentication, hateoas(links, links.getCreditsInfo, [])],
-    async (req, res) => {
-        respond(req, res, async () => {
-            return await UserProductService.getCreditsInfo(req.user._id);
-        });
-    });
 
 export default router;

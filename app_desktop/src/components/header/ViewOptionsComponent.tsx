@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
-import { editorSettingsActions } from "../../features/editorSettings";
+import { hierarchySettingsActions } from "../../features/hierarchySettings";
 import {
   setTerminalDisabled,
   setTerminalMinimized,
@@ -12,7 +12,7 @@ import { useTerminals } from "../../hooks/useTerminals";
 import { useExternalBrowser } from "../../hooks/useExternalBrowser";
 
 function ViewOptionsComponent() {
-  const editorSettings = useSelector((state: RootState) => state.editorSettings);
+  const hierarchySettings = useSelector((state: RootState) => state.hierarchySettings);
   const shortcuts = useSelector((state: RootState) => state.shortcuts);
   const { disabled, minimized } = useSelector((state: RootState) => state.terminalSettings);
   const { closeActiveTab, newTab } = useTerminals();
@@ -20,7 +20,7 @@ function ViewOptionsComponent() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleMinimizeTerminal = () => dispatch(setTerminalMinimized(!minimized));
-  const handleMinimizeExplorer = () => dispatch(editorSettingsActions.setHierarchyMinimized(!editorSettings.hierarchy.minimized));
+  const handleMinimizeExplorer = () => dispatch(hierarchySettingsActions.setHierarchyMinimized(!hierarchySettings.minimized));
   useHotkeys(shortcuts.close_active_terminal.join('+'), () => closeActiveTab(), [closeActiveTab]);
   useHotkeys(shortcuts.new_terminal.join('+'), () => newTab(), [newTab]);
   useHotkeys(shortcuts.hide_terminal.join('+'), () => handleMinimizeTerminal(), [handleMinimizeTerminal]);
@@ -51,23 +51,17 @@ function ViewOptionsComponent() {
           >
             Shortcuts
           </button>
-          <button
-            onClick={() => navigate("/extensions")}
-            className="button-main w-full text-left px-2 py-1"
-          >
-            Extensions
-          </button>
           <hr className="border-color" />
           <button
             onClick={() => dispatch(
-              editorSettingsActions.setHierarchyMinimized(
-                !editorSettings.hierarchy.minimized
+              hierarchySettingsActions.setHierarchyMinimized(
+                !hierarchySettings.minimized
               )
             )}
             className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
             
-              <span>{editorSettings.hierarchy.minimized
+              <span>{hierarchySettings.minimized
               ? "Show Explorer"
               : "Hide Explorer"}</span>
               <span>{shortcuts.hide_explorer.join(" + ")}</span>

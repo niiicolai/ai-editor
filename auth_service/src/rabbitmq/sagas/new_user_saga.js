@@ -23,6 +23,7 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
       const user = new UserModel({
         username: body.username,
         email: body.email,
+        role: body.role,
         incomplete_transactions: [{ transaction: transaction._id }],
         logins: [{ type: "password", password: body.password }],
       });

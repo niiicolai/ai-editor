@@ -12,6 +12,10 @@ export const userSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
+    credit: {
+      type: Number,
+      default: 0,
+    },
     deleted_at: {
       type: Date,
       required: false,

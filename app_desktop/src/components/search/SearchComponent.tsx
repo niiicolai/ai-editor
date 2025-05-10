@@ -1,14 +1,14 @@
 import { SearchIcon, XIcon } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
-import { setSearchVisible } from "../../features/editorSearch";
+import { setSearchVisible } from "../../features/search";
 import { FileItemType } from "../../types/directoryInfoType";
 import { useSearch } from "../../hooks/useSearch";
 import SearchItemComponent from "./SearchItemComponent";
 
 function SearchComponent() {
   const { searchFiles, search } = useSearch();
-  const { visible } = useSelector((state: RootState) => state.editorSearch);
+  const { visible } = useSelector((state: RootState) => state.search);
   const dispatch = useDispatch();
   const hideSearch = () => dispatch(setSearchVisible(false));
 

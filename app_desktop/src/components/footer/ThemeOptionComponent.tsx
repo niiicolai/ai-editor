@@ -4,7 +4,7 @@ import { AppWindow } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 function ThemeOptionComponent() {
-  const { theme } = useSelector((state: RootState) => state.editorSettings);
+  const theme = useSelector((state: RootState) => state.theme);
   const navigate = useNavigate();
 
   return (

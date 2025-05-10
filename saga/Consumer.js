@@ -12,14 +12,11 @@ export class Consumer {
     }
 
     async consume(msg) {
-        objectValidator(msg, 'msg');
-
         try {
             const message = await this.onConsume(msg);
             this.rabbitMq.sendMessage(`${this.queueName}_success`, message);
         } catch {
-            const message = await this.onCompensate(msg);
-            this.rabbitMq.sendMessage(`${this.queueName}_compensate`, message);
+            this.rabbitMq.sendMessage(`${this.queueName}_compensate`, msg);
         }
     }
 }
@@ -34,20 +31,13 @@ export class ConsumerBuilder {
         return this;
     }
 
-    onCompensate(callback) {
-        this.params.onCompensate = callback;
-        return this;
-    }
-
     build() {
         if (!this.params.queueName) throw new Error("A queueName must be specified!");
         if (!this.params.rabbitMq) throw new Error("A rabbitMq must be specified!");
         if (!this.params.onConsume) throw new Error("An onConsume callback must be specified!");
-        if (!this.params.onCompensate) throw new Error("An onCompensate callback must be specified!");
         
         const consumer = new Consumer(this.params.queueName, this.params.rabbitMq, {
             onConsume: this.params.onConsume,
-            onCompensate: this.params.onCompensate
         });
 
         return consumer;

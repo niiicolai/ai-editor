@@ -11,27 +11,29 @@ import {
 
 import shortcuts from './features/shortcuts';
 import userAgentSession from './features/userAgentSession';
-import editorSearch from './features/editorSearch';
-import editorSettings from './features/editorSettings';
+import search from './features/search';
+import hierarchySettings from './features/hierarchySettings';
 import hierarchy from './features/hierarchy';
 import editor from './features/editor';
 import terminals from './features/terminals';
 import terminalSettings from './features/terminalSettings';
 import tabs from './features/tabs';
 import projectIndex from './features/projectIndex';
+import theme from './features/theme';
 
 const store = configureStore({
     reducer: {
         projectIndex,
         userAgentSession,
         shortcuts,
-        editorSearch,
-        editorSettings,
+        search,
+        hierarchySettings,
         hierarchy,
         terminals,
         terminalSettings,
         editor,
-        tabs
+        tabs,
+        theme,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

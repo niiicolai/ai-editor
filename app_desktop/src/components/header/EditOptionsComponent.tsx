@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { setSearchVisible } from "../../features/editorSearch";
+import { setSearchVisible } from "../../features/search";
 import DropdownComponent from "../utils/DropdownComponent";
 import { RootState } from "../../store";
 import { useHotkeys } from "react-hotkeys-hook";

@@ -31,20 +31,6 @@ export default {
             }
         }
     },
-    userCreditInfoResponse: {
-        type: 'object',
-        properties: {
-            totalMaxCredits: {
-                type: 'number'
-            },
-            totalUsedCredits: {
-                type: 'number'
-            },
-            creditsLeft: {
-                type: 'number'
-            },
-        }
-    },
     userProductsResponse: {
         type: 'object',
         properties: {

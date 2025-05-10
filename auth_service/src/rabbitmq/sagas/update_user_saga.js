@@ -20,7 +20,7 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
       const transaction = new TransactionModel({
         state: "pending",
         type: queueName,
-        parameters: JSON.stringify({ _id }),
+        parameters: JSON.stringify({ _id: body._id }),
       });
       await transaction.save({ session });
 

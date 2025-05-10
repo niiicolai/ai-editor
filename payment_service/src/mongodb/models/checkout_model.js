@@ -12,7 +12,7 @@ export const checkoutSchema = new mongoose.Schema(
         state: {
             type: String,
             default: 'open',
-            enum: ['open', 'pending', 'cancelled', 'purchased']
+            enum: ['open', 'pending', 'cancelled', 'purchased', 'expired'],
         },
         sessionId: {
             type: String,

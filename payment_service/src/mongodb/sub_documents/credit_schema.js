@@ -6,11 +6,6 @@ export const creditSchema = new mongoose.Schema(
             type: Number,
             required: true
         },
-        usedCredits: {
-            type: Number,
-            required: false,
-            default: 0
-        },
     },
     {
         timestamps: {

@@ -8,6 +8,7 @@ if (!JWT_EXPIRES_IN) console.error('JWT_EXPIRES_IN is not set or is invalid in .
 
 interface JWTPayload {
     _id: string;
+    role: string;
 }
 
 interface JWTSignOption {

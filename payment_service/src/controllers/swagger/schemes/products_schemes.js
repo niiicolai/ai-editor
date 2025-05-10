@@ -70,4 +70,50 @@ export default {
             },
         }
     },
+    productCreateInput: {
+        type: 'object',
+        properties: {
+            title: {
+                type: 'string',
+            },
+            description: {
+                type: 'string',
+            },
+            category: {
+                type: 'string',
+            },
+            noOfCredits: {
+                type: 'number',
+            },
+            price: {
+                type: 'number',
+            },
+            stripePriceId: {
+                type: 'string',
+            },
+        }
+    },
+    productUpdateInput: {
+        type: 'object',
+        properties: {
+            title: {
+                type: 'string',
+            },
+            description: {
+                type: 'string',
+            },
+            category: {
+                type: 'string',
+            },
+            noOfCredits: {
+                type: 'number',
+            },
+            price: {
+                type: 'number',
+            },
+            stripePriceId: {
+                type: 'string',
+            },
+        }
+    }
 };

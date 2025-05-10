@@ -8,7 +8,7 @@ import { respond } from "../respond.js";
 const router = express.Router();
 export const links = {
     get: { rel: "get checkout", method: "GET", href: "/checkout/{_id}" },
-    getAll: { reg: "get all checkout", method: "GET", href: "/checkouts" },
+    getAll: { rel: "get all checkout", method: "GET", href: "/checkouts" },
     create: { rel: "create checkout", method: "POST", href: "/checkout" },
     update: { rel: "update checkout", method: "POST", href: "/checkout/{_id}" },
     getOrCreate: { rel: "get or create checkout", method: "POST", href: "/find_or_create_checkout" },

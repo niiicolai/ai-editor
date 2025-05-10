@@ -14,6 +14,12 @@ export const userSchema = new mongoose.Schema({
         unique: true,
         required: true
     },
+    role: {
+        type: String,
+        enum: ['admin', 'member'],
+        default: 'member',
+        required: true
+    },
     incomplete_transactions: [{
         transaction: {
             type: mongoose.Schema.Types.ObjectId,

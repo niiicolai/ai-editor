@@ -8,7 +8,7 @@ const [username, email, password] = TEST_USER.split(":");
 
 export default class Migration_1744558723987_add_default_user extends Migration {
     async up() {
-        await UserService.create({ username, email, password });
+        await UserService.create({ username, email, password, role: "admin" });
     }
 
     async down() {

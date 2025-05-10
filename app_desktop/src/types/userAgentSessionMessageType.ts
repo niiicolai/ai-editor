@@ -6,6 +6,7 @@ export interface UserAgentSessionMessageType {
         name: string;
         args: string;
     }
+    state: string;
     role: string;
     user_files: {
         _id: string;

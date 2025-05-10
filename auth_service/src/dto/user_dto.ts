@@ -3,6 +3,7 @@ export default (doc) => {
     _id: doc._id,
     username: doc.username,
     email: doc.email,
+    role: doc.role,
     ...(doc.logins?.length > 0 && {
       logins: doc.logins.map((login) => {
         return {

@@ -19,7 +19,6 @@ export default class InputAgentEvent extends WebsocketEvent {
       return;
     }
 
-    console.log(data)
 
     const sessionId = connection.userData.sessionId;
     const userId = connection.userData.user._id;
@@ -35,6 +34,7 @@ export default class InputAgentEvent extends WebsocketEvent {
       await UserAgentSessionMessageService.create(
         {
           context: data,
+          state: "completed",
           role: "user",
           userAgentSessionId: sessionId,
         },
@@ -42,6 +42,18 @@ export default class InputAgentEvent extends WebsocketEvent {
       );
 
     reply("user_input_reply", userAgentSessionMessionInput);
+
+    const userAgentSessionMessionAgent =
+      await UserAgentSessionMessageService.create(
+        {
+          context: { content: "None" },
+          state: "pending",
+          role: "assistant",
+          userAgentSessionId: sessionId,
+        },
+        userId
+      );
+    reply("user_input_reply", userAgentSessionMessionAgent);
 
     /**
      * Update session title if it is the first message.
@@ -72,7 +84,7 @@ export default class InputAgentEvent extends WebsocketEvent {
           },
         ]
       );
-      console.log(titleResponse)
+      console.log(titleResponse);
       await UserAgentSessionService.update(
         sessionId,
         { title: titleResponse.content },
@@ -105,16 +117,14 @@ export default class InputAgentEvent extends WebsocketEvent {
         )}`,
       },
     ]);
-    const userAgentSessionMessionAgent =
-      await UserAgentSessionMessageService.create(
+    const updatedUserAgentSessionMessionAgent =
+      await UserAgentSessionMessageService.update(
+        userAgentSessionMessionAgent._id.toString(),
         {
-          context: {
-            content: agentResponse.content,
-            clientFn: agentResponse.clientFn,
-            code: agentResponse.code,
-          },
-          role: "assistant",
-          userAgentSessionId: sessionId,
+          content: agentResponse.content,
+          state: "completed",
+          code: agentResponse.code,
+          clientFn: agentResponse.clientFn,
         },
         userId
       );
@@ -148,25 +158,25 @@ export default class InputAgentEvent extends WebsocketEvent {
       );
       reply("session_operation", operation);
     } else if (agentResponse.clientFn) {
-        const goalResponse = await AgentService.noFuncPrompt(
-            `Make a very short description of my goal: ${data?.content}; Do not put quotes around the description.`,
-            "user",
-            [
-              ...lastMessages.messages.map((m) => {
-                return { role: m.role, content: m.content };
-              }),
-              {
-                role: "developer",
-                content: `The current file is ${data?.currentFile?.name}`,
-              },
-              {
-                role: "developer",
-                content: `The directory state is ${JSON.stringify(
-                  data?.directoryInfo
-                )}`,
-              },
-            ]
-          );
+      const goalResponse = await AgentService.noFuncPrompt(
+        `Make a very short description of my goal: ${data?.content}; Do not put quotes around the description.`,
+        "user",
+        [
+          ...lastMessages.messages.map((m) => {
+            return { role: m.role, content: m.content };
+          }),
+          {
+            role: "developer",
+            content: `The current file is ${data?.currentFile?.name}`,
+          },
+          {
+            role: "developer",
+            content: `The directory state is ${JSON.stringify(
+              data?.directoryInfo
+            )}`,
+          },
+        ]
+      );
       operation = await UserAgentSessionOperationService.create(
         {
           name: goalResponse.content,
@@ -182,6 +192,6 @@ export default class InputAgentEvent extends WebsocketEvent {
       reply("session_operation", operation);
     }
 
-    reply("user_input_reply", userAgentSessionMessionAgent);
+    reply("user_input_reply_update", updatedUserAgentSessionMessionAgent);
   }
 }

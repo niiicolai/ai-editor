@@ -28,8 +28,6 @@ export default class InputAskEvent extends WebsocketEvent {
     const focusFiles = data.focusFiles;
     const directoryInfo = data.directoryInfo;
 
-    console.log(data);
-
     const lastMessages = await UserAgentSessionMessageService.findAll(
       sessionId,
       1,
@@ -42,12 +40,25 @@ export default class InputAskEvent extends WebsocketEvent {
         {
           context: { content, currentFile, focusFiles, directoryInfo },
           role: "user",
+          state: "completed",
           userAgentSessionId: sessionId,
         },
         userId
       );
 
     reply("user_input_reply", userAgentSessionMessionInput);
+
+    const userAgentSessionMessionAgent =
+      await UserAgentSessionMessageService.create(
+        {
+          context: { content: "None" },
+          state: "pending",
+          role: "assistant",
+          userAgentSessionId: sessionId,
+        },
+        userId
+      );
+    reply("user_input_reply", userAgentSessionMessionAgent);
 
     /**
      * Update session title if it is the first message.
@@ -143,20 +154,18 @@ export default class InputAskEvent extends WebsocketEvent {
         }
       ]
     );
-    const userAgentSessionMessionAgent =
-      await UserAgentSessionMessageService.create(
+    const updatedUserAgentSessionMessionAgent =
+      await UserAgentSessionMessageService.update(
+        userAgentSessionMessionAgent._id.toString(),
         {
-          context: {
-            content: agentResponse.content,
-            clientFn: agentResponse.clientFn,
-            code: agentResponse.code,
-          },
-          role: "assistant",
-          userAgentSessionId: sessionId,
+          content: agentResponse.content,
+          state: "completed",
+          code: agentResponse.code,
+          clientFn: agentResponse.clientFn,
         },
         userId
       );
 
-    reply("user_input_reply", userAgentSessionMessionAgent);
+    reply("user_input_reply_update", updatedUserAgentSessionMessionAgent);
   }
 }

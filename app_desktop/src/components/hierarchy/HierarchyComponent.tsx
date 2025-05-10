@@ -2,27 +2,22 @@ import Scrollbar from "react-scrollbars-custom";
 import HierarchyItemComponent from "./HierarchyItemComponent";
 import HierarchyNewComponent from "./HierarchyNewComponent";
 import HierarchyDeleteComponent from "./HierarchyDeleteComponent";
+import editorNoFiles from "../../assets/editorNoFiles.png";
+import HierarchyRightClickMenuComponent from "./HierarchyRightClickMenuComponent";
 import { ChevronRight, ChevronDown, ChevronLeft } from "lucide-react";
 import { FileItemType } from "../../types/directoryInfoType";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
-import { editorSettingsActions } from "../../features/editorSettings";
+import { hierarchySettingsActions } from "../../features/hierarchySettings";
 import { setInspectorMenu } from "../../features/hierarchy";
-import editorNoFiles from "../../assets/editorNoFiles.png";
-import HierarchyRightClickMenuComponent from "./HierarchyRightClickMenuComponent";
 
 
 function HierarchyComponent() {
   const dispatch = useDispatch();
-  const editorSettings = useSelector(
-    (state: RootState) => state.editorSettings
-  );
-  const hierarchy = useSelector((state: RootState) => state.hierarchy);
-  const { minimized: isMinimized } = editorSettings.hierarchy;
-  const { currentFile, currentPath, directoryState } = hierarchy;
+  const { minimized: isMinimized } = useSelector((state: RootState) => state.hierarchySettings);
+  const { currentFile, currentPath, directoryState, renameFileItem }  = useSelector((state: RootState) => state.hierarchy);
   const currentFolder = currentPath ? currentPath.split("\\").pop() || "" : "";
   const hasFiles = currentPath && directoryState[currentPath]?.files.length > 0;
-  const renameFileItem = hierarchy?.renameFileItem;
 
   const handleContextMenu = (event: any) => {
     event.preventDefault();
@@ -41,7 +36,7 @@ function HierarchyComponent() {
       <div className="h-full flex flex-col justify-center main-bgg text-white p-1">
         <button
           onClick={() =>
-            dispatch(editorSettingsActions.setHierarchyMinimized(false))
+            dispatch(hierarchySettingsActions.setHierarchyMinimized(false))
           }
           className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -77,7 +72,7 @@ function HierarchyComponent() {
 
               {hasFiles && (
                 <div className="px-2 py-1">
-                  {hierarchy.directoryState[currentPath].files.map((file) => (
+                  {directoryState[currentPath].files.map((file) => (
                     <HierarchyItemComponent
                       key={file.path}
                       file={file}
@@ -86,11 +81,11 @@ function HierarchyComponent() {
                       currentFile={currentFile}
                       getChildren={(file: FileItemType) =>
                         file.isDirectory
-                          ? hierarchy.directoryState[file.path]?.files || []
+                          ? directoryState[file.path]?.files || []
                           : []
                       }
                       getIsOpen={(file: FileItemType) =>
-                        hierarchy.directoryState[file.path]?.isOpen
+                        directoryState[file.path]?.isOpen
                       }
                     />
                   ))}

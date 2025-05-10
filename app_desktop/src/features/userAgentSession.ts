@@ -24,17 +24,36 @@ const userAgentSessionSlice = createSlice({
     setSessionId: (state: any, action: PayloadAction<string | null>) => {
       state.sessionId = action.payload;
     },
-    setOperation: (state: any, action: PayloadAction<UserAgentSessionOperationType | null>) => {
+    setOperation: (
+      state: any,
+      action: PayloadAction<UserAgentSessionOperationType | null>
+    ) => {
       state.operation = action.payload;
     },
-    addMessage: (state: any, action: PayloadAction<UserAgentSessionMessageType>) => {
+    addMessage: (
+      state: any,
+      action: PayloadAction<UserAgentSessionMessageType>
+    ) => {
       state.messages.push(action.payload);
     },
     clearMessages: (state: any) => {
       state.messages = [];
-    }
+    },
+    setMessages: (
+      state: any,
+      action: PayloadAction<UserAgentSessionMessageType[]>
+    ) => {
+      state.messages = action.payload;
+    },
   },
 });
 
-export const { setSessionId, setSessionTitle, addMessage, clearMessages, setOperation } = userAgentSessionSlice.actions;
+export const {
+  setSessionId,
+  setSessionTitle,
+  addMessage,
+  clearMessages,
+  setOperation,
+  setMessages,
+} = userAgentSessionSlice.actions;
 export default userAgentSessionSlice.reducer;

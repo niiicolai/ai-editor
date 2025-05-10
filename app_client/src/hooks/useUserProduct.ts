@@ -8,7 +8,3 @@ export const useGetUserProduct = (_id: string) => {
 export const useGetUserProducts = (page: number, limit: number) => {
     return useQuery({ queryKey: ['products', page, limit], queryFn: () => UserProductService.getAll(page, limit) });
 }
-
-export const useGetCreditInfo = () => {
-    return useQuery({ queryKey: ['credit_info'], queryFn: () => UserProductService.getCreditInfo() })
-}

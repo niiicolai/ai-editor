@@ -2,6 +2,7 @@ import { UserType } from "../types/userType";
 import TokenService from "./tokenService";
 
 const API_URL = "http://localhost:3000/api/v1";
+const API2_URL = "http://localhost:3001/api/v1";
 
 export default class UserService {
     static async isAuthorized(): Promise<boolean> {
@@ -15,6 +16,22 @@ export default class UserService {
         const isNotAuthorized = (code === 401 || code === 403);
 
         return !isNotAuthorized;
+    }
+
+    static async creditLeft(): Promise<{ _id: string, credit: number }> {
+        const response = await fetch(`${API2_URL}/user?fields=credit`, {
+            headers: {
+                'authorization': `Bearer ${TokenService.getToken()}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+
+        const json = await response.json();
+
+        return json.data as { _id: string, credit: number };
     }
     
     static async get(): Promise<UserType> {

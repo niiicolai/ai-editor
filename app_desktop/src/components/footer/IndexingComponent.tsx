@@ -16,10 +16,12 @@ import {
   ProjectIndexItemType,
   ProjectIndexItemVarType,
 } from "../../types/projectIndexType";
+import { useFiles } from "../../hooks/useFiles";
 import { useReadFile } from "../../hooks/useReadFile";
 import { FileItemType } from "../../types/directoryInfoType";
 import { useCreateProjectIndexItem } from "../../hooks/useProjectIndexItem";
 import { useNavigate } from "react-router-dom";
+import { useIgnoreAi } from "../../hooks/useIgnoreAi"; 
 
 export default function IndexingComponent() {
   const projectIndex = useSelector((state: RootState) => state.projectIndex);
@@ -33,23 +35,31 @@ export default function IndexingComponent() {
   const createProjectIndexItem = useCreateProjectIndexItem();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const _files = useFiles();
+  const ignoreAi = useIgnoreAi();
 
   const backendIndexing = async () => {
+    dispatch(setIsLoadingIndex(true));
+    if (Object.keys(projectIndex.items).length === 0) {
+      return dispatch(setIsLoadingIndex(false));
+    }
+
     if (!currentPath) {
-      return;
+      return dispatch(setIsLoadingIndex(false));
     }
     let currentProjectIndexFile = null;
     try {
       currentProjectIndexFile = await projectIndexFile.read(currentPath);
       if (!currentProjectIndexFile?._id) {
-        currentProjectIndexFile = await projectIndexFile.write(currentPath);
+
+        //currentProjectIndexFile = await projectIndexFile.write(currentPath);
       }
     } catch {
-      return;
+      return dispatch(setIsLoadingIndex(false));
     }
 
     if (!currentProjectIndexFile?._id) {
-      return;
+      return dispatch(setIsLoadingIndex(false));
     }
     try {
       if (projectIndex.meta?.name != currentPath) {
@@ -62,8 +72,15 @@ export default function IndexingComponent() {
       }
 
       const newItems = {} as ProjectIndexItemType;
+      console.log("Project Index:", projectIndex.items);
       for (const key in projectIndex.items) {
+        if (projectIndex.items[key].ignore) {
+          console.log("Ignoring file:", projectIndex.items[key].name);
+          continue;
+        }
+
         if (projectIndex.items[key]._id) {
+          console.log("File already indexed:", projectIndex.items[key].name);
           newItems[key] = projectIndex.items[key];
           continue;
         }
@@ -91,23 +108,30 @@ export default function IndexingComponent() {
           ),
           vars: JSON.stringify((item.vars as ProjectIndexItemVarType[]) ?? []),
           projectIndexId: currentProjectIndexFile._id,
-        });
+        }) as any;
+        console.log("Saved item:", savedItem);
 
         newItems[item.path] = {
           ...item,
-          _id: savedItem._id,
+          _id: savedItem[0]._id,
         };
       }
 
       dispatch(
         setItems({
+          ...projectIndex.items,
           ...newItems,
         })
       );
-    } catch {}
+    } catch {
+      
+    } finally {
+      dispatch(setIsLoadingIndex(false));
+    }
   };
 
   const clientIndexing = async () => {
+
     if (!currentPath) {
       return;
     }
@@ -117,15 +141,26 @@ export default function IndexingComponent() {
         setMeta({ name: currentPath, _id: projectIndex.meta?._id ?? null })
       );
     }
-
+    
+    const ignoreFiles = await ignoreAi.read(currentPath);
     const newItems = {} as ProjectIndexItemType;
     for (const key in hierarchy.directoryState) {
-      const files = hierarchy.directoryState[key].files.filter(
-        (f: FileItemType) => !f.isDirectory
-      );
+      const files = hierarchy.directoryState[key].files;
+      const allFiles = [] as FileItemType[];
+      for (const file of files) {
+        if (file.isDirectory) {
+          if (ignoreFiles?.includes(file.name)) continue;
+          const directoryFiles = await _files.readDirectory(file.path);
+          allFiles.push(...directoryFiles);
+        } else {
+          allFiles.push(file);
+        }
+      }
 
-      for (const f of files) {
+      for (const f of allFiles) {
         if (projectIndex.items[f.path]) continue;
+        if (f.isDirectory) continue;
+
         const data = await readFile.read(f);
         const parsedData = await parseFile.parse(
           data?.content || "",
@@ -144,6 +179,7 @@ export default function IndexingComponent() {
             (parsedData?.functions as ProjectIndexItemFunctionType[]) ?? [],
           classes: (parsedData?.classes as ProjectIndexItemClassType[]) ?? [],
           vars: (parsedData?.vars as ProjectIndexItemVarType[]) ?? [],
+          ignore: ignoreFiles?.includes(f.name) || false,
         };
       }
     }
@@ -155,23 +191,12 @@ export default function IndexingComponent() {
     );
   };
 
-  const handleIndexing = async () => {
-    if (!currentPath) {
-      return;
-    }
-    dispatch(setIsLoadingIndex(true));
-    await clientIndexing();
-    //await backendIndexing();
-    dispatch(setIsLoadingIndex(false));
-  };
-
   useEffect(() => {
     if (currentPath && Object.entries(directoryState).length > 0) {
-      handleIndexing();
+      clientIndexing();
+      backendIndexing();
     }
   }, [currentPath, directoryState]);
-
-  console.log(projectIndex);
 
   return (
     <>

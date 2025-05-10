@@ -134,11 +134,6 @@ export const useParseFileContent = () => {
                         ...jsonParser(content),
                         lines
                     }
-                case 'yaml':
-                    return {
-                        ...jsonParser(content),
-                        lines
-                    }
                 default:
                     return {
                         description: 'None',

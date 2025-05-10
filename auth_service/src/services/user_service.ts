@@ -15,6 +15,7 @@ const allowedFields = [
   "_id",
   "username",
   "email",
+  "role",
   "created_at",
   "updated_at",
   "logins.type",
@@ -44,6 +45,7 @@ interface UserCreateBody {
   email: string;
   password: string;
   username: string;
+  role: string;
 }
 
 interface UserUpdateBody {
@@ -79,10 +81,11 @@ export default class UserService {
    * @param {Array<string>} fields
    * @returns {Promise<UserCreateResponse>}
    */
-  static async create({ username, password, email }: UserCreateBody, fields: Array<string> = []): Promise<UserCreateResponse> {
+  static async create({ username, password, email, role }: UserCreateBody, fields: Array<string> = []): Promise<UserCreateResponse> {
     stringValidator(username, "username");
     stringValidator(password, "password");
     stringValidator(email, "email");
+    stringValidator(role, "role");
 
     const usernameExists = await User.exists({ username });
     if (usernameExists) ClientError.badRequest("username already exists");
@@ -91,10 +94,10 @@ export default class UserService {
     if (emailExists) ClientError.badRequest("email already exists");
 
     const { user } = await produceNewUserSaga({
-      username, password, email
+      username, password, email, role
     });
 
-    const token = await JwtService.sign({ _id: user._id.toString() });
+    const token = await JwtService.sign({ _id: user._id.toString(), role: user.role });
 
     return {
       user: await this.find(user._id.toString(), fields),

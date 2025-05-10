@@ -10,13 +10,7 @@ export const useIgnoreAi = () => {
   const writeFile = useWriteFile();
 
   const parse = (content: string) => {
-    const params = {} as any;
-    const lines = content?.split("\n");
-    for (const line of lines) {
-        const splittedLine = line?.split("=");
-        params[splittedLine[0]] = splittedLine[1];
-    }
-    return params;
+    return content?.split("\n");
   };
 
   const read = async (path: string) => {
@@ -25,10 +19,11 @@ export const useIgnoreAi = () => {
 
     for (const file of files) {
       const isFile = file.name == ignoreAiFileName;
+
       if (isFile) {
         const result = await readFile.read(file);
         const parsed = parse(result?.content || "");
-        if (parsed._id) return parsed;
+        if (parsed) return parsed;
         break;
       }
     }
@@ -38,7 +33,7 @@ export const useIgnoreAi = () => {
 
   const write = async (path: string) => {
     const filePath = `${path}\\${ignoreAiFileName}`;
-    const content = `# Add properties below`;
+    const content = `.palm_project_index\n.palm_ignore_ai\n.env\nnode_modules`;
     await writeFile.write(
       path,
       filePath,

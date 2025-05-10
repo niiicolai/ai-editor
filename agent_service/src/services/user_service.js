@@ -9,6 +9,7 @@ const allowedFields = [
   "_id",
   "username",
   "email",
+  "credit",
   "created_at",
   "updated_at",
 ];

@@ -118,6 +118,7 @@ export default class UserAgentSessionMessageService {
                 clientFn: body?.context?.clientFn,
                 code: body?.context?.code,
                 role: body.role,
+                state: body?.state || "pending",
                 user_files: body.user_files,
                 user_agent_session: userAgentSession._id,
                 user: user._id,
@@ -142,16 +143,17 @@ export default class UserAgentSessionMessageService {
      */
     static async update(_id, body, userId, fields = null) {
         objectValidator(body, "body");
-        stringValidator(body.content, "content");
         idValidator(_id, "_id");
         idValidator(userId, "userId");
-        fields = fieldsValidator(fields, allowedFields);
 
         const userAgentSessionMessage = await UserAgentSessionMessage.findOne({ _id, user: userId });
         if (!userAgentSessionMessage) ClientError.notFound("user agent session message not found");
 
         try {
-            userAgentSessionMessage.content = body.content;
+            if (body.content) userAgentSessionMessage.content = body.content;
+            if (body.clientFn) userAgentSessionMessage.clientFn = body.clientFn;
+            if (body.code) userAgentSessionMessage.code = body.code;
+            if (body.state) userAgentSessionMessage.state = body.state;
             await userAgentSessionMessage.save();
 
             return await this.find(userAgentSessionMessage._id.toString(), userId, fields);

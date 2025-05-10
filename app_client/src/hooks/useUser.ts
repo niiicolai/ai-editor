@@ -12,6 +12,10 @@ export const useIsAuthorized = () => {
     return useQuery({ queryKey: ['user_auth_state'], queryFn: UserService.isAuthorized });
 }
 
+export const useGetUserCreditLeft = () => {
+    return useQuery({ queryKey: ['user_credit_left'], queryFn: UserService.creditLeft });
+}
+
 export const useLoginUser = () => {
     return useMutation({
         mutationFn: (credentials: { email: string, password: string }) =>

@@ -17,9 +17,3 @@ export interface UserProductsType {
     limit: number;
     page: number;
 }
-
-export interface CreditInfoType {
-    totalMaxCredits: number;
-    totalUsedCredits: number;
-    creditsLeft: number;
-}

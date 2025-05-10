@@ -45,6 +45,6 @@ export default class UserLoginService {
     );
     if (!isPasswordValid) ClientError.unauthorized("Invalid password");
     
-    return { token: await JwtService.sign({ _id: user._id.toString() }) };
+    return { token: await JwtService.sign({ _id: user._id.toString(), role: user.role }) };
   }
 }

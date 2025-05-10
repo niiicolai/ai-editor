@@ -51,33 +51,4 @@ export default class UserProductService {
             pages,
         };
     }
-
-    /**
-     * @function getCreditsInfo
-     * @description Get user credits info
-     * @param {String} userId
-     * @returns {Promise<Object>}
-     */
-    static async getCreditsInfo(userId) {
-        idValidator(userId, "userId");
-
-        const query = { user: userId, credit: { $ne: null } };
-        const userProducts = await UserProductModel
-            .find(query)
-            .sort({ created_at: -1 });
-        let totalMaxCredits = 0;
-        let totalUsedCredits = 0;
-        userProducts.forEach(p=> {
-            if (p.credit) {
-                totalMaxCredits += p.credit.noOfCredits;
-                totalUsedCredits += p.credit.usedCredits;                
-            }
-        })
-        const creditsLeft = totalMaxCredits - totalUsedCredits;
-        return {
-            totalMaxCredits,
-            totalUsedCredits,
-            creditsLeft,
-        };
-    }
 }

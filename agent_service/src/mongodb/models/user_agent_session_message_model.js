@@ -29,6 +29,12 @@ const userAgentSessionMessageSchema = new mongoose.Schema({
         ref: 'UserFile',
         required: false
     }],
+    state: {
+        type: String,
+        required: true,
+        enum: ['pending', 'processing', 'completed', 'failed'],
+        default: 'pending'
+    },
     user_agent_session: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'UserAgentSession',

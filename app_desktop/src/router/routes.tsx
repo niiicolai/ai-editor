@@ -2,7 +2,6 @@
 import EditorView from '../views/EditorView';
 import ThemeIndexView from '../views/theme/ThemeIndexView';
 import ShortcutIndexView from '../views/shortcut/ShortcutIndexView';
-import ExtensionIndexView from '../views/extensions/ExtensionIndexView';
 import ProjectIndexIndexView from '../views/projectIndex/ProjectIndexIndexView';
 
 import UserLoginView from '../views/user/UserLoginView';
@@ -26,14 +25,6 @@ export const routes = [
   {
     path: "/shortcuts",
     element: <ShortcutIndexView />,
-  },
-
-  /**
-   * Extension routes
-   */
-  {
-    path: "/extensions",
-    element: <ExtensionIndexView />,
   },
 
   /**

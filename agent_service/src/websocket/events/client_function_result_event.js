@@ -20,6 +20,33 @@ export default class UserInputEvent extends WebsocketEvent {
     const sessionId = connection.userData.sessionId;
     const userId = connection.userData.user._id;
 
+    const messageId = data._id;
+    if (!messageId) {
+      reply("error", { content: "MessageId not found" });
+      return;
+    }
+
+    const message = await UserAgentSessionMessageService.find(
+      messageId,
+      userId
+    );
+    if (!message) {
+      reply("error", { content: "Message not found" });
+      return;
+    }
+
+    await UserAgentSessionMessageService.update(
+      messageId,
+      {
+        clientFn: {
+          name: message.clientFn.name,
+          args: message.clientFn.args,
+          result: data.content,
+        },
+      },
+      userId
+    );
+
     const operations = await UserAgentSessionOperationService.findAll(
       1,
       10,
@@ -32,24 +59,24 @@ export default class UserInputEvent extends WebsocketEvent {
       return;
     }
 
-    const userAgentSessionMessionInput =
-      await UserAgentSessionMessageService.create(
-        {
-          context: data,
-          role: "system",
-          userAgentSessionId: sessionId,
-        },
-        userId
-      );
-
-    reply("user_input_reply", userAgentSessionMessionInput);
-
     const lastMessages = await UserAgentSessionMessageService.findAll(
       sessionId,
       1,
       10,
       userId
     );
+
+    const userAgentSessionMessionAgent =
+      await UserAgentSessionMessageService.create(
+        {
+          context: { content: "None" },
+          state: "pending",
+          role: "assistant",
+          userAgentSessionId: sessionId,
+        },
+        userId
+      );
+    reply("user_input_reply", userAgentSessionMessionAgent);
 
     /**
      * Create agent message
@@ -60,46 +87,42 @@ export default class UserInputEvent extends WebsocketEvent {
       }),
       {
         role: "developer",
-        content: `The current file is ${data?.currentFile?.name}`,
-      },
-      {
-        role: "developer",
-        content: `The directory state is ${JSON.stringify(
-          data?.directoryInfo
-        )}`,
-      },
-      {
-        role: "developer",
         content: `Your current goal is ${operation?.name}. Use the function result to solve the problem.`,
       },
       {
         role: "developer",
-        content: `You got ${operation.max_iterations-operation.iterations.length} left to complete your goal. You must not use function calls for the last available iteraiton.`,
+        content: `You got ${
+          operation.max_iterations - operation.iterations.length
+        } left to complete your goal. You must not use function calls for the last available iteraiton.`,
       },
       {
         role: "developer",
-        content: `This is a history of your actions: ${operation.iterations.map(m => m.user_agent_session_message.content).join(", ")}`,
+        content: `This is a history of your actions: ${operation.iterations
+          .map(
+            (m) => `
+            ${m.user_agent_session_message.content}
+            ${m.user_agent_session_message.clientFn?.name}(${m.user_agent_session_message.clientFn?.args}) => ${m.user_agent_session_message.clientFn?.result}`
+          )
+          .join(", ")}`,
       },
     ]);
-    
-    const userAgentSessionMessionAgent =
-      await UserAgentSessionMessageService.create(
+
+    const updatedUserAgentSessionMessionAgent =
+      await UserAgentSessionMessageService.update(
+        userAgentSessionMessionAgent._id.toString(),
         {
-          context: {
-            content: agentResponse.content,
-            clientFn: agentResponse.clientFn,
-            code: agentResponse.code,
-          },
-          role: "assistant",
-          userAgentSessionId: sessionId,
+          content: agentResponse.content,
+          state: "completed",
+          code: agentResponse.code,
+          clientFn: agentResponse.clientFn,
         },
         userId
       );
 
-    reply("user_input_reply", userAgentSessionMessionAgent);
+    reply("user_input_reply_update", updatedUserAgentSessionMessionAgent);
     let newState =
-      (operation.iterations.length + 1 >= operation.max_iterations ||
-      !userAgentSessionMessionAgent.clientFn)
+      operation.iterations.length + 1 >= operation.max_iterations ||
+      !userAgentSessionMessionAgent.clientFn
         ? "completed"
         : "running";
     const updatedOperation = await UserAgentSessionOperationService.update(
@@ -107,8 +130,13 @@ export default class UserInputEvent extends WebsocketEvent {
       {
         state: newState,
         iterations: [
-          ...operation.iterations.map(i=>{
-            return { _id: i._id, user_agent_session_message: i.user_agent_session_message._id, created_at: i.created_at, updated_at: i.updated_at }
+          ...operation.iterations.map((i) => {
+            return {
+              _id: i._id,
+              user_agent_session_message: i.user_agent_session_message._id,
+              created_at: i.created_at,
+              updated_at: i.updated_at,
+            };
           }),
           { user_agent_session_message: userAgentSessionMessionAgent._id },
         ],

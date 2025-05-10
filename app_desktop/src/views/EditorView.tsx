@@ -14,21 +14,33 @@ import { Link } from "react-router-dom";
 import { Lock } from "lucide-react";
 
 function EditorView() {
-  const { data: isAuthorized } = useIsAuthorized();  
-  const { sessionId } = useSelector((state: RootState) => state.userAgentSession);
+  const { data: isAuthorized } = useIsAuthorized();
+  const { sessionId } = useSelector(
+    (state: RootState) => state.userAgentSession
+  );
 
   return (
     <div className="flex flex-col justify-between h-screen">
       <HeaderComponent />
       <SearchComponent />
-      
+
       <div className="flex-1 flex flex-col lg:flex-row">
-        <div className={`h-full relative main-bgg text-white ${isAuthorized ? 'lg:w-96' : ''}`}>
-          <div className={`h-full flex-1 flex flex-col ${isAuthorized ? 'lg:w-96' : ''}`}>
+        <div
+          className={`h-full relative main-bgg text-white ${
+            isAuthorized ? "lg:w-96" : ""
+          }`}
+        >
+          <div
+            className={`h-full flex-1 flex flex-col ${
+              isAuthorized ? "lg:w-96" : ""
+            }`}
+          >
             {isAuthorized && sessionId && <ChatComponent />}
             {isAuthorized && !sessionId && <SessionsComponent />}
             {!isAuthorized && (
-              <div className={`h-full flex items-center justify-end border-r border-color`}>
+              <div
+                className={`h-full flex items-center justify-end border-r border-color`}
+              >
                 <Link
                   title="Login"
                   to="/user/login"
@@ -51,7 +63,7 @@ function EditorView() {
 
         <HierarchyComponent />
       </div>
-      
+
       <FooterComponent />
     </div>
   );
