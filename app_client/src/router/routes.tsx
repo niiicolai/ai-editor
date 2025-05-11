@@ -22,6 +22,10 @@ import NotFoundView from '../views/error/NotFoundView';
 import JobIndexView from '../views/job/JobIndexView';
 import TransactionIndexView from '../views/transaction/TransactionIndexView';
 
+import UsageIndexViewfrom from '../views/usage/UsageIndexView';
+
+import AvailableIndexView from '../views/available_llm/AvailableIndexView'
+
 export const routes = [
   {
     path: "/",
@@ -31,6 +35,22 @@ export const routes = [
   {
     path: "*",
     element: <NotFoundView />,
+  },
+
+  /**
+   * Usage routes
+   */
+  {
+    path: "/usage",
+    element: <UsageIndexViewfrom />,
+  },
+
+  /**
+   * Available LLM routes
+   */
+  {
+    path: "/models",
+    element: <AvailableIndexView />,
   },
 
   /**

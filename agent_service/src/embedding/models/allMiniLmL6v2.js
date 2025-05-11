@@ -1,5 +1,5 @@
 import { pipeline } from "@xenova/transformers";
-import { Model } from "../model";
+import { Model } from "../model.js";
 
 export default class AllMiniLmL6V2 extends Model {
   constructor() {

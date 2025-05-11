@@ -14,6 +14,26 @@ export default {
                 type: 'string',
                 description: 'Available LLM description'
             },
+            cost_per_input_token: {
+                type: 'number',
+                description: 'cost_per_input_token'
+            },
+            cost_per_output_token: {
+                type: 'number',
+                description: 'cost_per_output_token'
+            },
+            cost_per_cached_input_token: {
+                type: 'number',
+                description: 'cost_per_cached_input_token'
+            },
+            fee_per_input_token: {
+                type: 'number',
+                description: 'fee_per_input_token'
+            },
+            fee_per_output_token: {
+                type: 'number',
+                description: 'fee_per_output_token'
+            },
             created_at: {
                 type: 'string'
             },

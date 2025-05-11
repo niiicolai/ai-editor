@@ -25,6 +25,14 @@ const availableLlmSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    fee_per_input_token: {
+        type: Number,
+        required: true
+    },
+    fee_per_output_token: {
+        type: Number,
+        required: true
+    },
 }, {
     timestamps: {
         createdAt: 'created_at',

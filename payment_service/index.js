@@ -39,6 +39,3 @@ mongoConnect()
   .catch((error) => {
     console.error("ERROR: MongoDB connection failed", error);
   });
-
-
- 

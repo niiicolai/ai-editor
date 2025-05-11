@@ -96,7 +96,13 @@ function UserShowView() {
                           to="/checkouts?state=purchased"
                           className="fle w-36 text-center items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
-                          History
+                          Checkout History
+                        </Link>
+                        <Link
+                          to="/usage"
+                          className="fle w-36 text-center items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                          Usage History
                         </Link>
                       </div>
                     </dd>

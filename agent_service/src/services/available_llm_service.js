@@ -5,11 +5,17 @@ import ClientError from "../errors/clientError.js";
 import { idValidator } from "../validators/id_validator.js";
 import { fieldsValidator } from "../validators/fields_validator.js";
 import { paginatorValidator } from "../validators/paginator_validator.js";
+import { stringValidator } from "../validators/string_validator.js";
 
 const allowedFields = [
   "_id",
   "name",
   "description",
+  "cost_per_input_token",
+  "cost_per_output_token",
+  "cost_per_cached_input_token",
+  "fee_per_input_token",
+  "fee_per_output_token",
   "created_at",
   "updated_at",
 ];
@@ -29,6 +35,19 @@ export default class AvailableLlmService {
 
     const availableLlm = await AvailableLlm.findOne({
       _id,
+    }).select(fields);
+    if (!availableLlm)
+      ClientError.notFound("available LLM not found");
+
+    return dto(availableLlm);
+  }
+
+  static async findByName(name, fields = null) {
+    stringValidator(name, "name");
+    fields = fieldsValidator(fields, allowedFields);
+
+    const availableLlm = await AvailableLlm.findOne({
+      name,
     }).select(fields);
     if (!availableLlm)
       ClientError.notFound("available LLM not found");

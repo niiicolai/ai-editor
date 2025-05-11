@@ -9,7 +9,7 @@ import { setupWebsocket } from "./src/websocket/index.js";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import ProjectIndexItemService from "./src/services/project_index_item_service.js";
+
 mongoConnect()
   .then(async () => {
     const app = express();

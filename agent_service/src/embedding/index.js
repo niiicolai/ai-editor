@@ -12,7 +12,7 @@ const loadEmbeddingModels = async () => {
             const fileDir = path.join(dir, file);
             const filePath = pathToFileURL(fileDir);
             const module = await import(filePath.href);
-            models.push(module.default());
+            models.push(new module.default());
         } catch (error) {
             console.error('ERROR: Failed to load embedding model:', file, error);
         }

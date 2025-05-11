@@ -5,6 +5,7 @@ import User from "../mongodb/models/user_model.js";
 import dto from "../dto/user_agent_session_dto.js";
 import ClientError from '../errors/clientError.js';
 
+import { creatChatCompletion } from '../llm/index.js';
 import { objectValidator } from "../validators/object_validator.js";
 import { stringValidator } from "../validators/string_validator.js";
 import { idValidator } from "../validators/id_validator.js";
@@ -126,6 +127,37 @@ export default class UserAgentSessionService {
 
         try {
             userAgentSession.title = body.title;
+            await userAgentSession.save();
+
+            return await this.find(userAgentSession._id.toString(), userId);
+        } catch (error) {
+            console.error("Error updating user agent session:", error);
+            throw new Error("Error updating user agent session", error);
+        }
+    }
+
+    static async updateWithLlmTitle(_id, content, userId, lastMessages = []) {
+        stringValidator(content, "content");
+        idValidator(_id, "_id");
+        idValidator(userId, "userId");
+
+        const userAgentSession = await UserAgentSession.findOne({ _id, user: userId });
+        if (!userAgentSession) ClientError.notFound("user agent session not found");
+
+            const response = await creatChatCompletion([
+              ...lastMessages,
+              {
+                role: 'developer', 
+                content: `Based on the following input, select a chat title: ${content}; Be creative. Do not put quotes around the title.`
+              }
+            ], {
+                model: "gpt-4o-mini",
+                max_tokens: 10000,
+                temperature: 0.3,
+                useTools: false,
+            });
+        try {
+            userAgentSession.title = response?.content?.message || userAgentSession.title;
             await userAgentSession.save();
 
             return await this.find(userAgentSession._id.toString(), userId);

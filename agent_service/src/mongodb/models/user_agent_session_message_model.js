@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import { userAgentSessionMessageClientFunctionSchema } from '../sub_documents/user_agent_session_message_client_function_model.js';
+import { userAgentSessionMessageClientFunctionSchema } from '../sub_documents/user_agent_session_message_client_function_schema.js';
 
 const userAgentSessionMessageSchema = new mongoose.Schema({
     content: {

@@ -8,6 +8,8 @@ const llms = [
         cost_per_input_token: 0.0000006,
         cost_per_cached_input_token: 0.0000003,
         cost_per_output_token: 0.0000024,
+        fee_per_input_token: 0.0000001,
+        fee_per_output_token: 0.0000004,
         currency: 'dollar'
     }    
 ];
