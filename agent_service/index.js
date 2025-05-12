@@ -9,7 +9,9 @@ import { setupWebsocket } from "./src/websocket/index.js";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import { creatChatCompletion } from './src/llm/index.js'
 
+console.log('Starting...')
 mongoConnect()
   .then(async () => {
     const app = express();

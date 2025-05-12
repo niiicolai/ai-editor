@@ -3,7 +3,8 @@ import path from "path";
 import { pathToFileURL } from "url";
 
 const loadFunctions = async () => {
-  const tools = [];
+  const toolsOpenai = [];
+  const toolsGoogle = [];
   const functions = [];
   const dir = path.resolve("src", "llm", "functions");
   const files = fs.readdirSync(dir);
@@ -13,15 +14,16 @@ const loadFunctions = async () => {
       const fileDir = path.join(dir, file);
       const filePath = pathToFileURL(fileDir);
       const module = await import(filePath.href);
-      const { fn, tool } = module.default();
-      tools.push(tool);
+      const { fn, toolOpenai, toolGoogle } = module.default();
+      toolsOpenai.push(toolOpenai);
+      toolsGoogle.push(toolGoogle);
       functions.push(fn);
     } catch (error) {
       console.error("ERROR: Failed to load function:", file, error);
     }
   }
 
-  return { tools, functions };
+  return { toolsOpenai, toolsGoogle, functions };
 };
 
 const loadLlmModels = async () => {
@@ -43,7 +45,7 @@ const loadLlmModels = async () => {
   return { models };
 };
 
-const { tools, functions } = await loadFunctions();
+const { toolsOpenai, toolsGoogle, functions } = await loadFunctions();
 const { models } = await loadLlmModels();
 
 export const creatChatCompletion = async (
@@ -61,7 +63,10 @@ export const creatChatCompletion = async (
       const response = await model.creatChatCompletion(messages, {
         max_tokens: options.max_tokens,
         temperature: options.temperature,
-        tools: options.useTools ? tools : null,
+        tools: options.useTools ? {
+          toolsOpenai, 
+          toolsGoogle
+        } : null,
       });
 
       if (response.tool_call) {

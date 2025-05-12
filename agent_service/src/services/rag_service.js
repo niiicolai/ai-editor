@@ -28,7 +28,7 @@ export default class RagService {
     const response = await creatChatCompletion([
       ...options.messages,
       {
-        role: 'developer', 
+        role: 'user', 
         content: codebaseDocs && codebaseDocs.length > 0
               ? `You may use the following information for your answer if it's relevant: ${JSON.stringify(codebaseDocs)}`
               : ""

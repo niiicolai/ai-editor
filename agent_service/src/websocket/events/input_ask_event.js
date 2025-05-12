@@ -64,30 +64,31 @@ export default class InputAskEvent extends WebsocketEvent {
     );
     const instructions = [
       ...lastMessages.messages.map((m) => {
-        return { role: m.role, content: m.content };
+        return { role: m.role, content: `
+          Message: ${m.content}
+          ${m.code ? `Code: ${m.code}` : ''}
+          ${m.clientFn ? `ClientFn:  ${m.clientFn?.name}(${m.clientFn?.args}) = ${m.clientFn?.result}  ` : ''}
+        ` };
       }),
-      ...(currentFile ? [{
-        role: "developer",
+      ...(currentFile && currentFile?.name ? [{
+        role: "user",
         content: `The user is currently looking at file: ${currentFile?.name}`,
       }] : []),
-      ...(directoryInfo ? [{
-        role: "developer",
+      ...(directoryInfo && Object.keys(directoryInfo).length > 0 ? [{
+        role: "user",
         content: `The structure of the project is: ${JSON.stringify(
           directoryInfo
         )}`,
       }] : []),
       ...(focusFiles &&
         focusFiles.length > 0 ? [{
-          role: "developer",
+          role: "user",
           content: `Focus on the following files: ${JSON.stringify(
             focusFiles
           )}`,
         }] : []),
-      {
-        role: "developer",
-        content: `Example answer: Thanks for the answer. It is ...`,
-      },
     ];
+    console.log(instructions)
 
     const userAgentSessionMessionInput =
       await UserAgentSessionMessageService.create(

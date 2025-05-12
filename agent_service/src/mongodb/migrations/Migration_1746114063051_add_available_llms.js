@@ -11,6 +11,16 @@ const llms = [
         fee_per_input_token: 0.0000001,
         fee_per_output_token: 0.0000004,
         currency: 'dollar'
+    },
+    { 
+        name: 'gemini-2.0-flash-lite', 
+        description: 'Good a simple tasks',
+        cost_per_input_token: 0.000000075,
+        cost_per_cached_input_token: 0,
+        cost_per_output_token: 0.0000003,
+        fee_per_input_token: 0.00000001,
+        fee_per_output_token: 0.00000008,
+        currency: 'dollar'
     }    
 ];
 

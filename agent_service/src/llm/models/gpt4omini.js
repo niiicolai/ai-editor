@@ -38,7 +38,7 @@ export default class Gpt4oMini extends Model {
           },
         },
       },
-      ...(tools && { tools }),
+      ...(tools && tools.toolsOpenai && { tools: tools.toolsOpenai }),
     });
 
     const choice = response.choices[0].message;
