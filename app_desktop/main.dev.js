@@ -7,6 +7,15 @@ import path from "path";
 import unzipper from "unzipper";
 import { exec } from "child_process";
 import { Worker } from "worker_threads";
+import { 
+  insertEmbeddedFile,
+  updateEmbeddedFile, 
+  deleteEmbeddedFile, 
+  deleteAllEmbeddedFiles, 
+  vectorSearchEmbeddedFiles, 
+  textSearchEmbeddedFiles, 
+  paginateEmbeddedFiles, 
+} from "./src/sqlite/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -291,6 +300,76 @@ async function createWindow() {
 
   ipcMain.on("search", async (event, searchPath, patternStr) => {
     console.log(searchPath, patternStr);
+  });
+
+  ipcMain.on("insert-embedded-file", async (event, body) => {
+    try {
+      const insertId = insertEmbeddedFile(body);
+      event.reply("on-insert-embedded-file", { success: true, id: insertId });
+    } catch (error) {
+      console.error("Error inserting embedded file:", error);
+      event.reply("on-insert-embedded-file", { success: false, error: error.message });
+    }
+  });
+
+  ipcMain.on("update-embedded-file", async (event, id, body) => {
+    try {
+      updateEmbeddedFile(id, body);
+      event.reply("on-update-embedded-file", { success: true });
+    } catch (error) {
+      console.error("Error updating embedded file:", error);
+      event.reply("on-update-embedded-file", { success: false, error: error.message });
+    }
+  });
+
+  ipcMain.on("delete-embedded-file", async (event, id) => {
+    try {
+      deleteEmbeddedFile(id);
+      event.reply("on-delete-embedded-file", { success: true });
+    } catch (error) {
+      console.error("Error deleting embedded file:", error);
+      event.reply("on-delete-embedded-file", { success: false, error: error.message });
+    }
+  });
+
+  ipcMain.on("delete-all-embedded-files", async (event, id) => {
+    try {
+      deleteAllEmbeddedFiles(id);
+      event.reply("on-delete-all-embedded-files", { success: true });
+    } catch (error) {
+      console.error("Error deleting all embedded files:", error);
+      event.reply("on-delete-all-embedded-files", { success: false, error: error.message });
+    }
+  });
+
+  ipcMain.on("vector-search-embedded-files", async (event, project_id, queryEmbedding) => {
+    try {
+      const result = vectorSearchEmbeddedFiles(queryEmbedding, project_id);
+      event.reply("on-vector-search-embedded-files", { success: true, result });
+    } catch (error) {
+      console.error("Error vector searching embedded files:", error);
+      event.reply("on-vector-search-embedded-files", { success: false, error: error.message });
+    }
+  });
+
+  ipcMain.on("text-search-embedded-files", async (event, project_id, query) => {
+    try {
+      const result = textSearchEmbeddedFiles(query, project_id);
+      event.reply("on-text-search-embedded-files", { success: true, result });
+    } catch (error) {
+      console.error("Error text searching embedded files:", error);
+      event.reply("on-text-search-embedded-files", { success: false, error: error.message });
+    }
+  });
+
+  ipcMain.on("paginate-embedded-files", async (event, page, limit, project_id) => {
+    try {
+      const result = paginateEmbeddedFiles(page, limit, project_id);
+      event.reply("on-paginate-embedded-files", { success: true, result });
+    } catch (error) {
+      console.error("Error paginate embedded files:", error);
+      event.reply("on-paginate-embedded-files", { success: false, error: error.message });
+    }
   });
 
   // Open the DevTools.

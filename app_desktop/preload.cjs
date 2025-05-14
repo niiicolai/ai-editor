@@ -1,6 +1,10 @@
+/**
+ * Exposes a set of Electron IPC functionalities to the renderer process via the `contextBridge`.
+ * Provides methods for interacting with the file system, executing terminal commands, managing windows,
+ * and handling embedded files, among other features.
+ */
 const { contextBridge, ipcRenderer } = require('electron');
 
-// Expose only the ipcRenderer functionality needed
 contextBridge.exposeInMainWorld('electron', {
     openFolder: () => ipcRenderer.send('open-folder'),
     onOpenFolder: (callback) => ipcRenderer.on('on-open-folder', (event, path) => callback(path)),
@@ -45,4 +49,25 @@ contextBridge.exposeInMainWorld('electron', {
     minimizeWindow: () => ipcRenderer.send('minimize-window'),
     restoreWindow: () => ipcRenderer.send('restore-window'),
     closeWindow: () => ipcRenderer.send('close-window'),
+
+    insertEmbeddedFile: (body) => ipcRenderer.send('insert-embedded-file', body),
+    onInsertEmbeddedFile: (callback) => ipcRenderer.on('on-insert-embedded-file', (event, content) => callback(content)),
+
+    updateEmbeddedFile: (id, body) => ipcRenderer.send('update-embedded-file', id, body),
+    onUpdateEmbeddedFile: (callback) => ipcRenderer.on('on-update-embedded-file', (event, content) => callback(content)),
+
+    deleteEmbeddedFile: (id, body) => ipcRenderer.send('delete-embedded-file', id, body),
+    onDeleteEmbeddedFile: (callback) => ipcRenderer.on('on-delete-embedded-file', (event, content) => callback(content)),
+
+    deleteAllEmbeddedFiles: (project_id) => ipcRenderer.send('delete-all-embedded-files', project_id),
+    onDeleteAllEmbeddedFiles: (callback) => ipcRenderer.on('on-delete-all-embedded-files', (event, content) => callback(content)),
+
+    vectorSearchEmbeddedFiles: (project_id, queryEmbedding) => ipcRenderer.send('vector-search-embedded-files', project_id, queryEmbedding),
+    onVectorSearchEmbeddedFiles: (callback) => ipcRenderer.on('on-vector-search-embedded-files', (event, content) => callback(content)),
+
+    textSearchEmbeddedFiles: (project_id, query) => ipcRenderer.send('text-search-embedded-files', project_id, query),
+    onVectorSearchEmbeddedFiles: (callback) => ipcRenderer.on('on-text-search-embedded-files', (event, content) => callback(content)),
+
+    paginateEmbeddedFiles: (page, limit, project_id) => ipcRenderer.send('paginate-embedded-files', page, limit, project_id),
+    onPaginateEmbeddedFiles: (callback) => ipcRenderer.on('on-paginate-embedded-files', (event, content) => callback(content)),
 });
