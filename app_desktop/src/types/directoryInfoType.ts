@@ -13,6 +13,7 @@ export interface FileItemType {
   name: string;
   path: string;
   isDirectory: boolean;
+  indexed?: boolean;
 }
 
 export interface DirectoryStateFileType {

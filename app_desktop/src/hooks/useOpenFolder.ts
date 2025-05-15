@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { openFolder } from "../electron/openFolder";
 import { readDirectory } from "../electron/readDirectory";
 import { RootState } from "../store";
+import { setQueue } from "../features/projectIndex";
 
 export const useOpenFolder = () => {
   const hierarchy = useSelector((state: RootState) => state.hierarchy);
@@ -29,6 +30,7 @@ export const useOpenFolder = () => {
 
         dispatch(setDirectoryState(newDirectoryState));
         dispatch(setCurrentPath(path));
+        dispatch(setQueue(directoryFiles.filter((f) => !f.isDirectory)));
       }
     } catch (error) {
       console.error("Error opening folder:", error);

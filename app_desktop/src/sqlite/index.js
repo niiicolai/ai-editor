@@ -5,21 +5,34 @@ const db = new Database("editor_db.db");
 vec.load(db);
 
 db.prepare(`
-  CREATE VIRTUAL TABLE IF NOT EXISTS embeddedfiles USING vec0(
-    embedding FLOAT[384],
-    project_id TEXT,
-    filepath TEXT,
-    filename TEXT,
-    description TEXT,
-    created_at TEXT
-  );
+    CREATE VIRTUAL TABLE IF NOT EXISTS embeddedfiles USING vec0(
+        rowid INTEGER PRIMARY KEY AUTOINCREMENT,
+        embedding FLOAT[384],
+        project_id TEXT,
+        filepath TEXT,
+        filename TEXT,
+        description TEXT,
+        hash TEXT,
+        created_at TEXT,
+        updated_at TEXT
+    );
 `).run();
 
 export const insertEmbeddedFile = (body) => {
+    // check if the filepath and hash already exist 
+    const existingFile = db.prepare(`
+        SELECT rowid 
+        FROM embeddedfiles 
+        WHERE filepath = ? AND hash = ?
+    `).get(body.filepath, body.hash);
+
+    if (existingFile) {
+        throw new Error("A file with the same filepath and hash already exists.");
+    }
     const stmt = db.prepare(`
         INSERT INTO embeddedfiles (
-            embedding, filepath, filename, description, project_id, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?)
+            embedding, filepath, filename, description, project_id, hash, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
     const info = stmt.run(
         JSON.stringify(body.embedding),
@@ -27,7 +40,9 @@ export const insertEmbeddedFile = (body) => {
         body.filename,
         body.description,
         body.project_id,
-        body.created_at
+        body.hash,
+        body.created_at,
+        body.updated_at
     );
     return info.lastInsertRowid;
 };
@@ -35,7 +50,7 @@ export const insertEmbeddedFile = (body) => {
 export const updateEmbeddedFile = (id, body) => {
   const stmt = db.prepare(`
     UPDATE embeddedfiles
-    SET embedding = ?, filepath = ?, filename = ?, description = ?, project_id = ?, created_at = ?
+    SET embedding = ?, filepath = ?, filename = ?, description = ?, project_id = ?, hash = ?, created_at = ?, updated_at = ?
     WHERE rowid = ?
   `);
   stmt.run(
@@ -44,7 +59,9 @@ export const updateEmbeddedFile = (id, body) => {
     body.filename,
     body.description,
     body.project_id,
+    body.hash,
     body.created_at,
+    body.updated_at,
     id
   );
 };
@@ -64,7 +81,7 @@ export const deleteAllEmbeddedFiles = (project_id) => {
 
 export const vectorSearchEmbeddedFiles = (queryEmbedding, project_id) => {
     const stmt = db.prepare(`
-        SELECT rowid, filepath, filename, description, created_at, distance
+        SELECT rowid, filepath, filename, description, hash, created_at, updated_at, distance
         FROM embeddedfiles
         WHERE embedding MATCH ? AND project_id = ?
         ORDER BY distance ASC
@@ -77,7 +94,7 @@ export const vectorSearchEmbeddedFiles = (queryEmbedding, project_id) => {
 
 export const textSearchEmbeddedFiles = (query, project_id) => {
     const stmt = db.prepare(`
-        SELECT rowid, filepath, filename, description, created_at
+        SELECT rowid, filepath, filename, description, hash, created_at, updated_at
         FROM embeddedfiles
         WHERE 
             project_id = @project_id AND (
@@ -106,7 +123,7 @@ export const paginateEmbeddedFiles = (page, limit, project_id) => {
     const pages = Math.ceil(total / limit);
 
     const filesStmt = db.prepare(`
-        SELECT rowid, filepath, filename, description, created_at
+        SELECT rowid, filepath, filename, description, hash, created_at, updated_at
         FROM embeddedfiles
         WHERE project_id = ?
         ORDER BY created_at DESC

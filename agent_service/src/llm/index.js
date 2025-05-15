@@ -58,15 +58,16 @@ export const creatChatCompletion = async (
   }
 ) => {
   for (const model of models) {
-
     if (model.name == options.model) {
       const response = await model.creatChatCompletion(messages, {
         max_tokens: options.max_tokens,
         temperature: options.temperature,
-        tools: options.useTools ? {
-          toolsOpenai, 
-          toolsGoogle
-        } : null,
+        tools: options.useTools
+          ? {
+              toolsOpenai,
+              toolsGoogle,
+            }
+          : null,
       });
 
       if (response.tool_call) {
@@ -78,17 +79,22 @@ export const creatChatCompletion = async (
               messages,
               callArgs
             );
-
             return {
-              message: message || "no message",
-              code,
-              clientFn,
+              usage: response.usage,
+              content: {
+                message: message || "no message",
+                code,
+                clientFn,
+              },
             };
           }
         }
 
         return {
-          message: `No function matched: ${callName}`,
+          usage: response.usage,
+          content: {
+            message: `No function matched: ${callName}`,
+          },
         };
       } else {
         return response;

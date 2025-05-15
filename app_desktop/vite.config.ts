@@ -12,5 +12,8 @@ export default defineConfig({
   },
   server: {
     port: 5174,
+    watch: {
+      ignored: ['**/editor_db.db'] // Adjust path if needed
+    }
   }
 })

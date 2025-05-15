@@ -38,7 +38,8 @@
     "sqlite-vec": "^0.1.7-alpha.2",
     "tailwindcss": "^4.1.4",
     "trash": "^9.0.0",
-    "unzipper": "^0.12.3"
+    "unzipper": "^0.12.3",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@electron/fuses": "^1.8.0",

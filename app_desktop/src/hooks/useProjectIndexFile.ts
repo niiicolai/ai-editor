@@ -2,14 +2,15 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { useReadFile } from "./useReadFile";
 import { useWriteFile } from "./useWriteFile";
-import { useCreateProjectIndex } from "./useProjectIndex";
+import { v4 as uuidv4 } from 'uuid';
+import { useState } from "react";
 
 export const useProjectIndexFile = () => {
   const projectIndexFileName = ".palm_project_index";
+  const [projectId, setProjectId] = useState("");
   const hierarchy = useSelector((state: RootState) => state.hierarchy);
   const readFile = useReadFile();
   const writeFile = useWriteFile();
-  const createProjectIndex = useCreateProjectIndex();
 
   const parse = (content: string) => {
     const params = {} as any;
@@ -19,6 +20,7 @@ export const useProjectIndexFile = () => {
   };
 
   const read = async (path: string) => {
+    if (projectId) return { _id: projectId };
     const directory = hierarchy.directoryState[path];
     const files = directory.files;
 
@@ -27,7 +29,11 @@ export const useProjectIndexFile = () => {
       if (isIndexFile) {
         const result = await readFile.read(file);
         const parsed = parse(result?.content || "");
-        if (parsed._id) return { _id: parsed._id };
+        const _id = parsed?._id;
+        if (_id) {
+          setProjectId(_id);
+          return { _id };
+        }
         break;
       }
     }
@@ -36,17 +42,27 @@ export const useProjectIndexFile = () => {
   };
 
   const write = async (path: string) => {
-    const newProjectIndex = await createProjectIndex.mutateAsync({
-      name: path,
-    });
+    if (projectId) return { _id: projectId };
+
+    const _id = uuidv4();
     await writeFile.write(
       path,
       `${path}\\${projectIndexFileName}`,
       projectIndexFileName,
-      `_id=${newProjectIndex._id}`
+      `_id=${_id}`
     );
-    return { _id: newProjectIndex._id };
+    setProjectId(_id);
+    return { _id };
   };
 
-  return { write, read };
+  const writeOrRead = async (path: string) => {
+    const data = await read(path);
+    if (data && data._id) {
+      return data;
+    }
+
+    return await write(path);
+  }
+
+  return { write, read, writeOrRead };
 };

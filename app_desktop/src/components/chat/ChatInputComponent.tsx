@@ -6,11 +6,12 @@ import { FocusFileItemType } from "../../types/directoryInfoType";
 import { useFocusFiles } from "../../hooks/useFocusFiles";
 import { useGetAvailableLlms } from "../../hooks/useAvailableLlm";
 import { AvailableLlmType } from "../../types/availableLlmType";
+import { useVectorSearchEmbeddedFiles } from "../../hooks/useEmbeddedFile";
+import EmbeddingService from "../../services/embeddingService";
 
 const actions = [
     { label: 'ask', value: 'input_ask' },
     { label: 'agent', value: 'input_agent' },
-    { label: 'deep research', value: 'input_deep_research' }
 ];
 
 function ChatInputComponent({
@@ -21,6 +22,7 @@ function ChatInputComponent({
     const projectIndex = useSelector((state: RootState) => state.projectIndex);
     const { sessionId } = useSelector((state: RootState) => state.userAgentSession);
     const { currentFile, directoryState, currentPath } = useSelector((state: RootState) => state.hierarchy);
+    const { search } = useVectorSearchEmbeddedFiles();
     const { focusFiles, removeFocusFile } = useFocusFiles();
     const { data: llms } = useGetAvailableLlms(1, 10);
     const [formError, setFormError] = useState<string | null>(null);
@@ -34,11 +36,19 @@ function ChatInputComponent({
 
         if (!content) return setFormError("message is required");
 
+        let embeddedFiles = null;
+        if (projectIndex?.meta?._id) {
+            const queryEmbedding = await EmbeddingService.create({ filesToEmbedding: [{ id: '', content }]})
+            embeddedFiles = (await search(projectIndex.meta._id, queryEmbedding[0].embeddings[0].embedding))
+                ?.result.sort((a:any, b:any) => b.distance - a.distance)
+        }
+
         try {
             sendMessage(JSON.stringify({
                 event: selectedAction,
                 data: {
                     content,
+                    embeddedFiles,
                     currentFile,
                     focusFiles,
                     directoryInfo: directoryState,

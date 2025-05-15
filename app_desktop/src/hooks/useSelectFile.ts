@@ -7,30 +7,32 @@ import { FileItemType } from "../types/directoryInfoType";
 import { readFile } from "../electron/readFile";
 import { setFile } from "../features/editor";
 import { useGetLanguage } from "./useGetLanguage";
+import { setQueue } from "../features/projectIndex";
 
 export const useSelectFile = () => {
-  const hierarchy = useSelector((state: RootState) => state.hierarchy);
+  const { queue } = useSelector((state: RootState) => state.projectIndex);
+  const { directoryState } = useSelector((state: RootState) => state.hierarchy);
   const { getLanguageFromFile } = useGetLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
 
   const handleToggleIsOpen = async (file: FileItemType) => {
-    const newDirectoryState = {
-      ...hierarchy.directoryState,
+    dispatch(setDirectoryState({
+      ...directoryState,
       [file.path]: {
-        ...hierarchy.directoryState[file.path],
-        isOpen: !hierarchy.directoryState[file.path].isOpen,
+        ...directoryState[file.path],
+        isOpen: !directoryState[file.path].isOpen,
       },
-    };
-    dispatch(setDirectoryState(newDirectoryState));
+    }));
   };
 
   const handleLoadDirectory = async (path: string) => {
     setIsLoading(true);
     try {
       const directoryFiles = await readDirectory(path);
+      const newQueue = [...queue, ...directoryFiles.filter((f) => !f.isDirectory)];
       const newDirectoryState = {
-        ...hierarchy.directoryState,
+        ...directoryState,
         [path]: {
           isOpen: true,
           files: directoryFiles,
@@ -38,6 +40,7 @@ export const useSelectFile = () => {
       };
 
       dispatch(setDirectoryState(newDirectoryState));
+      dispatch(setQueue(newQueue));
     } catch (error) {
       console.error("Error reading directory:", error);
     } finally {
@@ -50,7 +53,7 @@ export const useSelectFile = () => {
 
     try {
         if (file.isDirectory) {
-            const directoryExists = hierarchy.directoryState[file.path];
+            const directoryExists = directoryState[file.path];
             if (directoryExists) await handleToggleIsOpen(file);
             else await handleLoadDirectory(file.path);
         } else {

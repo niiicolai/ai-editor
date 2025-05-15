@@ -56,7 +56,7 @@ contextBridge.exposeInMainWorld('electron', {
     updateEmbeddedFile: (id, body) => ipcRenderer.send('update-embedded-file', id, body),
     onUpdateEmbeddedFile: (callback) => ipcRenderer.on('on-update-embedded-file', (event, content) => callback(content)),
 
-    deleteEmbeddedFile: (id, body) => ipcRenderer.send('delete-embedded-file', id, body),
+    deleteEmbeddedFile: (id) => ipcRenderer.send('delete-embedded-file', id),
     onDeleteEmbeddedFile: (callback) => ipcRenderer.on('on-delete-embedded-file', (event, content) => callback(content)),
 
     deleteAllEmbeddedFiles: (project_id) => ipcRenderer.send('delete-all-embedded-files', project_id),
@@ -66,7 +66,7 @@ contextBridge.exposeInMainWorld('electron', {
     onVectorSearchEmbeddedFiles: (callback) => ipcRenderer.on('on-vector-search-embedded-files', (event, content) => callback(content)),
 
     textSearchEmbeddedFiles: (project_id, query) => ipcRenderer.send('text-search-embedded-files', project_id, query),
-    onVectorSearchEmbeddedFiles: (callback) => ipcRenderer.on('on-text-search-embedded-files', (event, content) => callback(content)),
+    onTextSearchEmbeddedFiles: (callback) => ipcRenderer.on('on-text-search-embedded-files', (event, content) => callback(content)),
 
     paginateEmbeddedFiles: (page, limit, project_id) => ipcRenderer.send('paginate-embedded-files', page, limit, project_id),
     onPaginateEmbeddedFiles: (callback) => ipcRenderer.on('on-paginate-embedded-files', (event, content) => callback(content)),
