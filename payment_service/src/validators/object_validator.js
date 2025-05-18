@@ -1,4 +1,4 @@
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error.js';
 
 export const objectValidator = (obj, entityName='options') => {
     if (!obj) ClientError.badRequest(`${entityName} is required`);

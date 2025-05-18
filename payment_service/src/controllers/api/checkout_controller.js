@@ -1,6 +1,6 @@
 import express from "express";
 import CheckoutService from "../../services/checkout_service.js";
-import ClientError from "../../errors/clientError.js";
+import ClientError from "../../errors/client_error.js";
 import { authentication } from "../middleware/authentication.js";
 import { hateoas } from "../middleware/hateoas.js";
 import { respond } from "../respond.js";

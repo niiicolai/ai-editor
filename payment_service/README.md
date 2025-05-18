@@ -43,9 +43,9 @@ npm run mongo:generate:migration <name>
 
 ## Build Docker Image
 ```bash
-docker build -t payment_service .
+docker build -t payment_service:v1.0 .
 ```
 ## Run Docker Container
 ```bash
-docker run -d -p 3002:3002 --name payment_service payment_service
+docker run -d -p 3002:3002 payment_service:v1.0
 ```

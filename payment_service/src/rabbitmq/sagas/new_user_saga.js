@@ -2,7 +2,7 @@ import rabbitMq from "../index.js";
 import UserModel from "../../mongodb/models/user_model.js";
 import TransactionModel from "../../mongodb/models/transaction_model.js";
 import mongoose from "mongoose";
-import SagaBuilder from "../../../../saga/SagaBuilder.js";
+import SagaBuilder from "../saga/SagaBuilder.js";
 
 const queueName = "new_user:agent_service";
 const consumer = SagaBuilder.consumer(queueName, rabbitMq)

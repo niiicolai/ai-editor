@@ -1,12 +1,12 @@
 import ProductModel from '../mongodb/models/product_model.js';
 import dto from "../dto/product_dto.js";
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error.js';
 
 import { idValidator } from "../validators/id_validator.js";
 import { paginatorValidator } from "../validators/paginator_validator.js";
 import { objectValidator } from '../validators/object_validator.js';
 import { stringValidator } from '../validators/string_validator.js';
-import { numberValidator } from '../../../agent_service/src/validators/number_validator.js';
+import { numberValidator } from '../validators/number_validator.js';
 
 export default class ProductService {
     /**

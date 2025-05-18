@@ -1,4 +1,4 @@
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error.js';
 
 export const stringValidator = (s, entityName='name', options = {
     min: {

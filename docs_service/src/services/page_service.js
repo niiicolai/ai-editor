@@ -1,7 +1,7 @@
 import PageModel from "../mongodb/models/page_model.js";
 import CategoryModel from "../mongodb/models/category_model.js";
 import dto from "../dto/page_dto.js";
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error.js';
 
 import { idValidator } from "../validators/id_validator.js";
 import { fieldsValidator } from "../validators/fields_validator.js";

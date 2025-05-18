@@ -2,7 +2,7 @@ import CheckoutModel from '../mongodb/models/checkout_model.js';
 import UserModel from '../mongodb/models/user_model.js';
 import UserProductModel from '../mongodb/models/user_product_model.js';
 import dto from "../dto/checkout_dto.js";
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error.js';
 import Stripe from 'stripe';
 import mongoose from 'mongoose';
 

@@ -1,6 +1,6 @@
 import UserProductModel from '../mongodb/models/user_product_model.js';
 import dto from "../dto/user_product_dto.js";
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error.js';
 
 import { idValidator } from "../validators/id_validator.js";
 import { paginatorValidator } from "../validators/paginator_validator.js";

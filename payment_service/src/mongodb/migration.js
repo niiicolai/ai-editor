@@ -142,6 +142,7 @@ export class Migration {
     }
 
     console.log("Migrations run successfully");
+    process.exit(0);
   }
 }
 

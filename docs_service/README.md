@@ -43,9 +43,9 @@ npm run mongo:generate:migration <name>
 
 ## Build Docker Image
 ```bash
-docker build -t documentation_service .
+docker build -t documentation_service:v1.0 .
 ```
 ## Run Docker Container
 ```bash
-docker run -d -p 3002:3002 --name documentation_service documentation_service
+docker run -d -p 3004:3004 documentation_service:v1.0
 ```

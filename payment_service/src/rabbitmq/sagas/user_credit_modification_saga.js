@@ -3,9 +3,9 @@ import UserModel from "../../mongodb/models/user_model.js";
 import UserProductModel from "../../mongodb/models/user_product_model.js";
 import TransactionModel from "../../mongodb/models/transaction_model.js";
 import CheckoutModel from "../../mongodb/models/checkout_model.js";
-import ClientError from "../../errors/clientError.js";
+import ClientError from "../../errors/client_error.js";
 import mongoose from "mongoose";
-import SagaBuilder from "../../../../saga/SagaBuilder.js";
+import SagaBuilder from "../saga/SagaBuilder.js";
 
 const queueName = "user_credit_modification:payment_service";
 const producer = SagaBuilder.producer(queueName, rabbitMq)

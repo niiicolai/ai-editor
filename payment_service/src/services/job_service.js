@@ -1,6 +1,6 @@
 import JobModel from "../mongodb/models/job_model.js";
 import dto from "../dto/job_dto.js";
-import ClientError from "../errors/clientError.js";
+import ClientError from "../errors/client_error.js";
 
 import { idValidator } from "../validators/id_validator.js";
 import { paginatorValidator } from "../validators/paginator_validator.js";
