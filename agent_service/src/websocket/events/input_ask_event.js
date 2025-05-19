@@ -2,7 +2,7 @@ import { WebsocketEvent } from "../event.js";
 import UserService from "../../services/user_service.js";
 import Decimal from "decimal.js";
 
-import { ChatHandler } from "../../chat/chat_handler.js";
+import { ChatHandler } from "../../llm/chat_handler.js";
 
 export default class InputAskEvent extends WebsocketEvent {
   constructor() {

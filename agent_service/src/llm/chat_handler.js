@@ -4,8 +4,8 @@ import UserAgentSessionOperationService from "../services/user_agent_session_ope
 import LlmUsageService from "../services/llm_usage_service.js";
 import AvailableLlmService from "../services/available_llm_service.js";
 
-import { creatChatCompletion } from "../llm/index.js";
-import { MessageBuilder } from "../llm/messageBuilder.js";
+import { creatChatCompletion } from "./index.js";
+import { MessageBuilder } from "./messageBuilder.js";
 
 class MessageBuilderChatHandler extends MessageBuilder {
   constructor(handler) {
