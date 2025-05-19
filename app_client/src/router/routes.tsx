@@ -24,7 +24,9 @@ import TransactionIndexView from '../views/transaction/TransactionIndexView';
 
 import UsageIndexViewfrom from '../views/usage/UsageIndexView';
 
-import AvailableIndexView from '../views/available_llm/AvailableIndexView'
+import AvailableIndexView from '../views/available_llm/AvailableIndexView';
+
+import SampleIndexView from '../views/sample/SampleIndexView';
 
 export const routes = [
   {
@@ -51,6 +53,14 @@ export const routes = [
   {
     path: "/models",
     element: <AvailableIndexView />,
+  },
+
+  /**
+   * Samples routes
+   */
+  {
+    path: "/admin/samples",
+    element: <SampleIndexView />,
   },
 
   /**

@@ -1,7 +1,9 @@
+import asyncio
 from src.models.sample_model import insert_many, find, paginate, count
 from src.services.context_precision_service import cal_context_precision
 from src.services.faithfulness_service import cal_faithfulness
 from src.services.response_relevancy_service import cal_response_relevancy
+from src.dto.sample_dto import dto
 
 def get_sample(_id):
     if _id is None: raise Exception("id is required")
@@ -9,7 +11,7 @@ def get_sample(_id):
     sample = find({ "_id": _id })
     if sample is None: raise Exception("sample not found")
     
-    return sample
+    return dto(sample)
 
 def get_samples(page, limit):
     if page is None: raise Exception("page is required")
@@ -19,7 +21,7 @@ def get_samples(page, limit):
     total = count()
     pages = (total + limit - 1) // limit 
     return {
-        "samples": samples,
+        "samples": [dto(s) for s in samples],
         "total": total,
         "pages": pages,
         "page": page,
@@ -27,38 +29,32 @@ def get_samples(page, limit):
     }
 
 async def create_many(body):
+    samples_to_insert = []
     for s in body:
-        question = s["input_prompt"]
-        answer = s["output_response"]
-        retrieved_documents = [e["description"] for e in s["input_embedded_files"]]
-        
-        context_precision = await cal_context_precision(
-            question, 
-            answer,
-            retrieved_documents,
+        question = s.get("input_prompt")
+        answer = s.get("output_response")
+        embedded_files = s.get("input_embedded_files", [])
+        retrieved_documents = [e.get("description", "") for e in embedded_files]
+
+        context_precision, faithfulness, response_relevancy = await asyncio.gather(
+            cal_context_precision(question, answer, retrieved_documents),
+            cal_faithfulness(question, answer, retrieved_documents),
+            cal_response_relevancy(question, answer, retrieved_documents)
         )
-        
-        faithfulness = await cal_faithfulness(
-            question, 
-            answer,
-            retrieved_documents,
-        )
-        
-        response_relevancy = await cal_response_relevancy(
-            question, 
-            answer,
-            retrieved_documents,
-        )
-         
-        insert_many([{
-            "input_prompt": s["input_prompt"],
-            "input_embedded_files": s["input_embedded_files"],
-            "output_response": s["output_response"],
-            "event": s["event"],
-            "config": s["config"],
+
+        sample = {
+            "input_prompt": question,
+            "input_embedded_files": embedded_files,
+            "output_response": answer,
+            "event": s.get("event"),
+            "config": s.get("config"),
             "metrics": {
                 "context_precision": context_precision,
                 "response_relevancy": response_relevancy,
                 "faithfulness": faithfulness
             }
-        }])
+        }
+        samples_to_insert.append(sample)
+
+    if samples_to_insert:
+        insert_many(samples_to_insert)

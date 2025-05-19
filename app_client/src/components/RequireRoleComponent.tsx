@@ -16,7 +16,6 @@ function RequireRoleComponent({
             setHasRole(true);
         }
     }, [user]);
-    console.log("user", user);
 
     if (!hasRole) {
         return (

@@ -195,6 +195,22 @@ function UserShowView() {
                           View
                         </Link>
                       </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-900">
+                            RAG Evaluation
+                          </h4>
+                          <p className="text-sm text-gray-500">
+                            Inspect samples
+                          </p>
+                        </div>
+                        <Link
+                          to="/admin/samples"
+                          className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                          View
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
