@@ -4,7 +4,7 @@ import UserCreditModificationModel from "../../mongodb/models/user_credit_modifi
 import TransactionModel from "../../mongodb/models/transaction_model.js";
 import mongoose from "mongoose";
 
-import SagaBuilder from "../../../../saga/SagaBuilder.js";
+import SagaBuilder from "../saga/SagaBuilder.js";
 
 const queueName = "user_credit_modification:payment_service";
 const consumer = SagaBuilder.consumer(queueName, rabbitMq)

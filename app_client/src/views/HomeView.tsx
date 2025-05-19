@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import productImage from "../assets/product.png";
-import editorPersonImage from "../assets/editorPerson.png";
 import LayoutComponent from "../components/LayoutComponent";
 
 function HomeView() {

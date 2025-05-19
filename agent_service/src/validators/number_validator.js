@@ -1,4 +1,4 @@
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error.js';
 
 export const numberValidator = (n, entityName='amount', options = {
     min: {

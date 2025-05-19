@@ -62,7 +62,7 @@ export const setupSwagger = async (app) => {
     }
 
     const router = express.Router();
-    const swaggerDocument = swaggerJsdoc(options);
+    const swaggerDocument = swaggerJsdoc(options as any);
     router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
     app.use(router);
 };

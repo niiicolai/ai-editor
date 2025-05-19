@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
-import { userLoginSchema } from '../sub_documents/user_login.js';
-import { userTwoFactorSchema } from '../sub_documents/user_two_factor.js';
+import { userLoginSchema } from '../sub_documents/user_login';
+import { userTwoFactorSchema } from '../sub_documents/user_two_factor';
 
 export const userSchema = new mongoose.Schema({
     username: {

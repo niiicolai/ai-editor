@@ -1,13 +1,13 @@
 import "dotenv/config";
-import { mongoConnect } from "./index.js";
-import { setupRabbitMq } from "../rabbitmq/index.js";
+import { mongoConnect } from "./index";
+import { setupRabbitMq } from "../rabbitmq/index";
 import { fileURLToPath } from "url";
 import fs from "fs";
 import path from "path";
 
-import MigrationModel from "./models/migration_model.js";
+import MigrationModel from "./models/migration_model";
 
-const migrationTemplate = (name) => `import { Migration } from "../migration.js";
+const migrationTemplate = (name) => `import { Migration } from "../migration";
 
 export default class ${name} extends Migration {
     async up() {
@@ -116,7 +116,7 @@ export class Migration {
 
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const migrationPath = path.join(__dirname, "migrations");
-    const migrationFile = path.join(migrationPath, `${name}.js`);
+    const migrationFile = path.join(migrationPath, `${name}.ts`);
 
     if (!fs.existsSync(migrationPath)) {
       throw new Error("Migrations directory does not exist");

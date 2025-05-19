@@ -1,9 +1,10 @@
-import rabbitMq from "../index.js";
-import TransactionModel from "../../mongodb/models/transaction_model.js";
+import rabbitMq from "../index";
+import UserModel from "../../mongodb/models/user_model";
+import TransactionModel from "../../mongodb/models/transaction_model";
+import SagaBuilder from "../saga/SagaBuilder.js";
 import mongoose from "mongoose";
-import SagaBuilder from "../../../../saga/SagaBuilder.js";
 
-const queueName = "new_email:auth_service";
+const queueName = "delete_user:auth_service";
 const producer = SagaBuilder.producer(queueName, rabbitMq)
 
   .onProduce(async (body) => {
@@ -11,18 +12,33 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
     session.startTransaction();
 
     try {
+      const user = await UserModel.findOne(
+        { _id: body._id, deleted_at: null },
+        { session }
+      );
+      if (!user) throw new Error("User not found");
+
+      user.deleted_at = new Date();
+
       const transaction = new TransactionModel({
         state: "pending",
         type: queueName,
-        parameters: JSON.stringify({ ...body }),
+        parameters: JSON.stringify({ _id: body._id }),
       });
       await transaction.save({ session });
+
+      user.incomplete_transactions.push({
+        transaction: transaction._id,
+      });
+      await user.save({ session });
+
       await session.commitTransaction();
 
       return {
-        subject: body.subject,
-        content: body.content,
-        email: body.email,
+        user: {
+          _id: user._id,
+          deleted_at: user.deleted_at,
+        },
         transaction: {
           _id: transaction._id,
           state: transaction.state,
@@ -65,12 +81,20 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      
       const transaction = await TransactionModel.findOne(
         { _id: message.transaction._id, state: "pending" },
         { session }
       );
       if (!transaction) throw new Error("Transaction not found");
+
+      const user = await UserModel.findOne(
+        { _id: message.user._id },
+        { session }
+      );
+      if (!user) throw new Error("User not found");
+
+      user.incomplete_transactions.pull({ transaction: message.transaction._id });
+      await user.save({ session });
 
       await TransactionModel.updateOne(
         { _id: message.transaction._id },
@@ -89,5 +113,5 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
 
   .build();
 
-export const produceSendEmailSaga = async (body) => await producer.produce(body);
+export const produceDeleteUserSaga = async (body) => await producer.produce(body);
 export default async () => producer.addListeners();

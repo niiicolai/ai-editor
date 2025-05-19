@@ -2,7 +2,7 @@ import UserAgentSessionOperationModel from "../mongodb/models/user_agent_session
 import UserAgentSessionModel from "../mongodb/models/user_agent_session_model.js";
 import UserModel from "../mongodb/models/user_model.js";
 import dto from "../dto/user_agent_session_operation_dto.js";
-import ClientError from "../errors/clientError.js";
+import ClientError from "../errors/client_error.js";
 
 import { idValidator } from "../validators/id_validator.js";
 import { fieldsValidator } from "../validators/fields_validator.js";

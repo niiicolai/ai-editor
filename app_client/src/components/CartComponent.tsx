@@ -1,15 +1,7 @@
 import { useGetOrCreateCheckout, useUpdateCheckout, useStartCheckout } from "../hooks/useCheckout";
-import { useGetProduct } from "../hooks/useProduct";
 import { Link } from "react-router-dom";
-import { ProductType } from "../types/productType";
 import { CheckoutProductType } from "../types/checkoutType";
-import { UseQueryResult } from "@tanstack/react-query";
 import { useState } from "react";
-
-interface CartProduct {
-    product: string;
-    quantity: number;
-}
 
 function CartComponent() {
     const [cartError, setCartError] = useState<string | null>(null);
@@ -152,7 +144,7 @@ function CartComponent() {
                         <>
                             <div className="max-h-96 overflow-y-auto p-4">
                                 <ul className="divide-y divide-gray-200">
-                                    {productQueries.map((product: CheckoutProductType, index: number) => {
+                                    {productQueries.map((product: CheckoutProductType) => {
                                         return (
                                             <li key={product.product._id} className="py-3">
                                                 <div className="flex items-center">

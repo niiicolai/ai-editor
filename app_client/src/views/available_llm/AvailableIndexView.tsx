@@ -1,7 +1,6 @@
 import { useGetAvailableLlms } from "../../hooks/useAvailableLlm";
 import { usePagination } from "../../hooks/usePagination";
 import { AvailableLlmType } from "../../types/availableLlmType";
-import { Link } from "react-router-dom";
 import LayoutComponent from "../../components/LayoutComponent";
 
 export default function AvailableIndexView() {

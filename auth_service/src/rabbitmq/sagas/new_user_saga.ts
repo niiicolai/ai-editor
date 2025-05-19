@@ -1,9 +1,9 @@
-import rabbitMq from "../index.js";
-import UserModel from "../../mongodb/models/user_model.js";
-import TransactionModel from "../../mongodb/models/transaction_model.js";
-import PwdService from "../../services/pwd_service.js";
+import rabbitMq from "../index";
+import UserModel from "../../mongodb/models/user_model";
+import TransactionModel from "../../mongodb/models/transaction_model";
+import PwdService from "../../services/pwd_service";
 import mongoose from "mongoose";
-import SagaBuilder from "../../../../saga/SagaBuilder.js";
+import SagaBuilder from "../saga/SagaBuilder.js";
 
 const queueName = "new_user:auth_service";
 const producer = SagaBuilder.producer(queueName, rabbitMq)
@@ -36,8 +36,6 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
           _id: user._id,
           username: user.username,
           email: user.email,
-          created_at: user.created_at,
-          updated_at: user.updated_at,
         },
         transaction: {
           _id: transaction._id,
@@ -90,9 +88,7 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      user.incomplete_transactions = user.incomplete_transactions.filter(
-        (t) => t.transaction.toString() !== message.transaction._id
-      );
+      user.incomplete_transactions.pull({ transaction: message.transaction._id });
       await user.save({ session });
 
       await TransactionModel.updateOne(

@@ -1,4 +1,4 @@
-import ClientError from '../errors/clientError';
+import ClientError from '../errors/client_error';
 
 export const respond = async (req: any, res: any, callback: () => Promise<any>) => {
     try {

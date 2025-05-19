@@ -1,15 +1,15 @@
-import JwtService from "./jwt_service.js";
-import User from "../mongodb/models/user_model.js";
-import dto from "../dto/user_dto.js";
-import ClientError from '../errors/clientError.js';
+import JwtService from "./jwt_service";
+import User from "../mongodb/models/user_model";
+import dto from "../dto/user_dto";
+import ClientError from '../errors/client_error';
 
-import { produceNewUserSaga } from "../rabbitmq/sagas/new_user_saga.js";
-import { produceUpdateUserSaga } from "../rabbitmq/sagas/update_user_saga.js";
-import { produceDeleteUserSaga } from "../rabbitmq/sagas/delete_user_saga.js";
+import { produceNewUserSaga } from "../rabbitmq/sagas/new_user_saga";
+import { produceUpdateUserSaga } from "../rabbitmq/sagas/update_user_saga";
+import { produceDeleteUserSaga } from "../rabbitmq/sagas/delete_user_saga";
 
-import { idValidator } from "../validators/id_validator.js";
-import { stringValidator } from "../validators/string_validator.js";
-import { fieldsValidator } from "../validators/fields_validator.js";
+import { idValidator } from "../validators/id_validator";
+import { stringValidator } from "../validators/string_validator";
+import { fieldsValidator } from "../validators/fields_validator";
 
 const allowedFields = [
   "_id",

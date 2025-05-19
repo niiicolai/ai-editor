@@ -1,4 +1,4 @@
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error';
 
 export const paginatorValidator = (page, limit) => {
     if (!page) ClientError.badRequest("page is required");

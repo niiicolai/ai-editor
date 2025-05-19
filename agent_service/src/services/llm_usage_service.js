@@ -2,7 +2,7 @@ import LlmUsageModel from "../mongodb/models/llm_usage_model.js";
 import UserModel from "../mongodb/models/user_model.js";
 import AvailableLlmModel from "../mongodb/models/available_llm_model.js";
 import dto from "../dto/llm_usage_dto.js";
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error.js';
 import Decimal from 'decimal.js'
 import mongoose from "mongoose";
 

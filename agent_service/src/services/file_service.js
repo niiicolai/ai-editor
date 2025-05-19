@@ -1,6 +1,6 @@
 
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import ClientError from "../errors/clientError.js";
+import ClientError from "../errors/client_error.js";
 
 const { S3 } = process.env;
 if (!S3) {

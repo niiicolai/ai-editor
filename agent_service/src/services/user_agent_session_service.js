@@ -3,7 +3,7 @@ import UserAgentSession from "../mongodb/models/user_agent_session_model.js";
 import UserAgentSessionMessage from "../mongodb/models/user_agent_session_message_model.js";
 import User from "../mongodb/models/user_model.js";
 import dto from "../dto/user_agent_session_dto.js";
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error.js';
 
 import { creatChatCompletion } from '../llm/index.js';
 import { objectValidator } from "../validators/object_validator.js";

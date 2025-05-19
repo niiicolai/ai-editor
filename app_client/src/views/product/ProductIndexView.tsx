@@ -11,7 +11,7 @@ function ProductIndexView() {
   const category = searchParams.get('category');
   const { data: products, isLoading, error: productsError } = useGetProducts(1, 10, category || 'credit');
   const { data: checkout, isLoading: isLoadingCheckout, error: checkoutError } = useGetOrCreateCheckout();
-  const { mutateAsync: updateCheckout, isPending: updateIsPending, error: updateCheckoutError } = useUpdateCheckout();
+  const { mutateAsync: updateCheckout, isPending: updateIsPending } = useUpdateCheckout();
   const [cartError, setCartError] = useState<string | null>(null);
 
   const addProduct = async (product: ProductType, quantity: number = 1) => {

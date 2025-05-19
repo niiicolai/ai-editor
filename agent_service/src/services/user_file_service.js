@@ -3,7 +3,7 @@ import FileService from "./file_service.js";
 import UserFile from "../mongodb/models/user_file_model.js";
 import User from "../mongodb/models/user_model.js";
 import dto from "../dto/user_file_dto.js";
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error.js';
 
 import { objectValidator } from "../validators/object_validator.js";
 import { stringValidator } from "../validators/string_validator.js";

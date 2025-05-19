@@ -1,10 +1,13 @@
-import rabbitMq from "../index.js";
-import UserModel from "../../mongodb/models/user_model.js";
-import TransactionModel from "../../mongodb/models/transaction_model.js";
-import SagaBuilder from "../../../../saga/SagaBuilder.js";
+import rabbitMq from "../index";
+import UserModel from "../../mongodb/models/user_model";
+import TransactionModel from "../../mongodb/models/transaction_model";
+import PwdService from "../../services/pwd_service";
 import mongoose from "mongoose";
+import ClientError from "../../errors/client_error";
+import SagaBuilder from "../saga/SagaBuilder.js";
+import { stringValidator } from "../../validators/string_validator";
 
-const queueName = "delete_user:auth_service";
+const queueName = "update_user:auth_service";
 const producer = SagaBuilder.producer(queueName, rabbitMq)
 
   .onProduce(async (body) => {
@@ -12,17 +15,8 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
     session.startTransaction();
 
     try {
-      const user = await UserModel.findOne(
-        { _id: body._id, deleted_at: null },
-        { session }
-      );
+      const user = await UserModel.findOne({ _id: body._id, deleted_at: null });
       if (!user) throw new Error("User not found");
-
-      user.deleted_at = new Date();
-      user.incomplete_transactions.push({
-        transaction: transaction._id,
-      });
-      await user.save({ session });
 
       const transaction = new TransactionModel({
         state: "pending",
@@ -31,12 +25,48 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
       });
       await transaction.save({ session });
 
+      user.incomplete_transactions.push({
+        transaction: transaction._id,
+      });
+
+      if (body.username && body.username !== user.username) {
+        stringValidator(body.username, "username");
+
+        const usernameExists = await UserModel.exists({
+          username: body.username,
+        });
+        if (usernameExists) ClientError.badRequest("username already exists");
+
+        user.username = body.username;
+      }
+
+      if (body.email && body.email !== user.email) {
+        stringValidator(body.email, "email");
+
+        const emailExists = await UserModel.exists({ email: body.email });
+        if (emailExists) ClientError.badRequest("email already exists");
+
+        user.email = body.email;
+      }
+
+      if (body.password) {
+        stringValidator(body.password, "password");
+
+        const login = user.logins.find((login) => login.type === "password");
+        if (!login) ClientError.badRequest("No password type found")
+        else {
+          login.password = await PwdService.hashPassword(body.password);
+        }
+      }
+
+      await user.save({ session });
       await session.commitTransaction();
 
       return {
         user: {
           _id: user._id,
-          deleted_at: user.deleted_at,
+          username: user.username,
+          email: user.email,
         },
         transaction: {
           _id: transaction._id,
@@ -64,8 +94,7 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
 
       await TransactionModel.updateOne(
         { _id: message.transaction._id },
-        { state: "error", error: message.transaction.error },
-        { session }
+        { state: "error", error: message.transaction.error }
       );
       await session.commitTransaction();
     } catch (error) {
@@ -92,9 +121,7 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
       );
       if (!user) throw new Error("User not found");
 
-      user.incomplete_transactions = user.incomplete_transactions.filter(
-        (t) => t.transaction.toString() !== message.transaction._id
-      );
+      user.incomplete_transactions.pull({ transaction: message.transaction._id });
       await user.save({ session });
 
       await TransactionModel.updateOne(
@@ -114,5 +141,5 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
 
   .build();
 
-export const produceDeleteUserSaga = async (body) => await producer.produce(body);
+export const produceUpdateUserSaga = async (body) => await producer.produce(body);
 export default async () => producer.addListeners();

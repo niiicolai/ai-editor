@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import ClientError from "../errors/clientError";
+import ClientError from "../errors/client_error";
 
 export default class PwdService {
 

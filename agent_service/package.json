@@ -1,5 +1,5 @@
 {
-  "name": "job-agent",
+  "name": "agent-service",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",

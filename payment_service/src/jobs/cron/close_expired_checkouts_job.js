@@ -46,7 +46,7 @@ const onTick = async () => {
         job.message = 'Expired checkouts processed successfully: ' + expiredCheckouts.length + ' checkouts closed';
         await job.save();
     } catch (error) {
-        job.state = 'failed';
+        job.state = 'error';
         job.message = 'Error processing expired checkouts: ' + error.message;
         await job.save();
     }

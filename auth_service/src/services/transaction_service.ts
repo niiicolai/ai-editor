@@ -1,10 +1,10 @@
-import TransactionModel from "../mongodb/models/transaction_model.js";
-import dto from "../dto/transaction_dto.js";
-import ClientError from "../errors/clientError.js";
+import TransactionModel from "../mongodb/models/transaction_model";
+import dto from "../dto/transaction_dto";
+import ClientError from "../errors/client_error";
 
-import { idValidator } from "../validators/id_validator.js";
-import { paginatorValidator } from "../validators/paginator_validator.js";
-import { stringValidator } from "../validators/string_validator.js";
+import { idValidator } from "../validators/id_validator";
+import { paginatorValidator } from "../validators/paginator_validator";
+import { stringValidator } from "../validators/string_validator";
 
 export default class TransactionService {
   /**

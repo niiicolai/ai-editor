@@ -1,9 +1,9 @@
-import PwdService from "./pwd_service.js";
-import JwtService from "./jwt_service.js";
-import User from "../mongodb/models/user_model.js";
-import ClientError from "../errors/clientError";
+import PwdService from "./pwd_service";
+import JwtService from "./jwt_service";
+import User from "../mongodb/models/user_model";
+import ClientError from "../errors/client_error";
 
-import { stringValidator } from "../validators/string_validator.js";
+import { stringValidator } from "../validators/string_validator";
 
 interface UserLoginBody {
   email: string;

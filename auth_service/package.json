@@ -1,14 +1,14 @@
 {
-  "name": "job-agent",
+  "name": "auth-service",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "tsx index.js",
+    "start": "tsx index.ts",
     "test": "vitest",
-    "mongo:generate:migration": "node ./src/mongodb/migration.js generate",
-    "mongo:migrate": "node ./src/mongodb/migration.js up",
-    "mongo:migrate:undo": "node ./src/mongodb/migration.js down"
+    "mongo:generate:migration": "node ./src/mongodb/migration.ts generate",
+    "mongo:migrate": "node ./src/mongodb/migration.ts up",
+    "mongo:migrate:undo": "node ./src/mongodb/migration.ts down"
   },
   "author": "",
   "license": "ISC",

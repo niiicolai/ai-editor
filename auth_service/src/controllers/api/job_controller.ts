@@ -1,9 +1,9 @@
 import express from "express";
-import JobService from "../../services/job_service.js";
-import { authentication } from "../middleware/authentication.js";
-import { hateoas } from "../middleware/hateoas.js";
-import { respond } from "../respond.js";
-import { authorize } from "../middleware/authorize.js";
+import JobService from "../../services/job_service";
+import { authentication } from "../middleware/authentication";
+import { hateoas } from "../middleware/hateoas";
+import { respond } from "../respond";
+import { authorize } from "../middleware/authorize";
 
 const router = express.Router();
 const links = {

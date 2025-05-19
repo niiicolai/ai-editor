@@ -1,5 +1,5 @@
-import UserPasswordReset from "../../mongodb/models/user_password_reset_model.js";
-import JobModel from "../../mongodb/models/job_model.js";
+import UserPasswordReset from "../../mongodb/models/user_password_reset_model";
+import JobModel from "../../mongodb/models/job_model";
 import mongoose from "mongoose";
 import { CronJob } from "cron";
 
@@ -51,7 +51,7 @@ const onTick = async () => {
       " password resets closed";
     await job.save();
   } catch (error) {
-    job.state = "failed";
+    job.state = "error";
     job.message = "Error processing expired password resets: " + error.message;
     await job.save();
   }

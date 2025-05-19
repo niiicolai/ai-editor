@@ -1,4 +1,4 @@
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error';
 
 export const stringValidator = (s, entityName='name', options = {
     min: {
@@ -12,7 +12,7 @@ export const stringValidator = (s, entityName='name', options = {
     regex: {
         enabled: false,
         value: null,
-    },
+    } as any,
 }) => {
     if (!s) ClientError.badRequest(`${entityName} is required`);
     if (typeof s !== "string") ClientError.badRequest(`${entityName} must be a string`);

@@ -9,15 +9,15 @@ if (!url) console.error('ERROR: MESSAGE_BROKER_URL is not set in the environment
 
 /**
  * @description Callbacks to be added after connection is established
- * @type {object[]}
+ * @type {{ queueName: string, callback: (msg: any) => void }[]}
  */
-const addOnConnect = [];
+const addOnConnect: { queueName: string, callback: (msg: any) => void }[] = [];
 
 /**
  * @description Names of the queues being listened to
  * @type {string[]}
  */
-const queues = [];
+const queues: string[] = [];
 
 /**
  * @description The channel to the message broker
@@ -38,7 +38,7 @@ let conn;
  * @param {function} callback
  * @returns {void}
  */
-const addListener = (queueName, callback) => {
+const addListener = (queueName: string, callback) => {
 
     // Check if the queue is already being listened to
     if (queues.includes(queueName)) {

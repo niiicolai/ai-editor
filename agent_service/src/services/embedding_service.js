@@ -1,6 +1,6 @@
 
 import { createVectorEmbeddings } from "../embedding/index.js";
-import ClientError from "../errors/clientError.js";
+import ClientError from "../errors/client_error.js";
 import { objectValidator } from "../validators/object_validator.js";
 import { stringValidator } from "../validators/string_validator.js";
 

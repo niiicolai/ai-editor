@@ -1,15 +1,15 @@
-import UserPasswordReset from "../mongodb/models/user_password_reset_model.js";
-import User from "../mongodb/models/user_model.js";
-import dto from "../dto/user_password_reset_dto.js";
-import ClientError from "../errors/clientError.js";
-import PwdService from "./pwd_service.js";
+import UserPasswordReset from "../mongodb/models/user_password_reset_model";
+import User from "../mongodb/models/user_model";
+import dto from "../dto/user_password_reset_dto";
+import ClientError from "../errors/client_error";
+import PwdService from "./pwd_service";
 import mongoose from "mongoose";
 
-import { produceSendEmailSaga } from '../rabbitmq/sagas/send_email_saga.js';
+import { produceSendEmailSaga } from '../rabbitmq/sagas/send_email_saga';
 
-import { idValidator } from "../validators/id_validator.js";
-import { stringValidator } from "../validators/string_validator.js";
-import { fieldsValidator } from "../validators/fields_validator.js";
+import { idValidator } from "../validators/id_validator";
+import { stringValidator } from "../validators/string_validator";
+import { fieldsValidator } from "../validators/fields_validator";
 
 const allowedFields = ["expired_at", "created_at", "updated_at"];
 

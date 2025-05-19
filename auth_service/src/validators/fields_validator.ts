@@ -1,4 +1,4 @@
-import ClientError from '../errors/clientError.js';
+import ClientError from '../errors/client_error';
 
 export const fieldsValidator = (fields, allowedFields) => {
   if (fields) {

@@ -1,9 +1,9 @@
 import "dotenv/config";
-import { mongoConnect } from "./src/mongodb/index.js";
-import { setupRabbitMq } from "./src/rabbitmq/index.js";
-import { setupControllers } from "./src/controllers/index.js";
-import { setupCron } from "./src/jobs/index.js";
-import { setupSwagger } from "./src/controllers/swagger/swagger_controller.js";
+import { mongoConnect } from "./src/mongodb/index";
+import { setupRabbitMq } from "./src/rabbitmq/index";
+import { setupControllers } from "./src/controllers/index";
+import { setupCron } from "./src/jobs/index";
+import { setupSwagger } from "./src/controllers/swagger/swagger_controller";
 import { rateLimit } from 'express-rate-limit'
 import express from "express";
 import cors from "cors";
