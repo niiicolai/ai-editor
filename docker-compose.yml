@@ -1,24 +1,104 @@
-version: '3.8'
 
 services:
-  nginx:
-    image: ghcr.io/wunderbald/nginx-quic:latest
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/certs:/etc/nginx/certs:ro
+  editor_mongodb:
+    container_name: editor_mongodb
+    image: mongo
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"  # Required for QUIC
-    depends_on:
-      - auth_service
+      - "27017"
+    networks:
+      - app-network
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+
+  editor_rabbitmq:
+    container_name: editor_rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - "5672"
+      - "15672"
     networks:
       - app-network
 
-  auth_service:
-    build: ./auth_service
-    expose:
-      - "3000"
+  editor_payment_service:
+    container_name: editor_payment_service
+    image: payment_service:v1.0
+    ports:
+      - "3002:3002"
+    depends_on:
+      - editor_mongodb
+      - editor_rabbitmq
+    environment:
+      - MONGO_HOST=editor_mongodb
+      - MONGO_PORT=27017
+      - RABBITMQ_HOST=editor_rabbitmq
+      - RABBITMQ_PORT=5672
+    env_file:
+      - ./payment_service/.env.docker
+    networks:
+      - app-network
+    command: ["sh", "wait_for_start.sh"]
+
+  editor_documentation_service:
+    container_name: editor_documentation_service
+    image: documentation_service:v1.0
+    ports:
+      - "3004:3004"
+    depends_on:
+      - editor_mongodb
+    environment:
+      - MONGO_HOST=editor_mongodb
+      - MONGO_PORT=27017
+    env_file:
+      - ./docs_service/.env.docker
+    networks:
+      - app-network
+    command: ["sh", "wait_for_start.sh"]
+
+  editor_auth_service:
+    container_name: editor_auth_service
+    image: auth_service:v1.0
+    ports:
+      - "3000:3000"
+    depends_on:
+      - editor_mongodb
+      - editor_rabbitmq
+    environment:
+      - MONGO_HOST=editor_mongodb
+      - MONGO_PORT=27017
+      - RABBITMQ_HOST=editor_rabbitmq
+      - RABBITMQ_PORT=5672
+    env_file:
+      - ./auth_service/.env.docker
+    networks:
+      - app-network
+    command: ["sh", "wait_for_start.sh"]
+
+  editor_agent_service:
+    container_name: editor_agent_service
+    image: agent_service:v1.0
+    ports:
+      - "3001:3001"
+      - "4001:4001"
+    depends_on:
+      - editor_mongodb
+      - editor_rabbitmq
+    environment:
+      - MONGO_HOST=editor_mongodb
+      - MONGO_PORT=27017
+      - RABBITMQ_HOST=editor_rabbitmq
+      - RABBITMQ_PORT=5672
+    env_file:
+      - ./agent_service/.env.docker
+    networks:
+      - app-network
+    command: ["sh", "wait_for_start.sh"]
+
+  editor_app_client:
+    container_name: editor_app_client
+    image: app_client:v1.0
+    ports:
+      - "5174:5174"
+    env_file:
+      - ./app_client/.env.docker
     networks:
       - app-network
 
