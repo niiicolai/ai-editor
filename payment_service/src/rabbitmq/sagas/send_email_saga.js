@@ -1,5 +1,5 @@
-import rabbitMq from "../index";
-import TransactionModel from "../../mongodb/models/transaction_model";
+import rabbitMq from "../index.js";
+import TransactionModel from "../../mongodb/models/transaction_model.js";
 import mongoose from "mongoose";
 import SagaBuilder from "../saga/SagaBuilder.js";
 

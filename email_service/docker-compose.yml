@@ -20,11 +20,11 @@ services:
     networks:
       - app-network
 
-  editor_auth_service:
-    container_name: editor_auth_service
-    image: auth_service:v1.0
+  editor_email_service:
+    container_name: editor_email_service
+    image: email_service:v1.0
     ports:
-      - "3000:3000"
+      - "3006:3006"
     depends_on:
       - editor_mongodb
       - editor_rabbitmq
