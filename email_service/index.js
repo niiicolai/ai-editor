@@ -4,6 +4,7 @@ import { setupControllers } from "./src/controllers/index.js";
 import { setupRabbitMq } from "./src/rabbitmq/index.js";
 import { setupSwagger } from "./src/controllers/swagger/swagger_controller.js";
 import { rateLimit } from "express-rate-limit";
+import { GmailService } from "./src/services/gmail_service.js";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -28,6 +29,7 @@ mongoConnect()
     setupControllers(app);
     setupSwagger(app);
     setupRabbitMq();
+    GmailService.loadAuth();
 
     app.listen(PORT, () => {
       console.log("INFO: MongoDB connected successfully");

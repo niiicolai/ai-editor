@@ -1,14 +1,14 @@
 import rabbitMq from "../index.js";
 import TransactionModel from "../../mongodb/models/transaction_model.js";
 import mongoose from "mongoose";
-
 import SagaBuilder from "../saga/SagaBuilder.js";
+import { GmailService } from "../../services/gmail_service.js";
 
 const queueName = "send_email:email_service";
 const consumer = SagaBuilder.consumer(queueName, rabbitMq)
 
   .onConsume(async (message) => {
-    const { transaction } = message;
+    const { mail, transaction } = message;
 
     const existingTransaction = await TransactionModel.findOne({
       _id: transaction._id,
@@ -26,8 +26,9 @@ const consumer = SagaBuilder.consumer(queueName, rabbitMq)
         parameters: JSON.stringify({ message }),
       });
 
+      await GmailService.sendMail(mail.content, mail.subject, mail.to)
+
       await newTransaction.save({ session });
-      console.warn('TODO: SEND EMAIL')
       await session.commitTransaction();
 
       return {

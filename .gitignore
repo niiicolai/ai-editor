@@ -2,6 +2,7 @@
 .env.docker
 node_modules
 package-lock.json
-
+gmail_credentials.json
+gmail_token.json
 __pycache__
 venv

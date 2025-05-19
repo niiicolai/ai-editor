@@ -1,11 +1,12 @@
 import { ProjectIndexType, ProjectIndexesType } from "../types/projectIndexBackendType";
 import TokenService from "./tokenService";
 
-const API_URL = "http://localhost:3001/api/v1";
+const API_URL = import.meta.env.VITE_AGENT_API;
+if (!API_URL) console.error('CONFIGURATION ERROR(projectIndexService.ts): VITE_AGENT_API should be set in the .env file');
 
 export default class ProjectIndexService {
     static async get(_id: string): Promise<ProjectIndexType> {
-        const response = await fetch(`${API_URL}/project_index/${_id}`, {
+        const response = await fetch(`${API_URL}/api/v1/project_index/${_id}`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }
@@ -21,7 +22,7 @@ export default class ProjectIndexService {
     }
 
     static async getByName(name: string): Promise<ProjectIndexType> {
-        const response = await fetch(`${API_URL}/project_index_by_name/${name}`, {
+        const response = await fetch(`${API_URL}/api/v1/project_index_by_name/${name}`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }
@@ -37,7 +38,7 @@ export default class ProjectIndexService {
     }
 
     static async existByName(name: string): Promise<{ exist: boolean; }> {
-        const response = await fetch(`${API_URL}/project_index_exist_by_name/${name.replace(/\\|:/g, '')}`, {
+        const response = await fetch(`${API_URL}/api/v1/project_index_exist_by_name/${name.replace(/\\|:/g, '')}`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }
@@ -53,7 +54,7 @@ export default class ProjectIndexService {
     }
 
     static async getAll(page: number, limit: number): Promise<ProjectIndexesType> {
-        const response = await fetch(`${API_URL}/project_indexes?page=${page}&limit=${limit}`, {
+        const response = await fetch(`${API_URL}/api/v1/project_indexes?page=${page}&limit=${limit}`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }
@@ -75,7 +76,7 @@ export default class ProjectIndexService {
     }
 
     static async create(body: { name: string }): Promise<ProjectIndexType> {
-        const response = await fetch(`${API_URL}/project_index`, {
+        const response = await fetch(`${API_URL}/api/v1/project_index`, {
             method: 'POST',
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`,
@@ -94,7 +95,7 @@ export default class ProjectIndexService {
     }
 
     static async destroy(_id: string): Promise<void> {
-        const response = await fetch(`${API_URL}/project_index/${_id}`, {
+        const response = await fetch(`${API_URL}/api/v1/project_index/${_id}`, {
             method: 'DELETE',
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`

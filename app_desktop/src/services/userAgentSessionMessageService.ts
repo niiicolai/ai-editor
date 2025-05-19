@@ -1,11 +1,12 @@
 import { UserAgentSessionMessageType, UserAgentSessionMessagesType } from "../types/userAgentSessionMessageType";
 import TokenService from "./tokenService";
 
-const API_URL = "http://localhost:3001/api/v1";
+const API_URL = import.meta.env.VITE_AGENT_API;
+if (!API_URL) console.error('CONFIGURATION ERROR(userAgentSessionMessageService.ts): VITE_AGENT_API should be set in the .env file');
 
 export default class UserAgentSessionMessagesService {
     static async get(_id: string): Promise<UserAgentSessionMessageType> {
-        const response = await fetch(`${API_URL}/user_agent_session_message/${_id}`, {
+        const response = await fetch(`${API_URL}/api/v1/user_agent_session_message/${_id}`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }
@@ -21,7 +22,7 @@ export default class UserAgentSessionMessagesService {
     }
 
     static async getAll(page: number, limit: number, user_agent_session_id: string): Promise<UserAgentSessionMessagesType> {
-        const response = await fetch(`${API_URL}/user_agent_session_messages?page=${page}&limit=${limit}&user_agent_session_id=${user_agent_session_id}`, {
+        const response = await fetch(`${API_URL}/api/v1/user_agent_session_messages?page=${page}&limit=${limit}&user_agent_session_id=${user_agent_session_id}`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }
@@ -43,7 +44,7 @@ export default class UserAgentSessionMessagesService {
     }
 
     static async create(body: { content: string, userAgentSessionId: string, currentFile: { name: string, content: string}, directoryInfo: any }): Promise<UserAgentSessionMessageType> {
-        const response = await fetch(`${API_URL}/user_agent_session_message`, {
+        const response = await fetch(`${API_URL}/api/v1/user_agent_session_message`, {
             method: 'POST',
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`,
@@ -62,7 +63,7 @@ export default class UserAgentSessionMessagesService {
     }
 
     static async update(_id: string, body: { content: string }): Promise<UserAgentSessionMessageType> {
-        const response = await fetch(`${API_URL}/user_agent_session_message/${_id}`, {
+        const response = await fetch(`${API_URL}/api/v1/user_agent_session_message/${_id}`, {
             method: 'PATCH',
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`,
@@ -81,7 +82,7 @@ export default class UserAgentSessionMessagesService {
     }
 
     static async destroy(_id: string): Promise<void> {
-        const response = await fetch(`${API_URL}/user_agent_session_message/${_id}`, {
+        const response = await fetch(`${API_URL}/api/v1/user_agent_session_message/${_id}`, {
             method: 'DELETE',
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`

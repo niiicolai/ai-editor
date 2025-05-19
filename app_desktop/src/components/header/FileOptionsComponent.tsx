@@ -12,6 +12,9 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 import DropdownComponent from "../utils/DropdownComponent";
 
+const WEBSITE_DOMAIN_URL = import.meta.env.VITE_WEBSITE_DOMAIN;
+if (!WEBSITE_DOMAIN_URL) console.error('CONFIGURATION ERROR(FileOptionsComponent.ts): VITE_WEBSITE_DOMAIN should be set in the .env file');
+
 function FileOptionsComponent() {
   const { data: isAuthorized } = useIsAuthorized();
   const { openExternalBrowser } = useExternalBrowser();
@@ -112,7 +115,7 @@ function FileOptionsComponent() {
             <>
               <button
                 onClick={() =>
-                  openExternalBrowser("http://localhost:5173/products")
+                  openExternalBrowser(`${WEBSITE_DOMAIN_URL}/products`)
                 }
                 className="button-main w-full text-left px-2 py-1"
               >
@@ -120,7 +123,7 @@ function FileOptionsComponent() {
               </button>
               <button
                 onClick={() =>
-                  openExternalBrowser("http://localhost:5173/user")
+                  openExternalBrowser(`${WEBSITE_DOMAIN_URL}/user`)
                 }
                 className="button-main w-full text-left px-2 py-1"
               >

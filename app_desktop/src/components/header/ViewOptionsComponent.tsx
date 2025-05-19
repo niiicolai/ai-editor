@@ -11,6 +11,9 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useTerminals } from "../../hooks/useTerminals";
 import { useExternalBrowser } from "../../hooks/useExternalBrowser";
 
+const WEBSITE_DOMAIN_URL = import.meta.env.VITE_WEBSITE_DOMAIN;
+if (!WEBSITE_DOMAIN_URL) console.error('CONFIGURATION ERROR(ViewOptionsComponent.ts): VITE_WEBSITE_DOMAIN should be set in the .env file');
+
 function ViewOptionsComponent() {
   const hierarchySettings = useSelector((state: RootState) => state.hierarchySettings);
   const shortcuts = useSelector((state: RootState) => state.shortcuts);
@@ -40,7 +43,7 @@ function ViewOptionsComponent() {
             Themes
           </button>
           <button
-            onClick={() => openExternalBrowser("http://localhost:5173/docs")}
+            onClick={() => openExternalBrowser(`${WEBSITE_DOMAIN_URL}/docs`)}
             className="button-main w-full text-left px-2 py-1"
           >
             Documentation

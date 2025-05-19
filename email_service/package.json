@@ -8,18 +8,21 @@
     "test": "vitest",
     "mongo:generate:migration": "node ./src/mongodb/migration.js generate",
     "mongo:migrate": "node ./src/mongodb/migration.js up",
-    "mongo:migrate:undo": "node ./src/mongodb/migration.js down"
+    "mongo:migrate:undo": "node ./src/mongodb/migration.js down",
+    "configure:gmail": "node ./configure_gmail.js"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google-cloud/local-auth": "^3.0.1",
     "amqplib": "^0.10.3",
     "cors": "^2.8.5",
     "cron": "^3.1.7",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
+    "googleapis": "^148.0.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.12.0",

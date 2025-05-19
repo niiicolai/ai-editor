@@ -1,11 +1,12 @@
 import { ProjectIndexItemType, ProjectIndexItemsType, ProjectIndexItemCreateType } from "../types/projectIndexItemType";
 import TokenService from "./tokenService";
 
-const API_URL = "http://localhost:3001/api/v1";
+const API_URL = import.meta.env.VITE_AGENT_API;
+if (!API_URL) console.error('CONFIGURATION ERROR(projectIndexItemService.ts): VITE_AGENT_API should be set in the .env file');
 
 export default class ProjectIndexItemService {
     static async get(_id: string): Promise<ProjectIndexItemType> {
-        const response = await fetch(`${API_URL}/project_index_item/${_id}`, {
+        const response = await fetch(`${API_URL}/api/v1/project_index_item/${_id}`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }
@@ -21,7 +22,7 @@ export default class ProjectIndexItemService {
     }
 
     static async getAll(page: number, limit: number, projectIndexId: string): Promise<ProjectIndexItemsType> {
-        const response = await fetch(`${API_URL}/project_index_items?projectIndexId=${projectIndexId}&page=${page}&limit=${limit}`, {
+        const response = await fetch(`${API_URL}/api/v1/project_index_items?projectIndexId=${projectIndexId}&page=${page}&limit=${limit}`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }
@@ -43,7 +44,7 @@ export default class ProjectIndexItemService {
     }
 
     static async create(body: ProjectIndexItemCreateType): Promise<ProjectIndexItemType> {
-        const response = await fetch(`${API_URL}/project_index_item`, {
+        const response = await fetch(`${API_URL}/api/v1/project_index_item`, {
             method: 'POST',
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`,
@@ -62,7 +63,7 @@ export default class ProjectIndexItemService {
     }
 
     static async destroy(_id: string): Promise<void> {
-        const response = await fetch(`${API_URL}/project_index_item/${_id}`, {
+        const response = await fetch(`${API_URL}/api/v1/project_index_item/${_id}`, {
             method: 'DELETE',
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
