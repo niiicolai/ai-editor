@@ -8,6 +8,8 @@ import { produceNewSampleSaga } from "../rabbitmq/sagas/new_sample_saga.js";
 import { creatChatCompletion } from "./index.js";
 import { MessageBuilder } from "./messageBuilder.js";
 
+const RECORD_SAMPLES = parseInt(process.env.RECORD_SAMPLES || 0) === 1;
+
 class MessageBuilderChatHandler extends MessageBuilder {
   constructor(handler) {
     super();
@@ -42,6 +44,7 @@ export class ChatHandler {
     this.model = data.selected_llm ?? "gpt-4o-mini";
     this.content = data.content;
     this.userId = connection.userData?.user?._id;
+    this.userRole = connection.userData?.user?.role;
     this.sessionId = connection.userData?.sessionId;
     this.reply = reply;
 
@@ -189,7 +192,13 @@ export class ChatHandler {
     );
   }
 
+  /**
+   * @function recordSample
+   * @description record the sample for RAG evaluation (only for admins)
+   */
   async recordSample() {
+    if (!RECORD_SAMPLES || this.userRole !== 'admin') return;
+
     await produceNewSampleSaga({
       input_prompt: this.content,
       input_embedded_files: this.embeddedFiles || [],

@@ -25,4 +25,9 @@ export interface SamplesType {
     pages: number;
     limit: number;
     page: number;
+    stats: {
+        average_context_precision: number;
+        average_response_relevancy: number;
+        average_faithfulness: number;
+    }
 }

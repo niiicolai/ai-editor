@@ -6,16 +6,15 @@ import RestrictedComponent from "../../components/RestrictedComponent";
 import RequireRoleComponent from "../../components/RequireRoleComponent";
 
 export default function SampleIndexView() {
-  const { page, limit, nextPage, prevPage } = usePagination();
+  const { page, limit, nextPage, prevPage, setLimit } = usePagination();
   const { data, isLoading, error } = useGetSamples(page, limit);
 
   const renderSampleItem = (sample: SampleType) => {
     return (
       <div key={sample._id} className="p-4 border-b border-gray-200">
-
         <div className="flex justify-between gap-2">
           <div className="flex flex-col gap-2 w-1/2">
-          <div className="mt-1 text-sm text-gray-500 flex flex-col gap-1">
+            <div className="mt-1 text-sm text-gray-500 flex flex-col gap-1">
               <span className="font-bold">Event:</span>
               <span>{sample.event}</span>
             </div>
@@ -95,16 +94,72 @@ export default function SampleIndexView() {
                 <div className="max-w-3xl mx-auto">
                   <div className="bg-white shadow overflow-hidden sm:rounded-lg">
                     <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        RAG Evaluation Management
-                      </h3>
+                      <div>
+                        <h3 className="text-lg leading-6 font-medium text-gray-900">
+                          RAG Evaluation Management
+                        </h3>
+                        <div className="flex flex-col items-start gap-1 mt-2">
+                          <label htmlFor="limit" className="text-sm font-medium text-gray-700">
+                            Limit
+                          </label>
+                          <input
+                          id="limit"
+                          type="number"
+                          min={1}
+                          className="block w-20 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                          placeholder="Limit"
+                          value={limit}
+                          onChange={(e) =>
+                            setLimit(parseInt(e.target.value || "10"))
+                          }
+                          />
+                          <small>
+                            Max Limit: 100
+                          </small>
+                        </div>
+                      </div>
 
-                      <Link
-                        to="/user"
-                        className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      >
-                        Back
-                      </Link>
+                      <div className="flex gap-4">
+                        {data && (
+                          <div className="flex gap-1 text-xs text-center">
+                            <div className="w-24 flex flex-col gap-3 p-3 border border-gray-300 bg-emerald-400 text-white rounded-md">
+                              <div className="font-bold h-12 flex flex-col items-center justify-center">
+                                Average Context Precision
+                              </div>
+                              <div>
+                                {data.stats.average_context_precision.toFixed(
+                                  2
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="w-24 flex flex-col gap-3 p-3 border border-gray-300 bg-red-400 text-white rounded-md">
+                              <div className="font-bold h-12 flex flex-col items-center justify-center">
+                                Average Response Relevancy
+                              </div>
+                              <div>
+                                {data.stats.average_response_relevancy.toFixed(
+                                  2
+                                )}
+                              </div>
+                            </div>
+                            <div className="w-24 flex flex-col gap-3 p-3 border border-gray-300 bg-blue-400 text-white rounded-md">
+                              <div className="font-bold h-12 flex flex-col items-center justify-center">
+                                Average Faithfulness
+                              </div>
+                              <div>
+                                {data.stats.average_faithfulness.toFixed(2)}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        <Link
+                          to="/user"
+                          className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                          Back
+                        </Link>
+                      </div>
                     </div>
                     <div className="border-t border-gray-200">
                       <dl>
@@ -123,7 +178,7 @@ export default function SampleIndexView() {
                         )}
 
                         <div className="bg-gray-50 px-4 py-5">
-                          <div className="flex justify-between items-center">
+                          <div className="flex justify-between items-start">
                             <h2 className="text-lg font-medium text-gray-900">
                               Samples
                             </h2>

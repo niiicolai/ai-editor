@@ -12,7 +12,7 @@ def find(query={}):
 
 def paginate(page=1, limit=10):
     skip = (page - 1) * limit
-    return collection.find().skip(skip).limit(limit)
+    return collection.find().sort("created_at", -1).skip(skip).limit(limit)
 
 def count(query={}):
     return collection.count_documents(query)

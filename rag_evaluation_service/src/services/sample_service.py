@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 from src.models.sample_model import insert_many, find, paginate, count
 from src.services.context_precision_service import cal_context_precision
 from src.services.faithfulness_service import cal_faithfulness
@@ -17,15 +18,35 @@ def get_samples(page, limit):
     if page is None: raise Exception("page is required")
     if limit is None: raise Exception("limit is required")
     
-    samples = paginate(page, limit)
+    samples_cursor = paginate(page, limit)
+    samples = list(samples_cursor)
     total = count()
     pages = (total + limit - 1) // limit 
+    # Calculate averages for metrics across samples
+    if samples:
+        total_context_precision = sum(s.get("metrics", {}).get("context_precision", 0) for s in samples)
+        total_response_relevancy = sum(s.get("metrics", {}).get("response_relevancy", 0) for s in samples)
+        total_faithfulness = sum(s.get("metrics", {}).get("faithfulness", 0) for s in samples)
+        count_samples = len(samples)
+        average_context_precision = total_context_precision / count_samples
+        average_response_relevancy = total_response_relevancy / count_samples
+        average_faithfulness = total_faithfulness / count_samples
+    else:
+        average_context_precision = 0
+        average_response_relevancy = 0
+        average_faithfulness = 0
+    
     return {
         "samples": [dto(s) for s in samples],
         "total": total,
         "pages": pages,
         "page": page,
-        "limit": limit
+        "limit": limit,
+        "stats": {
+            "average_context_precision": average_context_precision,
+            "average_response_relevancy": average_response_relevancy,
+            "average_faithfulness": average_faithfulness
+        }
     }
 
 async def create_many(body):
@@ -52,7 +73,9 @@ async def create_many(body):
                 "context_precision": context_precision,
                 "response_relevancy": response_relevancy,
                 "faithfulness": faithfulness
-            }
+            },
+            "created_at": datetime.datetime.now(),
+            "updated_at": datetime.datetime.now()
         }
         samples_to_insert.append(sample)
 
