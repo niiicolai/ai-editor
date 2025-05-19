@@ -4,6 +4,7 @@ import UserAgentSessionOperationService from "../services/user_agent_session_ope
 import LlmUsageService from "../services/llm_usage_service.js";
 import AvailableLlmService from "../services/available_llm_service.js";
 
+import { produceNewSampleSaga } from "../rabbitmq/sagas/new_sample_saga.js";
 import { creatChatCompletion } from "./index.js";
 import { MessageBuilder } from "./messageBuilder.js";
 
@@ -35,6 +36,9 @@ export class ChatHandler {
     this.focusFiles = data.focusFiles ?? null;
     this.directoryInfo = data.directoryInfo ?? null;
     this.embeddedFiles = data.embeddedFiles ?? null;
+    this.embeddingModel = data.embeddingModel ?? "Unknown";
+    this.chunkMode = data.chunkMode ?? "Unknown";
+    this.searchMode = data.searchMode ?? "Unknown";
     this.model = data.selected_llm ?? "gpt-4o-mini";
     this.content = data.content;
     this.userId = connection.userData?.user?._id;
@@ -165,6 +169,8 @@ export class ChatHandler {
     );
 
     this.reply("user_input_reply_update", updatedMessage);
+    this.agentMessage = updatedMessage;
+    this.event = options.event;
 
     await LlmUsageService.create(
       {
@@ -181,5 +187,18 @@ export class ChatHandler {
       },
       this.userId
     );
+  }
+
+  async recordSample() {
+    await produceNewSampleSaga({
+      input_prompt: this.content,
+      input_embedded_files: this.embeddedFiles || [],
+      output_response: this.agentMessage.content,
+      llm_config: this.model,
+      embedding_config: this.embeddingModel,
+      chunk_config: this.chunkMode,
+      search_config: this.searchMode,
+      event_config: this.event,
+    });
   }
 }

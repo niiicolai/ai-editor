@@ -1,28 +1,52 @@
-import pika
 import json
-from src.rabbitmq.rabbitmq_connection import channel
+import threading
+import asyncio
+from src.rabbitmq.rabbitmq_connection import get_channel
+from src.services.sample_service import create_many
 
-queue_name='agent_service:new_sample'
+queue_name='new_sample:rag_evaluation_service'
+
+loop = asyncio.new_event_loop()
+def start_loop():
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
 
 def callback(ch, method, properties, body):
     try:
-        prompt_data = json.loads(body)
-        input_prompt = prompt_data['input']
-        options = prompt_data['options']
-        print(prompt_data)
+        data = json.loads(body)
         
-        # Generate code based on the prompt
-        response = prompt(input_prompt, options)
-
-        # Print the result (you can save it to a file, send it back to a queue, etc.)
-        print(f"Generated response: \n{response}")
+        transaction = data['transaction']
+        sample = data['sample']
+        input_prompt = sample['input_prompt']
+        input_embedded_files = sample['input_embedded_files']
+        output_response = sample['output_response']
+        llm_config = sample['llm_config']
+        embedding_config = sample['embedding_config']
+        chunk_config = sample['chunk_config']
+        search_config = sample['search_config']
+        event_config = sample['event_config']
+        
+        asyncio.run_coroutine_threadsafe(create_many([{
+            "input_prompt": input_prompt,
+            "input_embedded_files": input_embedded_files,
+            "output_response": output_response,
+            "event": event_config,
+            "config": {
+                "llm": llm_config,
+                "embedding_model": embedding_config,
+                "chunking_strategy": chunk_config,
+                "search_strategy": search_config
+            }
+        }]), loop)
         
         success_message = {
-            "input": input_prompt,
-            "response": response
+            "transaction": transaction,
         }
 
         success_queue = queue_name + '_success'
+        
+        channel = get_channel()
         channel.queue_declare(queue=success_queue)
         channel.basic_publish(
             exchange='',
@@ -45,13 +69,15 @@ def callback(ch, method, properties, body):
         )
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
-def consume_from_queue():
-    # Declare the same queue from which to receive messages
+def consume_samples_queue():
+    channel = get_channel()
     channel.queue_declare(queue=queue_name)
-    # Start consuming messages from the queue
     channel.basic_consume(queue=queue_name, on_message_callback=callback)
-    print(' [*] Waiting for messages. To exit press CTRL+C')
+    print('INFO:     new_sample_saga.py loaded')
     channel.start_consuming()
 
-# Start the consumer to listen for messages and generate code
-consume_from_queue()
+def start_consumer_thread():
+    threading.Thread(target=start_loop, daemon=True).start()
+    
+    thread = threading.Thread(target=consume_samples_queue, daemon=True)
+    thread.start()

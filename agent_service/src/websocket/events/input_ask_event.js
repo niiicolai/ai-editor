@@ -1,8 +1,7 @@
 import { WebsocketEvent } from "../event.js";
+import { ChatHandler } from "../../llm/chat_handler.js";
 import UserService from "../../services/user_service.js";
 import Decimal from "decimal.js";
-
-import { ChatHandler } from "../../llm/chat_handler.js";
 
 export default class InputAskEvent extends WebsocketEvent {
   constructor() {
@@ -78,6 +77,9 @@ export default class InputAskEvent extends WebsocketEvent {
         temperature: 0.7,
         useTools: false,
       });
+
+      await handler.recordSample();
+
     } catch (error) {
       console.log(error);
       reply("error", { content: "Something went wrong" });

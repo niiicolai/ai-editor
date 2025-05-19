@@ -17,6 +17,7 @@ import { setMeta, setQueue } from "../features/projectIndex";
 import { insertEmbeddedFile } from "../electron/insertEmbeddedFile";
 
 export const useEmbeddingFiles = () => {
+  const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
   const { queue, meta } = useSelector((state: RootState) => state.projectIndex);
   const { currentPath, directoryState } = useSelector(
     (state: RootState) => state.hierarchy
@@ -47,55 +48,34 @@ export const useEmbeddingFiles = () => {
       if (!meta?._id != project_id) {
         dispatch(setMeta({ name: currentPath as string, _id: project_id }));
       }
-      
-      const filesForIndexing = await Promise.all(
-        queue.map(async (f) => {
-          const fileInstance = await readFile.read(f);
-          const content = fileInstance?.content || "";
-          const language = fileInstance?.language || "plaintext";
-          const parsed = parseFile.parse(content, language);
-          const description = `filename: ${f.name}\nfilepath: ${
-            f.path
-          }\nlanguage: ${language}\nlines: ${parsed?.lines}\ndescription: ${
-            parsed?.description
-          }\nvars: ${JSON.stringify(
-            parsed?.vars || "[]"
-          )}\nfunctions: ${JSON.stringify(
-            parsed?.functions || "[]"
-          )}\nclasses: ${JSON.stringify(parsed?.classes || "[]")}`;
-          const hash = hashing.hash(description);
-          return {
-            embedding: [],
-            project_id,
-            filepath: f.path,
-            filename: f.name,
-            description,
-            hash,
-          };
-        })
-      );
 
-      const filesToEmbedding = filesForIndexing.map((f) => {
-        return { id: f.hash, content: f.description };
-      });
+      for (const f of queue) {
+        const fileInstance = await readFile.read(f);
+        const content = fileInstance?.content || "";
+        const language = fileInstance?.language || "plaintext";
+        const parsed = parseFile.parse(content, language);
+        const description = `filename: ${f.name}\nfilepath: ${
+          f.path
+        }\nlanguage: ${language}\nlines: ${parsed?.lines}\ndescription: ${
+          parsed?.description
+        }\nvars: ${JSON.stringify(
+          parsed?.vars || "[]"
+        )}\nfunctions: ${JSON.stringify(
+          parsed?.functions || "[]"
+        )}\nclasses: ${JSON.stringify(parsed?.classes || "[]")}`;
+        const hash = hashing.hash(description);
+        const embeddings = await EmbeddingService.create({ chunks: [description], model: embeddingModel });
 
-      const embeddings = await EmbeddingService.create({ filesToEmbedding });
-
-      for (const e of embeddings) {
-        const f = filesForIndexing.find((file) => file.hash == e.id);
-        if (!f) continue;
-        for (const embedding of e.embeddings) {
-          insertEmbeddedFile({
-            project_id,
-            filepath: f.filepath,
-            filename: f.filename,
-            description: f.description,
-            hash: f.hash,
-            embedding: embedding.embedding,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
-        }
+        await insertEmbeddedFile({
+          project_id,
+          filepath: f.path,
+          filename: f.name,
+          description,
+          hash,
+          embedding: embeddings[0].embedding,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
       }
 
       dispatch(setQueue([]));

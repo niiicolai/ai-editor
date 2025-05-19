@@ -20,7 +20,7 @@ function ChatInputComponent({
     sendMessage: (content:string) => void;
 }) {
     const projectIndex = useSelector((state: RootState) => state.projectIndex);
-    const { sessionId } = useSelector((state: RootState) => state.userAgentSession);
+    const { sessionId, embeddingModel, chunkMode, searchMode } = useSelector((state: RootState) => state.userAgentSession);
     const { currentFile, directoryState, currentPath } = useSelector((state: RootState) => state.hierarchy);
     const { search } = useVectorSearchEmbeddedFiles();
     const { focusFiles, removeFocusFile } = useFocusFiles();
@@ -38,9 +38,9 @@ function ChatInputComponent({
 
         let embeddedFiles = null;
         if (projectIndex?.meta?._id) {
-            const queryEmbedding = await EmbeddingService.create({ filesToEmbedding: [{ id: '', content }]})
-            embeddedFiles = (await search(projectIndex.meta._id, queryEmbedding[0].embeddings[0].embedding))
-                ?.result.sort((a:any, b:any) => b.distance - a.distance)
+            const queryEmbedding = await EmbeddingService.create({ chunks: [content], model: embeddingModel })
+            embeddedFiles = (await search(projectIndex.meta._id, queryEmbedding[0].embedding))
+                ?.result?.sort((a:any, b:any) => b.distance - a.distance)
         }
 
         try {
@@ -54,7 +54,10 @@ function ChatInputComponent({
                     directoryInfo: directoryState,
                     user_agent_session_id: sessionId,
                     selected_llm: selectedLlm,
-                    ...(projectIndex?.meta?._id && { projectIndexId: projectIndex?.meta?._id })
+                    ...(projectIndex?.meta?._id && { projectIndexId: projectIndex?.meta?._id }),
+                    embeddingModel, 
+                    chunkMode, 
+                    searchMode
                 }
             }));
             setContent("");

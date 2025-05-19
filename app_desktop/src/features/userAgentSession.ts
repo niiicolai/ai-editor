@@ -7,11 +7,17 @@ interface UserAgentSession {
   sessionId: string | null;
   operation: UserAgentSessionOperationType | null;
   messages: UserAgentSessionMessageType[];
+  embeddingModel: string;
+  chunkMode: string;
+  searchMode: string;
 }
 
 const userAgentSessionSlice = createSlice({
   name: "user_agent_session",
   initialState: {
+    embeddingModel: "Salesforce/codet5p-110m-embedding",
+    chunkMode: "custom_code",
+    searchMode: "vector_search",
     sessionTitle: null,
     sessionId: null,
     operation: null,

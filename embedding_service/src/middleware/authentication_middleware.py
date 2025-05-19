@@ -1,6 +1,9 @@
 from fastapi import Request, HTTPException
 import jwt
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 SECRET_KEY = os.getenv("JWT_SECRET")
 if SECRET_KEY is None: print("JWT_SECRET is not set in .env")

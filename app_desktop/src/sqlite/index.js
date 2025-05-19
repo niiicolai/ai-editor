@@ -7,7 +7,7 @@ vec.load(db);
 db.prepare(`
     CREATE VIRTUAL TABLE IF NOT EXISTS embeddedfiles USING vec0(
         rowid INTEGER PRIMARY KEY AUTOINCREMENT,
-        embedding FLOAT[384],
+        embedding FLOAT[256],
         project_id TEXT,
         filepath TEXT,
         filename TEXT,

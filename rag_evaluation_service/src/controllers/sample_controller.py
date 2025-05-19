@@ -2,7 +2,7 @@ from fastapi import HTTPException, Depends
 from src.services.sample_service import get_sample, get_samples
 from src.middleware.authentication_middleware import authentication_middleware
         
-def sampleController(app):
+def sample_controller(app):
 
     @app.get("/api/v1/sample/{id}")
     def get_sample_route(id: int, user=Depends(authentication_middleware)):
