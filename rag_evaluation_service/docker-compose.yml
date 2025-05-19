@@ -1,0 +1,15 @@
+
+services:
+
+  editor_rag_evaluation_service:
+    container_name: editor_rag_evaluation_service
+    image: rag_evaluation_service:v1.0
+    ports:
+      - "3005:3005"
+    env_file:
+      - .env.docker
+    networks:
+      - app-network
+
+networks:
+  app-network:

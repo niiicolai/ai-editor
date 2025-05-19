@@ -1,11 +1,12 @@
 import { JobType, JobsType } from "../types/jobType";
 import TokenService from "./tokenService";
 
-const API_URL = "http://localhost:3001/api/v1";
+const API_URL = import.meta.env.VITE_AGENT_API;
+if (!API_URL) console.error('CONFIGURATION ERROR(agentJobService.ts): VITE_AGENT_API should be set in the .env file');
 
 export default class AgentJobService {
     static async get(_id: string): Promise<JobType> {
-        const response = await fetch(`${API_URL}/job/${_id}`, {
+        const response = await fetch(`${API_URL}/api/v1/job/${_id}`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }
@@ -21,7 +22,7 @@ export default class AgentJobService {
     }
 
     static async getAll(page: number, limit: number, state: string): Promise<JobsType> {
-        const response = await fetch(`${API_URL}/jobs?page=${page}&limit=${limit}&state=${state}`, {
+        const response = await fetch(`${API_URL}/api/v1/jobs?page=${page}&limit=${limit}&state=${state}`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }

@@ -1,0 +1,15 @@
+
+services:
+
+  editor_embedding_service:
+    container_name: editor_embedding_service
+    image: embedding_service:v1.0
+    ports:
+      - "3003:3003"
+    env_file:
+      - .env.docker
+    networks:
+      - app-network
+
+networks:
+  app-network:

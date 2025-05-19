@@ -12,17 +12,18 @@ mongoConnect()
     const app = express();
     const PORT = process.env.WEB_PORT || 3000;
     const limiter = rateLimit({
+      crossOriginResourcePolicy: false,
       windowMs: 15 * 60 * 1000, // 15 minutes
       limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
       standardHeaders: 'draft-8', // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
       legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
     })
 
-    app.use(cors());
-    app.use(helmet());
+    app.use(cors({ origin: 'http://web.localhost' }));
+    //app.use(helmet());
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-    app.use(limiter);
+    //app.use(limiter);
     
     setupControllers(app);
     setupSwagger(app);

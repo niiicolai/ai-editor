@@ -1,12 +1,15 @@
 import { UserType } from "../types/userType";
 import TokenService from "./tokenService";
 
-const API_URL = "http://localhost:3000/api/v1";
-const API2_URL = "http://localhost:3001/api/v1";
+const AUTH_API_URL = import.meta.env.VITE_AUTH_API;
+if (!AUTH_API_URL) console.error('CONFIGURATION ERROR(agentJobService.ts): VITE_AUTH_API should be set in the .env file');
+
+const AGENT_API_URL = import.meta.env.VITE_AGENT_API;
+if (!AGENT_API_URL) console.error('CONFIGURATION ERROR(agentJobService.ts): VITE_AGENT_API should be set in the .env file');
 
 export default class UserService {
     static async isAuthorized(): Promise<boolean> {
-        const response = await fetch(`${API_URL}/user?fields=_id`, {
+        const response = await fetch(`${AUTH_API_URL}/api/v1/user?fields=_id`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }
@@ -19,7 +22,7 @@ export default class UserService {
     }
 
     static async creditLeft(): Promise<{ _id: string, credit: number }> {
-        const response = await fetch(`${API2_URL}/user?fields=credit`, {
+        const response = await fetch(`${AGENT_API_URL}/api/v1/user?fields=credit`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }
@@ -35,7 +38,7 @@ export default class UserService {
     }
     
     static async get(): Promise<UserType> {
-        const response = await fetch(`${API_URL}/user`, {
+        const response = await fetch(`${AUTH_API_URL}/api/v1/user`, {
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`
             }
@@ -51,7 +54,7 @@ export default class UserService {
     }
 
     static async login(email: string, password: string): Promise<void> {
-        const response = await fetch(`${API_URL}/user/login`, {
+        const response = await fetch(`${AUTH_API_URL}/api/v1/user/login`, {
             method: "POST",
             headers: {
                 'Content-Type': "application/json"
@@ -72,7 +75,7 @@ export default class UserService {
     }
 
     static async create(username: string, email: string, password: string): Promise<void> {
-        const response = await fetch(`${API_URL}/user`, {
+        const response = await fetch(`${AUTH_API_URL}/api/v1/user`, {
             method: "POST",
             headers: {
                 'Content-Type': "application/json"
@@ -94,7 +97,7 @@ export default class UserService {
     }
 
     static async update(username: string, email: string, password: string): Promise<UserType> {
-        const response = await fetch(`${API_URL}/user`, {
+        const response = await fetch(`${AUTH_API_URL}/api/v1/user`, {
             method: "PATCH",
             headers: {
                 'Content-Type': "application/json",
@@ -117,7 +120,7 @@ export default class UserService {
     }
 
     static async destroy(): Promise<void> {
-        const response = await fetch(`${API_URL}/user`, {
+        const response = await fetch(`${AUTH_API_URL}/api/v1/user`, {
             method: "DELETE",
             headers: {
                 'authorization': `Bearer ${TokenService.getToken()}`

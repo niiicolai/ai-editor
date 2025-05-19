@@ -21,7 +21,7 @@ mongoConnect()
       legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
     })
 
-    app.use(cors());
+    app.use(cors({ origin: '*' }));
     app.use(helmet());
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
