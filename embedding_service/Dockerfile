@@ -14,4 +14,4 @@ COPY . .
 EXPOSE 3003
 
 # Run the app
-CMD ["uvicorn", "main:app", "--host", "localhost", "--port", "3003"]
+CMD ["python", "main.py"]

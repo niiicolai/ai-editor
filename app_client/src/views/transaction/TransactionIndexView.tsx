@@ -1,6 +1,7 @@
 import { useGetPaymentTransactions } from "../../hooks/usePaymentTransaction";
 import { useGetAuthTransactions } from "../../hooks/useAuthTransaction";
 import { useGetAgentTransactions } from "../../hooks/useAgentTransaction";
+import { useGetEmailTransactions } from "../../hooks/useEmailTransaction";
 import { usePagination } from "../../hooks/usePagination";
 import { useState } from "react";
 import { TransactionType } from "../../types/transactionType";
@@ -15,6 +16,7 @@ export default function TransactionIndexView() {
     useState("error");
   const [authTransactionState, setAuthTransactionState] = useState("error");
   const [agentTransactionState, setAgentTransactionState] = useState("error");
+  const [emailTransactionState, setEmailTransactionState] = useState("error");
   const {
     page: pageAuth,
     limit: limitAuth,
@@ -32,6 +34,12 @@ export default function TransactionIndexView() {
     limit: limitAgent,
     nextPage: nextPageAgent,
     prevPage: prevPageAgent,
+  } = usePagination();
+  const {
+    page: pageEmail,
+    limit: limitEmail,
+    nextPage: nextPageEmail,
+    prevPage: prevPageEmail,
   } = usePagination();
   const {
     data: paymentTransactions,
@@ -52,8 +60,13 @@ export default function TransactionIndexView() {
     isLoading: agentTransactionsLoading,
     error: agentTransactionsError,
   } = useGetAgentTransactions(pageAgent, limitAgent, agentTransactionState);
-  const isLoading = paymentTransactionsLoading || authTransactionsLoading || agentTransactionsLoading;
-  const error = paymentTransactionsError || authTransactionsError || agentTransactionsError;
+  const {
+    data: emailTransactions,
+    isLoading: emailTransactionsLoading,
+    error: emailTransactionsError,
+  } = useGetEmailTransactions(pageEmail, limitEmail, emailTransactionState);
+  const isLoading = paymentTransactionsLoading || authTransactionsLoading || agentTransactionsLoading || emailTransactionsLoading;
+  const error = paymentTransactionsError || authTransactionsError || agentTransactionsError || emailTransactionsError;
 
   const renderStateButtons = (
     currentState: string,
@@ -275,6 +288,56 @@ export default function TransactionIndexView() {
                               }
                               disabled={
                                 pageAgent >= (agentTransactions?.pages ?? 0)
+                              }
+                              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                            >
+                              Next
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="bg-gray-30 px-4 py-5">
+                          <div className="flex justify-between items-center">
+                            <h2 className="text-lg font-medium text-gray-900">
+                              Email Transactions
+                            </h2>
+
+                            <div className="flex gap-2">
+                              {renderStateButtons(
+                                emailTransactionState,
+                                setEmailTransactionState
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            {emailTransactions &&
+                              emailTransactions.transactions.map(
+                                (transaction: TransactionType) =>
+                                  renderTransactionItem(transaction)
+                              )}
+                            {emailTransactions?.transactions.length === 0 && (
+                              <div className="p-4 border-b border-gray-200">
+                                <h3 className="text-sm font-medium text-gray-900">
+                                  No transactions Found
+                                </h3>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex justify-between mt-4">
+                            <button
+                              onClick={prevPageEmail}
+                              disabled={pageEmail === 1}
+                              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                            >
+                              Previous
+                            </button>
+                            <button
+                              onClick={() =>
+                                nextPageEmail(emailTransactions?.pages ?? 0)
+                              }
+                              disabled={
+                                pageEmail >= (emailTransactions?.pages ?? 0)
                               }
                               className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
                             >
