@@ -54,15 +54,17 @@ export const useEmbeddingFiles = () => {
         const content = fileInstance?.content || "";
         const language = fileInstance?.language || "plaintext";
         const parsed = parseFile.parse(content, language);
-        const description = `filename: ${f.name}\nfilepath: ${
-          f.path
-        }\nlanguage: ${language}\nlines: ${parsed?.lines}\ndescription: ${
-          parsed?.description
-        }\nvars: ${JSON.stringify(
-          parsed?.vars || "[]"
-        )}\nfunctions: ${JSON.stringify(
-          parsed?.functions || "[]"
-        )}\nclasses: ${JSON.stringify(parsed?.classes || "[]")}`;
+        const description = `
+        filename: ${f.name}\n
+        filepath: ${f.path}\n
+        language: ${language}\n
+        lines: ${parsed?.lines}\n
+        description: ${parsed?.description}
+        ${parsed?.vars && parsed?.vars?.length ? `\vars: ${JSON.stringify(parsed?.vars || "[]")}` : '' }
+        ${parsed?.functions && parsed?.functions?.length ? `\functions: ${JSON.stringify(parsed?.functions || "[]")}` : '' }
+        ${parsed?.classes && parsed?.classes?.length ? `\nclasses: ${JSON.stringify(parsed?.classes || "[]")}` : '' }
+        ${parsed?.comments && parsed?.comments?.length ? `\comments: ${JSON.stringify(parsed?.comments || "[]")}` : '' }`;
+        console.log(description)
         const hash = hashing.hash(description);
         const embeddings = await EmbeddingService.create({ chunks: [description], model: embeddingModel });
 

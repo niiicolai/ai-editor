@@ -6,7 +6,7 @@ import { FocusFileItemType } from "../../types/directoryInfoType";
 import { useFocusFiles } from "../../hooks/useFocusFiles";
 import { useGetAvailableLlms } from "../../hooks/useAvailableLlm";
 import { AvailableLlmType } from "../../types/availableLlmType";
-import { useVectorSearchEmbeddedFiles } from "../../hooks/useEmbeddedFile";
+import { useTextSearchEmbeddedFiles, useVectorSearchEmbeddedFiles } from "../../hooks/useEmbeddedFile";
 import EmbeddingService from "../../services/embeddingService";
 
 const actions = [
@@ -22,13 +22,14 @@ function ChatInputComponent({
     const projectIndex = useSelector((state: RootState) => state.projectIndex);
     const { sessionId, embeddingModel, chunkMode, searchMode } = useSelector((state: RootState) => state.userAgentSession);
     const { currentFile, directoryState, currentPath } = useSelector((state: RootState) => state.hierarchy);
-    const { search } = useVectorSearchEmbeddedFiles();
     const { focusFiles, removeFocusFile } = useFocusFiles();
     const { data: llms } = useGetAvailableLlms(1, 10);
     const [formError, setFormError] = useState<string | null>(null);
     const [content, setContent] = useState("");
     const [selectedLlm, setSelectedLlm] = useState("");
     const [selectedAction, setSelectedAction] = useState(actions[0].value);
+    const vectorSearch = useVectorSearchEmbeddedFiles();
+    const textSearch = useTextSearchEmbeddedFiles();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -36,19 +37,34 @@ function ChatInputComponent({
 
         if (!content) return setFormError("message is required");
 
-        let embeddedFiles = null;
-        if (projectIndex?.meta?._id) {
+        const embeddedFiles = [];
+        if (projectIndex?.meta?._id && searchMode === 'vector_search' ||
+            projectIndex?.meta?._id && searchMode === 'hybrid_search'
+        ) {
             const queryEmbedding = await EmbeddingService.create({ chunks: [content], model: embeddingModel })
-            embeddedFiles = (await search(projectIndex.meta._id, queryEmbedding[0].embedding))
-                ?.result?.sort((a:any, b:any) => b.distance - a.distance)
+            embeddedFiles.push(...(await vectorSearch.search(projectIndex.meta._id, queryEmbedding[0].embedding))
+                ?.result?.sort((a:any, b:any) => a.distance - b.distance))
         }
+        if (projectIndex?.meta?._id && searchMode === 'text_search' ||
+            projectIndex?.meta?._id && searchMode === 'hybrid_search'
+        ) {
+            embeddedFiles.push(...(await textSearch.search(projectIndex.meta._id, content))
+                ?.result)
+        }
+
+        // filter duplicate embeddedFiles by rowid
+        const uniqueEmbeddedFiles = embeddedFiles.filter(
+            (file, index, self) =>
+            file.rowid &&
+            self.findIndex(f => f.rowid === file.rowid) === index
+        );
 
         try {
             sendMessage(JSON.stringify({
                 event: selectedAction,
                 data: {
                     content,
-                    embeddedFiles,
+                    embeddedFiles: uniqueEmbeddedFiles,
                     currentFile,
                     focusFiles,
                     directoryInfo: directoryState,

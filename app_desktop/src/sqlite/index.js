@@ -85,7 +85,7 @@ export const vectorSearchEmbeddedFiles = (queryEmbedding, project_id) => {
         FROM embeddedfiles
         WHERE embedding MATCH ? AND project_id = ?
         ORDER BY distance ASC
-        LIMIT 5
+        LIMIT 2
     `);
 
     const result = stmt.all(JSON.stringify(queryEmbedding), project_id);
@@ -93,20 +93,40 @@ export const vectorSearchEmbeddedFiles = (queryEmbedding, project_id) => {
 };
 
 export const textSearchEmbeddedFiles = (query, project_id) => {
-    const stmt = db.prepare(`
+    const terms = query
+        .split(' ')
+        .map(term => term.trim().replace(/[?!.,;:]+$/, ''))
+        .filter(term => term.length > 0);
+
+    if (terms.length === 0) return [];
+
+    // Build dynamic WHERE clause for each term
+    const whereClauses = terms.map((_, i) => `
+        (
+            filename LIKE @q${i} OR
+            filepath LIKE @q${i} OR
+            description LIKE @q${i}
+        )
+    `).join(' OR ');
+
+    const sql = `
         SELECT rowid, filepath, filename, description, hash, created_at, updated_at
         FROM embeddedfiles
         WHERE 
-            project_id = @project_id AND (
-                filename LIKE @q OR
-                filepath LIKE @q OR
-                description LIKE @q
-            )
+            project_id = @project_id AND
+            ${whereClauses}
         ORDER BY created_at DESC
-        LIMIT 20
-    `);
+        LIMIT 2
+    `;
 
-    const result = stmt.all({ q: `%${query}%`, project_id });
+    // Build params object
+    const params = { project_id };
+    terms.forEach((term, i) => {
+        params[`q${i}`] = `%${term}%`;
+    });
+
+    const stmt = db.prepare(sql);
+    const result = stmt.all(params);
     return result;
 };
 

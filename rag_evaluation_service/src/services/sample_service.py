@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import json
 from src.models.sample_model import insert_many, find, paginate, count
 from src.services.context_precision_service import cal_context_precision
 from src.services.faithfulness_service import cal_faithfulness
@@ -55,7 +56,7 @@ async def create_many(body):
         question = s.get("input_prompt")
         answer = s.get("output_response")
         embedded_files = s.get("input_embedded_files", [])
-        retrieved_documents = [e.get("description", "") for e in embedded_files]
+        retrieved_documents = [json.dumps(e) for e in embedded_files]
 
         context_precision, faithfulness, response_relevancy = await asyncio.gather(
             cal_context_precision(question, answer, retrieved_documents),

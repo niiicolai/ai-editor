@@ -9,31 +9,103 @@ export default function SampleIndexView() {
   const { page, limit, nextPage, prevPage, setLimit } = usePagination();
   const { data, isLoading, error } = useGetSamples(page, limit);
 
+  const downloadCSV = () => {
+    if (!data || !data.samples || data.samples.length === 0) return;
+
+    const headers = [
+      "Question",
+      "Answer",
+      "Event",
+      "LLM",
+      "Embedding Model",
+      "Chunking Strategy",
+      "Search Strategy",
+      "Context Precision",
+      "Response Relevancy",
+      "Faithfulness",
+      "Created At",
+      "Updated At"
+    ];
+
+    const rows = data.samples.map((sample: SampleType) => [
+      `"${sample.input_prompt.replace(/"/g, '""')}"`,
+      `"${sample.output_response.replace(/"/g, '""')}"`,
+      `"${sample.event}"`,
+      `"${sample.config.llm}"`,
+      `"${sample.config.embedding_model}"`,
+      `"${sample.config.chunking_strategy}"`,
+      `"${sample.config.search_strategy}"`,
+      sample.metrics.context_precision,
+      sample.metrics.response_relevancy,
+      sample.metrics.faithfulness,
+      `"${new Date(sample.created_at).toISOString()}"`,
+      `"${new Date(sample.updated_at).toISOString()}"`
+    ]);
+
+    const csvContent =
+      headers.join(",") +
+      "\n" +
+      rows.map((row) => row.join(",")).join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "samples.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
   const renderSampleItem = (sample: SampleType) => {
     return (
       <div key={sample._id} className="p-4 border-b border-gray-200">
         <div className="flex justify-between gap-2">
           <div className="flex flex-col gap-2 w-1/2">
-            <div className="mt-1 text-sm text-gray-500 flex flex-col gap-1">
-              <span className="font-bold">Event:</span>
-              <span>{sample.event}</span>
-            </div>
-            <div className="mt-1 text-sm text-gray-500 flex flex-col gap-1 w-full h-12 overflow-hidden truncate">
+            <div className="mt-1 text-sm text-gray-500 flex flex-col gap-1 w-full">
               <span className="font-bold">Question:</span>
-              <span>{sample.input_prompt}</span>
+              <span className="p-3 border border-gray-300 rounded-md bg-white text-xs overflow-hidden">
+                {sample.input_prompt.length > 159
+                  ? sample.input_prompt.slice(0, 159) + "..."
+                  : sample.input_prompt}
+              </span>
             </div>
-            <div className="mt-1 text-sm text-gray-500 flex flex-col gap-1 w-full h-12 overflow-hidden truncate">
+            <div className="mt-1 text-sm text-gray-500 flex flex-col gap-1 w-full">
               <span className="font-bold">Answer:</span>
-              <span>{sample.output_response}</span>
+              <span className="p-3 border border-gray-300 rounded-md bg-white text-xs overflow-hidden">
+                {sample.output_response.length > 159
+                  ? sample.output_response.slice(0, 159) + "..."
+                  : sample.output_response}
+              </span>
             </div>
-            <div className="mt-1 text-sm text-gray-500 flex flex-col gap-1 w-full h-12 overflow-hidden truncate">
+            <div className="mt-1 text-sm text-gray-500 flex flex-col gap-1 w-full">
               <span className="font-bold">Retrieved Files:</span>
-              <span>{JSON.stringify(sample.input_embedded_files)}</span>
+              <span className="flex flex-col gap-1">
+                {sample.input_embedded_files &&
+                  sample.input_embedded_files.map((embeddedFile: any) => (
+                    <div
+                      key={embeddedFile._id}
+                      className="p-3 border border-gray-300 rounded-md bg-white text-xs overflow-hidden"
+                    >
+                      {JSON.stringify(embeddedFile).length > 110
+                        ? JSON.stringify(embeddedFile).slice(0, 110) + "..."
+                        : JSON.stringify(embeddedFile)}
+                    </div>
+                  ))}
+              </span>
             </div>
           </div>
 
           <div className="flex flex-col gap-2 w-64">
-            <div className="flex flex-col gap-1 mb-1 pb-1 border-b border-gray-300">
+            <div className="flex flex-col gap-1 pb-3 border-b border-gray-300">
+              <div className="mt-1 text-sm text-gray-500 w-full overflow-hidden truncate flex justify-between gap-1">
+                <span className="font-bold">Event:</span>
+                <span>{sample.event}</span>
+              </div>
+            </div>
+            <div className="flex flex-col gap-1 pb-3 border-b border-gray-300">
               <div className="mt-1 text-sm text-gray-500 w-full overflow-hidden truncate flex flex-col gap-1">
                 <span className="font-bold">LLM:</span>
                 <span>{sample.config.llm}</span>
@@ -52,7 +124,7 @@ export default function SampleIndexView() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-1 mb-1 pb-1 border-b border-gray-300">
+            <div className="flex flex-col gap-1 pb-3 border-b border-gray-300">
               <div className="mt-1 text-sm text-gray-500 w-full overflow-hidden truncate flex justify-between gap-1">
                 <span className="font-bold">Context Precision:</span>
                 <span>{sample.metrics.context_precision.toFixed(2)}</span>
@@ -99,23 +171,24 @@ export default function SampleIndexView() {
                           RAG Evaluation Management
                         </h3>
                         <div className="flex flex-col items-start gap-1 mt-2">
-                          <label htmlFor="limit" className="text-sm font-medium text-gray-700">
+                          <label
+                            htmlFor="limit"
+                            className="text-sm font-medium text-gray-700"
+                          >
                             Limit
                           </label>
                           <input
-                          id="limit"
-                          type="number"
-                          min={1}
-                          className="block w-20 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                          placeholder="Limit"
-                          value={limit}
-                          onChange={(e) =>
-                            setLimit(parseInt(e.target.value || "10"))
-                          }
+                            id="limit"
+                            type="number"
+                            min={1}
+                            className="block w-20 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                            placeholder="Limit"
+                            value={limit}
+                            onChange={(e) =>
+                              setLimit(parseInt(e.target.value || "10"))
+                            }
                           />
-                          <small>
-                            Max Limit: 100
-                          </small>
+                          <small>Max Limit: 100</small>
                         </div>
                       </div>
 
@@ -153,12 +226,17 @@ export default function SampleIndexView() {
                             </div>
                           </div>
                         )}
-                        <Link
-                          to="/user"
-                          className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                          Back
-                        </Link>
+                        <div className="flex flex-col gap-3">
+                          <Link
+                            to="/user"
+                            className="inline-flex items-center px-4 py-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          >
+                            Back
+                          </Link>
+                          <button onClick={() => downloadCSV()} className="inline-flex items-center px-4 py-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Download CSV
+                          </button>
+                        </div>
                       </div>
                     </div>
                     <div className="border-t border-gray-200">
