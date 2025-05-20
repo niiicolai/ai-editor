@@ -4,6 +4,7 @@ import { SampleType } from "../../types/sampleType";
 import { Link } from "react-router-dom";
 import RestrictedComponent from "../../components/RestrictedComponent";
 import RequireRoleComponent from "../../components/RequireRoleComponent";
+import LineChartComponent from "../../components/LineChartComponent";
 
 export default function SampleIndexView() {
   const { page, limit, nextPage, prevPage, setLimit } = usePagination();
@@ -24,7 +25,7 @@ export default function SampleIndexView() {
       "Response Relevancy",
       "Faithfulness",
       "Created At",
-      "Updated At"
+      "Updated At",
     ];
 
     const rows = data.samples.map((sample: SampleType) => [
@@ -39,13 +40,11 @@ export default function SampleIndexView() {
       sample.metrics.response_relevancy,
       sample.metrics.faithfulness,
       `"${new Date(sample.created_at).toISOString()}"`,
-      `"${new Date(sample.updated_at).toISOString()}"`
+      `"${new Date(sample.updated_at).toISOString()}"`,
     ]);
 
     const csvContent =
-      headers.join(",") +
-      "\n" +
-      rows.map((row) => row.join(",")).join("\n");
+      headers.join(",") + "\n" + rows.map((row) => row.join(",")).join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -57,7 +56,7 @@ export default function SampleIndexView() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  }
+  };
 
   const renderSampleItem = (sample: SampleType) => {
     return (
@@ -233,7 +232,10 @@ export default function SampleIndexView() {
                           >
                             Back
                           </Link>
-                          <button onClick={() => downloadCSV()} className="inline-flex items-center px-4 py-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                          <button
+                            onClick={() => downloadCSV()}
+                            className="inline-flex items-center px-4 py-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          >
                             Download CSV
                           </button>
                         </div>
@@ -256,11 +258,38 @@ export default function SampleIndexView() {
                         )}
 
                         <div className="bg-gray-50 px-4 py-5">
-                          <div className="flex justify-between items-start">
+                          <div className="flex justify-between items-start border-b border-gray-300 mb-3 pb-3">
                             <h2 className="text-lg font-medium text-gray-900">
-                              Samples
+                              Metrics over time
                             </h2>
+
+                            {data && (
+                              <LineChartComponent
+                                y1Label="Context Precision"
+                                y2Label="Response Relevancy"
+                                y3Label="Faithfulness"
+                                data={data.samples.map(
+                                  (sample: SampleType, index: number) => {
+                                    return {
+                                      x: index,
+                                      y1: sample.metrics.context_precision,
+                                      y2: sample.metrics.response_relevancy,
+                                      y3: sample.metrics.faithfulness,
+                                      name:
+                                        sample.input_prompt.slice(0, 30) +
+                                        (sample.input_prompt.length > 30
+                                          ? "..."
+                                          : ""),
+                                    };
+                                  }
+                                ).reverse()}
+                              />
+                            )}
                           </div>
+
+                          <h2 className="text-lg font-medium text-gray-900">
+                            Samples
+                          </h2>
 
                           <div>
                             {data &&

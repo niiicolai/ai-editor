@@ -1,4 +1,3 @@
-import { EmbeddingsType } from "../types/embeddedFileType";
 import TokenService from "./tokenService";
 
 const API_URL = import.meta.env.VITE_EMBEDDING_API;
