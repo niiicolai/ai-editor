@@ -7,6 +7,7 @@ A simple TypeScript user application.
 - Dotenv
 - Node.js
 - Vitest
+- Bcrypt
 
 # Install
 Configure environment variables
