@@ -33,7 +33,7 @@ export default class PageService {
 
         const page = await PageModel
             .findOne({ _id })
-            .select(fields)
+            .select(fields.join(" "))
             .populate('category');
         if (!page) ClientError.notFound("page not found");
 
@@ -61,7 +61,7 @@ export default class PageService {
         }
         const pageDocs = await PageModel
             .find(params)
-            .select(fields)
+            .select(fields.join(" "))
             .skip((page - 1) * limit)
             .limit(limit)
             .sort({ created_at: -1 })

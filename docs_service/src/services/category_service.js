@@ -30,7 +30,7 @@ export default class CategoryService {
 
         const category = await CategoryModel
             .findOne({ _id })
-            .select(fields);
+            .select(fields.join(" "));
         if (!category) ClientError.notFound("category not found");
 
         return dto(category);
@@ -50,7 +50,7 @@ export default class CategoryService {
 
         const categories = await CategoryModel
             .find()
-            .select(fields)
+            .select(fields.join(" "))
             .skip((page - 1) * limit)
             .limit(limit)
             .sort({ created_at: -1 });
