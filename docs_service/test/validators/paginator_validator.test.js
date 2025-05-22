@@ -11,6 +11,22 @@ test.each([
 });
 
 test.each([
+  [{ page: "a", limit: 1, e: "page must be a number" }],
+  [{ page: null, limit: 1, e: "page must be a number" }],
+  [{ page: undefined, limit: 1, e: "page must be a number" }],
+  [{ page: 1, limit: "a", e: "limit must be a number" }],
+  [{ page: 1, limit: null, e: "limit must be a number" }],
+  [{ page: 1, limit: undefined, e: "limit must be a number" }],
+])("paginatorValidator invalid partitions", async ({ page, limit, e }) => {
+  expect(() =>
+    paginatorValidator(page, limit, {
+        minLimit: 1,
+        maxLimit: 100
+    })
+  ).toThrowError(e);
+});
+
+test.each([
     [{ page: 0, limit: 1, e: 'page 0 out of bounds. Min page is 1' }], 
     [{ page: -1, limit: 2, e: 'page -1 out of bounds. Min page is 1' }], 
 ])("paginatorValidator page outer bounds - min", async ({ page, limit, e }) => {

@@ -11,6 +11,7 @@ test.each([
 });
 
 test.each([
+    [{ _id: '', e: '_id is required' }], 
     [{ _id: 'A', e: '_id must be a valid ObjectId' }], 
     [{ _id: 'Aa', e: '_id must be a valid ObjectId'}], 
 ])("idValidator invalid partitions", async ({ _id, e }) => {

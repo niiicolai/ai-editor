@@ -16,6 +16,20 @@ test.each([
 });
 
 test.each([
+  [{ s: null, e: "s is required" }],
+  [{ s: undefined, e: "s is required" }],
+  [{ s: 1, e: "s must be a string" }],
+])("stringValidator invalid partitions", async ({ s, e }) => {
+  expect(() =>
+    stringValidator(s, "s", {
+      min: { enabled: false, value: 0 },
+      max: { enabled: false, value: 0 },
+      regex: null
+    })
+  ).toThrowError(e);
+});
+
+test.each([
   [{ s: "A", e: "s A out of bounds. Min s is 3" }],
   [{ s: "Aa", e: "s Aa out of bounds. Min s is 3" }],
 ])("stringValidator outer boundary - min", async ({ s, e }) => {

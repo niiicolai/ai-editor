@@ -11,6 +11,19 @@ test.each([[0], [1], [2]])("numberValidator valid partitions", async (n) => {
 });
 
 test.each([
+  [{ n: "a", e: "n must be a number" }],
+  [{ n: null, e: "n must be a number" }],
+  [{ n: undefined, e: "n must be a number" }],
+])("numberValidator invalid partitions", async ({ n, e }) => {
+  expect(() =>
+    numberValidator(n, "n", {
+      min: { enabled: false, value: 0 },
+      max: { enabled: false, value: 0 },
+    })
+  ).toThrowError(e);
+});
+
+test.each([
   [{ n: 0, e: "n 0 out of bounds. Min n is 3" }],
   [{ n: 1, e: "n 1 out of bounds. Min n is 3" }],
   [{ n: 2, e: "n 2 out of bounds. Min n is 3" }],
