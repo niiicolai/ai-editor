@@ -1,6 +1,7 @@
 import { WebsocketEvent } from "../event.js";
 import { ChatHandler } from "../../llm/chat_handler.js";
 import UserService from "../../services/user_service.js";
+import RankingService from "../../services/ranking_service.js";
 import Decimal from "decimal.js";
 
 export default class InputAskEvent extends WebsocketEvent {
@@ -13,8 +14,8 @@ export default class InputAskEvent extends WebsocketEvent {
       const currentFile = data.currentFile ?? null;
       const focusFiles = data.focusFiles ?? null;
       const directoryInfo = data.directoryInfo ?? null;
-      const embeddedFiles = data.embeddedFiles ?? null;
       const content = data.content;
+      let embeddedFiles = data.embeddedFiles ?? null;
 
       const userId = connection.userData?.user?._id;
       const sessionId = connection.userData?.sessionId;
@@ -29,6 +30,11 @@ export default class InputAskEvent extends WebsocketEvent {
       const user_credit = new Decimal(user.credit);
       if (user_credit.isZero() || user_credit.isNegative()) {
         throw new Error("insufficient credits");
+      }
+
+      if (embeddedFiles) {
+        const reranked = await RankingService.rerank(content, embeddedFiles);
+        embeddedFiles = reranked.map((r) => r.text);
       }
 
       const handler = new ChatHandler(connection, reply, data);

@@ -34,25 +34,16 @@ export const useEmbeddingFiles = () => {
     if (chunkMode === 'custom_code') {
       const parsed = parseFile.parse(content, language);
 
-      return `
-        filename: ${name}\n
-        filepath: ${path}\n
-        language: ${language}\n
-        lines: ${parsed?.lines}\n
-        description: ${parsed?.description}
-        ${parsed?.vars && parsed?.vars?.length ? `\nvars: ${JSON.stringify(parsed?.vars || "[]")}` : '' }
-        ${parsed?.functions && parsed?.functions?.length ? `\nfunctions: ${JSON.stringify(parsed?.functions || "[]")}` : '' }
-        ${parsed?.classes && parsed?.classes?.length ? `\nclasses: ${JSON.stringify(parsed?.classes || "[]")}` : '' }
-        ${parsed?.comments && parsed?.comments?.length ? `\ncomments: ${JSON.stringify(parsed?.comments || "[]")}` : '' }`;
+      return `filename: ${name}\nfilepath: ${path}\nlanguage: ${language}\nlines: ${parsed?.lines}\ndescription: ${parsed?.description}${parsed?.vars && parsed?.vars?.length ? `\nvars: ${JSON.stringify(parsed?.vars || "[]")}` : '' }${parsed?.functions && parsed?.functions?.length ? `\nfunctions: ${JSON.stringify(parsed?.functions || "[]")}` : '' }${parsed?.classes && parsed?.classes?.length ? `\nclasses: ${JSON.stringify(parsed?.classes || "[]")}` : '' }${parsed?.comments && parsed?.comments?.length ? `\ncomments: ${JSON.stringify(parsed?.comments || "[]")}` : '' }${parsed?.syntaxError && parsed?.syntaxError?.length ? `\syntax error: ${parsed?.syntaxError}` : '' }`;
         
     } else if (chunkMode === 'language_model_augmentation') {
       const llmContent = await LlmService.create({ event: chunkMode, messages: [{ 
           role: 'user', 
-          content: `You are a describing code file for a RAG application.\nYou must max use 250 characters.\nfilename: ${name}\nfilepath: ${path}\nlanguage: ${language}\n\nHere is the code:\n${content}`}
+          content: `You describe a code file for a RAG app (max 250 chars). Highlight what it does, how it fits in, signs of too many responsibilities, if tests are missing, or if syntax errors exist. Consider the following areas: navigation; refactoring; testing; debugging;\nfilename: ${name}\nfilepath: ${path}\nlanguage: ${language}\n\nHere is the code:\n${content}`}
       ]})
       
       return llmContent.content.message;
-    
+
     } else {
       throw new Error("(useEmbeddingFiles): Chunk mode is not supported");
     }

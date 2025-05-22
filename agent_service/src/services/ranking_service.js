@@ -6,10 +6,11 @@ export default class RankingService {
       "feature-extraction",
       "Xenova/all-MiniLM-L6-v2"
     );
-
+    
+    documents = documents.map((d) => JSON.stringify(d))
     // Embed all sentences
     const queryEmbedding = await embed(query);
-    const candidateEmbeddings = await Promise.all(candidates.map(embed));
+    const candidateEmbeddings = await Promise.all(documents.map(embed));
 
     // Function to compute cosine similarity
     function cosineSimilarity(vecA, vecB) {
@@ -21,9 +22,9 @@ export default class RankingService {
 
     // Rank candidates
     const scores = candidateEmbeddings.map((vec) =>
-      cosineSimilarity(queryEmbedding[0], vec[0])
+      cosineSimilarity(queryEmbedding[0].data, vec[0].data)
     );
-    const ranked = candidates
+    const ranked = documents
       .map((text, i) => ({ text, score: scores[i] }))
       .sort((a, b) => b.score - a.score);
 

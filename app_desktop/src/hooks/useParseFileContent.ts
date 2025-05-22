@@ -6,6 +6,7 @@ const javascriptParser = (content: string) => {
     const classes: ProjectIndexItemClassType[] = [];
     const vars: ProjectIndexItemVarType[] = [];
     const comments: { line: number; text: string }[] = [];
+    let syntaxError: string | null = null;
 
     const lines = content.split("\n");
 
@@ -13,6 +14,15 @@ const javascriptParser = (content: string) => {
     let inMultilineComment = false;
     let multilineBuffer = '';
     let multilineStartLine = 0;
+
+    try {
+        // Try parsing with new Function to catch syntax errors
+        // (This does not execute the code, just parses it)
+        // eslint-disable-next-line no-new-func
+        new Function(content);
+    } catch (err: any) {
+        syntaxError = err.message || "Syntax error detected";
+    }
 
     lines.forEach((line, index) => {
         const trimmedLine = line.trim();
@@ -99,14 +109,28 @@ const javascriptParser = (content: string) => {
         .filter(word => word.length > 2);
     const uniqueKeywords = Array.from(new Set(words)).slice(0, 15);
 
-    const description = `This file contains ${functions.length} function(s), ${classes.length} class(es), ${vars.length} variable(s), ${comments.length} comment(s). This is random words from the file: ${uniqueKeywords.join(', ')}.`;
+    const description = `This file contains ${functions.length} function(s), ${classes.length} class(es), ${vars.length} variable(s), ${comments.length} comment(s). This is random words from the file: ${uniqueKeywords.join(', ')}.` +
+        (syntaxError ? ` Syntax error: ${syntaxError}` : '');
 
-    return { functions, classes, vars, comments, description };
+    return { functions, classes, vars, comments, description, syntaxError };
 };
-
 const yamlParser = (content: string) => {
     const lines = content.split("\n");
     const vars = [] as ProjectIndexItemVarType[];
+    let syntaxError: string | null = null;
+
+    try {
+        // Simple YAML validation: try parsing with JSON after conversion
+        // (not robust, but catches some syntax errors)
+        // Replace tabs with spaces, remove comments, and try to parse as JSON
+        const jsonLike = lines
+            .filter(line => !line.trim().startsWith('#'))
+            .map(line => line.replace(/^(\s*)(\w+):/, '$1"$2":'))
+            .join('\n');
+        JSON.parse(`{${jsonLike}}`);
+    } catch (err: any) {
+        syntaxError = err.message || "Syntax error detected";
+    }
 
     lines.forEach((line, index) => {
         const match = line.match(/^(\w+):/);
@@ -119,26 +143,30 @@ const yamlParser = (content: string) => {
         }
     });
 
-    const description = `This YAML file contains ${vars.length} key(s).`;
+    const description = `This YAML file contains ${vars.length} key(s).` +
+        (syntaxError ? ` Syntax error: ${syntaxError}` : '');
 
-    return { vars, description, functions: [], classes: [], comments: [] };
+    return { vars, description, functions: [], classes: [], comments: [], syntaxError };
 };
 
 const jsonParser = (content: string) => {
+    let syntaxError: string | null = null;
+    let vars: ProjectIndexItemVarType[] = [];
     try {
         const parsed = JSON.parse(content);
-        const vars = Object.keys(parsed).map((key, index) => ({
+        vars = Object.keys(parsed).map((key, index) => ({
             name: key,
             signature: `${key}: ${typeof parsed[key]}`,
             line: index + 1,
         }));
-
-        const description = `This JSON file contains ${vars.length} key(s).`;
-
-        return { vars, description, functions: [], classes: [], comments: [] };
-    } catch (error) {
-        throw new Error("Invalid JSON content");
+    } catch (error: any) {
+        syntaxError = error.message || "Invalid JSON content";
     }
+
+    const description = `This JSON file contains ${vars.length} key(s).` +
+        (syntaxError ? ` Syntax error: ${syntaxError}` : '');
+
+    return { vars, description, functions: [], classes: [], comments: [], syntaxError };
 };
 
 const xmlParser = (content: string) => {
@@ -146,6 +174,29 @@ const xmlParser = (content: string) => {
     const tagRegex = /<(\w+)[^>]*>/g;
     let match;
     let line = 1;
+    let syntaxError: string | null = null;
+
+    try {
+        // Try parsing with DOMParser if available, otherwise fallback to regex
+        // In Node.js, this will throw, so just catch and ignore
+        if (typeof window !== "undefined" && typeof DOMParser !== "undefined") {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(content, "application/xml");
+            const parserError = doc.getElementsByTagName("parsererror");
+            if (parserError.length > 0) {
+                syntaxError = parserError[0].textContent || "Syntax error detected";
+            }
+        } else {
+            // Simple check for unclosed tags
+            const openTags = (content.match(/<(\w+)/g) || []).length;
+            const closeTags = (content.match(/<\/(\w+)>/g) || []).length;
+            if (openTags !== closeTags) {
+                syntaxError = "Mismatched XML tags";
+            }
+        }
+    } catch (err: any) {
+        syntaxError = err.message || "Syntax error detected";
+    }
 
     while ((match = tagRegex.exec(content)) !== null) {
         vars.push({
@@ -157,9 +208,10 @@ const xmlParser = (content: string) => {
         line += content.slice(0, match.index).split("\n").length - 1;
     }
 
-    const description = `This XML file contains ${vars.length} tag(s).`;
+    const description = `This XML file contains ${vars.length} tag(s).` +
+        (syntaxError ? ` Syntax error: ${syntaxError}` : '');
 
-    return { vars, description, functions: [], classes: [], comments: [] };
+    return { vars, description, functions: [], classes: [], comments: [], syntaxError };
 };
 
 const plaintextParser = (content: string) => {
@@ -172,7 +224,7 @@ const plaintextParser = (content: string) => {
         .filter(word => word.length > 2);
     const uniqueKeywords = Array.from(new Set(words)).slice(0, 15);
     const description = `This plaintext file contains ${lines} line(s) and keywords: ${uniqueKeywords.join(', ')}.`;
-    return { description, functions: [], classes: [], vars: [], comments: [] };
+    return { description, functions: [], classes: [], vars: [], comments: [], syntaxError: "" };
 }
 
 export const useParseFileContent = () => {
@@ -212,7 +264,8 @@ export const useParseFileContent = () => {
                     }
                 default:
                     return {
-                        description: 'None',
+                        description: 'None', 
+                        syntaxError: '',
                         functions: [],
                         classes: [],
                         vars: [], 
