@@ -51,12 +51,10 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
 
       if (body.password) {
         stringValidator(body.password, "password");
-
+        const password = await PwdService.hashPassword(body.password);
         const login = user.logins.find((login) => login.type === "password");
-        if (!login) ClientError.badRequest("No password type found")
-        else {
-          login.password = await PwdService.hashPassword(body.password);
-        }
+        if (!login) user.logins.push({ type: 'password', password })
+        else login.password = password;
       }
 
       await user.save({ session });

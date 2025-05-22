@@ -1,6 +1,20 @@
 import UserService from "../../src/services/user_service";
-import { expect, test } from "vitest";
+import UserModel from "../../src/mongodb/models/user_model";
+import { expect, test, beforeAll } from "vitest";
 import { ObjectId } from "mongodb";
+
+const _id = new ObjectId().toString();
+
+beforeAll(async () => {
+  await UserModel.deleteMany();
+  await UserModel.create({
+    _id,
+    username: "test55",
+    email: "test@55test.com",
+    role: "member",
+    logins: []
+  });
+})
 
 test.each([
   [
@@ -85,27 +99,15 @@ test.each([
   await expect(UserService.create(body)).rejects.toThrowError(e);
 });
 
-test.each([
-  [
-    {
-      body: {
-        username: "test2",
-        password: "Te1!stTest",
-        email: "test@2test.com",
-        role: "member",
-      },
-    },
-  ],
-])("UserService.find valid partitions", async ({ body }) => {
-  const { user } = await UserService.create(body);
-  const findResult = await UserService.find(user._id.toString());
+test("UserService.find valid partition", async () => {
+  const findResult = await UserService.find(_id);
 
-  expect(findResult.username).toBe(body.username);
-  expect(findResult.email).toBe(body.email);
-  expect(findResult.role).toBe(body.role);
+  expect(findResult.username).toBe("test55");
+  expect(findResult.email).toBe("test@55test.com");
+  expect(findResult.role).toBe("member");
   expect(findResult.created_at).toBeDefined();
   expect(findResult.updated_at).toBeDefined();
-  expect(findResult._id).toBeDefined();
+  expect(findResult._id.toString()).toStrictEqual(_id);
 });
 
 test.each([
@@ -137,26 +139,20 @@ test.each([
 test.each([
   [
     {
-      before: {
-        username: "test3",
-        password: "Te1!stTest",
-        email: "test@3test.com",
-      },
-      after: {
+      body: {
         username: "test4",
         password: "Te1!4stTest",
         email: "test@4test.com",
       },
     },
   ],
-])("UserService.update valid partitions", async ({ before, after }) => {
-  const { user } = await UserService.create({ ...before, role: "member" });
-  const updateResult = await UserService.update(user._id.toString(), after);
+])("UserService.update valid partitions", async ({ body }) => {
+  const updateResult = await UserService.update(_id, body);
 
-  expect(updateResult.username).toBe(after.username);
-  expect(updateResult.email).toBe(after.email);
+  expect(updateResult.username).toBe(body.username);
+  expect(updateResult.email).toBe(body.email);
   expect(updateResult.role).toBe("member");
-  expect(updateResult._id).toStrictEqual(user._id);
+  expect(updateResult._id.toString()).toStrictEqual(_id);
   expect(updateResult.created_at).toBeDefined();
   expect(updateResult.updated_at).toBeDefined();
 });

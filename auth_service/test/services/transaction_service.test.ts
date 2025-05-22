@@ -3,6 +3,7 @@ import TransactionService from "../../src/services/transaction_service";
 import { expect, test, beforeAll } from "vitest";
 
 beforeAll(async () => {
+  await TransactionModel.deleteMany();
   await TransactionModel.create({
     type: "test",
     state: "pending",

@@ -3,6 +3,7 @@ import JobService from "../../src/services/job_service";
 import { expect, test, beforeAll } from "vitest";
 
 beforeAll(async () => {
+  await JobModel.deleteMany();
   await JobModel.create({
     type: "test",
     state: "pending",

@@ -13,7 +13,7 @@ export const userPasswordResetSchema = new mongoose.Schema(
     },
     deleted_at: {
       type: Date,
-      required: true,
+      required: false,
     },
   },
   {

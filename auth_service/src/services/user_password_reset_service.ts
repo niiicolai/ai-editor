@@ -5,7 +5,7 @@ import ClientError from "../errors/client_error";
 import PwdService from "./pwd_service";
 import mongoose from "mongoose";
 
-import { produceSendEmailSaga } from '../rabbitmq/sagas/send_email_saga';
+import { produceSendEmailSaga } from "../rabbitmq/sagas/send_email_saga";
 
 import { idValidator } from "../validators/id_validator";
 import { stringValidator } from "../validators/string_validator";
@@ -19,16 +19,7 @@ interface UserPasswordResetResponse {
   updated_at: string;
 }
 
-interface UserPasswordResetCreateBody {
-  email: string;
-}
-
-interface UserPasswordResetUpdateBody {
-  password: string;
-}
-
 export default class UserPasswordResetService {
-
   /**
    * @function find
    * @description Get user password reset by id
@@ -36,7 +27,10 @@ export default class UserPasswordResetService {
    * @param {Array<string>} fields
    * @returns {Promise<UserPasswordResetResponse>}
    */
-  static async find(_id: string, fields: Array<string> = []): Promise<UserPasswordResetResponse> {
+  static async find(
+    _id: string,
+    fields: Array<string> = []
+  ): Promise<UserPasswordResetResponse> {
     idValidator(_id);
     fields = fieldsValidator(fields, allowedFields);
 
@@ -55,7 +49,16 @@ export default class UserPasswordResetService {
    * @param {Array<string>} fields
    * @returns {Promise<UserPasswordResetResponse>}
    */
-  static async create({ email }: UserPasswordResetCreateBody, fields: Array<string> = []): Promise<UserPasswordResetResponse> {
+  static async create(
+    {
+      email,
+    }: {
+      email: string;
+    },
+    fields: Array<string> = []
+  ): Promise<UserPasswordResetResponse> {
+    stringValidator(email, "email");
+    
     const user = await User.findOne({ email });
     if (!user) ClientError.notFound("user not found");
 
@@ -68,10 +71,11 @@ export default class UserPasswordResetService {
         expired_at: new Date(Date.now() + 10 * 60 * 1000), // Add 10 minutes
         user: user._id,
       });
+      await userPasswordReset.save();
 
       await produceSendEmailSaga({
         email: user.email,
-        subject: 'Password reset request',
+        subject: "Password reset request",
         content: `Hi,\n\nClick on the following link to reset password: ${userPasswordReset._id}`,
       });
 
@@ -89,7 +93,15 @@ export default class UserPasswordResetService {
    * @param {Array<string>} fields
    * @returns {Promise<UserPasswordResetResponse>}
    */
-  static async update(_id: string, { password }: UserPasswordResetUpdateBody, fields: Array<string> = []): Promise<UserPasswordResetResponse> {
+  static async update(
+    _id: string,
+    {
+      password,
+    }: {
+      password: string;
+    },
+    fields: Array<string> = []
+  ): Promise<UserPasswordResetResponse> {
     idValidator(_id);
     stringValidator(password, "password");
 
@@ -112,19 +124,17 @@ export default class UserPasswordResetService {
     });
     if (!user) ClientError.notFound("user not found");
 
-    const pwdLogin = user?.logins.find((l) => l.type == "password");
-    if (!pwdLogin) ClientError.notFound("no password login");
-
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      if (pwdLogin) {
-        pwdLogin.password = await PwdService.hashPassword(password);
-      } else {
-        throw new Error("Password login is undefined");
+      if (user) {
+        password = await PwdService.hashPassword(password); 
+        const pwdLogin = user.logins.find((l) => l.type == "password");
+        if (!pwdLogin) user.logins.push({ type: 'password', password })
+        else if (pwdLogin) pwdLogin.password = password;
+        await user.save({ session });
       }
-      await user?.save({ session });
 
       if (userPwdReset) {
         userPwdReset.deleted_at = new Date();
@@ -135,7 +145,7 @@ export default class UserPasswordResetService {
 
       await produceSendEmailSaga({
         email: user?.email,
-        subject: 'Password reset complete',
+        subject: "Password reset complete",
         content: `Hi,\n\nYour password has been changed.`,
       });
 
@@ -158,9 +168,10 @@ export default class UserPasswordResetService {
   static async destroy(_id: string): Promise<void> {
     idValidator(_id);
 
-    const userPwdReset = await UserPasswordReset.findOne(
-        { _id, deleted_at: null }
-    );
+    const userPwdReset = await UserPasswordReset.findOne({
+      _id,
+      deleted_at: null,
+    });
     if (!userPwdReset) ClientError.notFound("user password reset not found");
 
     try {
@@ -173,7 +184,6 @@ export default class UserPasswordResetService {
 
         await userPwdReset?.save();
       }
-      
     } catch (error) {
       console.log(error);
       throw error;
