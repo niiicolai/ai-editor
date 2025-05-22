@@ -42,7 +42,7 @@ export default class UserAgentSessionMessageService {
     const userAgentSessionMessage = await UserAgentSessionMessage.findOne({
       _id,
       user: userId,
-    }).select(fields);
+    }).select(fields.join(" "));
     if (!userAgentSessionMessage)
       ClientError.notFound("user agent session message not found");
 
@@ -70,7 +70,7 @@ export default class UserAgentSessionMessageService {
       user_agent_session: sessionId,
       role: { $ne: "system" },
     })
-      .select(fields)
+      .select(fields.join(" "))
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ created_at: -1 });
@@ -100,7 +100,7 @@ export default class UserAgentSessionMessageService {
       user: userId,
       user_agent_session: sessionId,
     })
-      .select(fields)
+      .select(fields.join(" "))
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ created_at: -1 });

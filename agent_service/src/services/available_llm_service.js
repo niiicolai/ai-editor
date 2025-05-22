@@ -35,7 +35,7 @@ export default class AvailableLlmService {
 
     const availableLlm = await AvailableLlm.findOne({
       _id,
-    }).select(fields);
+    }).select(fields.join(" "));
     if (!availableLlm)
       ClientError.notFound("available LLM not found");
 
@@ -48,7 +48,7 @@ export default class AvailableLlmService {
 
     const availableLlm = await AvailableLlm.findOne({
       name,
-    }).select(fields);
+    }).select(fields.join(" "));
     if (!availableLlm)
       ClientError.notFound("available LLM not found");
 
@@ -68,7 +68,7 @@ export default class AvailableLlmService {
     fields = fieldsValidator(fields, allowedFields);
 
     const llms = await AvailableLlm.find()
-      .select(fields)
+      .select(fields.join(" "))
       .skip((page - 1) * limit)
       .limit(limit)
       .sort({ created_at: -1 });

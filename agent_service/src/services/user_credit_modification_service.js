@@ -27,7 +27,7 @@ export default class UserCreditModificationService {
 
         const userCreditModification = await UserCreditModification
             .findOne({ _id, user: userId })
-            .select(fields);
+            .select(fields.join(" "));
         if (!userCreditModification) ClientError.notFound("user credit modification not found");
 
         return dto(userCreditModification);
@@ -40,7 +40,7 @@ export default class UserCreditModificationService {
 
         const userCreditModifications = await UserCreditModification
             .find({ user: userId })
-            .select(fields)
+            .select(fields.join(" "))
             .skip((page - 1) * limit)
             .limit(limit)
             .sort({ created_at: -1 });

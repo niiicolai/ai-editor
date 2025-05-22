@@ -35,7 +35,7 @@ export default class UserService {
 
     const user = await User
       .findOne({ _id, deleted_at: null })
-      .select(fields);
+      .select(fields.join(" "));
     if (!user) ClientError.notFound("user not found");
 
     return dto(user);

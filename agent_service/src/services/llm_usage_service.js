@@ -55,7 +55,7 @@ export default class LlmUsageService {
 
         const llmUsage = await LlmUsageModel
             .findOne({ _id, user: userId })
-            .select(fields)
+            .select(fields.join(" "))
             .populate('llm user_agent_session_messages context_user_agent_session_messages');
         if (!llmUsage) ClientError.notFound("LLM usage not found");
 
@@ -79,7 +79,7 @@ export default class LlmUsageService {
         const query = { user: userId };
         const llmUsages = await LlmUsageModel
             .find(query)
-            .select(fields)
+            .select(fields.join(" "))
             .skip((page - 1) * limit)
             .limit(limit)
             .sort({ created_at: -1 })

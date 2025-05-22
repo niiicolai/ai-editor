@@ -12,5 +12,5 @@ export const fieldsValidator = (fields, allowedFields) => {
   return (fields
         ? fields.filter((field) => allowedFields.includes(field))
         : allowedFields
-    ).join(" ");
+    );
 };

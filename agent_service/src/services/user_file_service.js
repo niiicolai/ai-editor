@@ -43,7 +43,7 @@ export default class UserFileService {
 
         const userFile = await UserFile
             .findOne({ _id, user: userId })
-            .select(fields);
+            .select(fields.join(" "));
         if (!userFile) ClientError.notFound("user file not found");
 
         return dto(userFile);
@@ -65,7 +65,7 @@ export default class UserFileService {
 
         const userFiles = await UserFile
             .find({ user: userId })
-            .select(fields)
+            .select(fields.join(" "))
             .skip((page - 1) * limit)
             .limit(limit)
             .sort({ created_at: -1 });

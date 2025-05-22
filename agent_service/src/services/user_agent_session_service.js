@@ -38,7 +38,7 @@ export default class UserAgentSessionService {
 
         const userAgentSession = await UserAgentSession
             .findOne({ _id, user: userId })
-            .select(fields);
+            .select(fields.join(" "));
         if (!userAgentSession) ClientError.notFound("user agent session not found");
 
         return dto(userAgentSession);
@@ -60,7 +60,7 @@ export default class UserAgentSessionService {
 
         const userAgentSessions = await UserAgentSession
             .find({ user: userId })
-            .select(fields)
+            .select(fields.join(" "))
             .skip((page - 1) * limit)
             .limit(limit)
             .sort({ created_at: -1 });

@@ -41,7 +41,7 @@ export default class UserAgentSessionOperationService {
         _id,
         user: userId,
       })
-      .select(fields)
+      .select(fields.join(" "))
       .populate('iterations.user_agent_session_message');;
     if (!userAgentSessionOperation)
       ClientError.notFound("user agent session operation not found");
@@ -69,7 +69,7 @@ export default class UserAgentSessionOperationService {
     if (state) query.state = state;
     const userAgentSessionOperations =
       await UserAgentSessionOperationModel.find(query)
-        .select(fields)
+        .select(fields.join(" "))
         .skip((page - 1) * limit)
         .limit(limit)
         .sort({ created_at: -1 })
