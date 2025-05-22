@@ -1,4 +1,3 @@
 
 export function log(req, res) {
-    consolelog(req, re)
-}
+    console.log(req, res)

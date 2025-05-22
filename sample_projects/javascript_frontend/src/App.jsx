@@ -1,6 +1,6 @@
 import './App.css'
 
-function test() {
+function test() 
   consolelog("test")
 }
 

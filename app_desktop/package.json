@@ -18,6 +18,8 @@
     "@tailwindcss/vite": "^4.1.4",
     "@tanstack/react-query": "^5.74.3",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "@typescript-eslint/typescript-estree": "^8.32.1",
+    "acorn-walk": "^8.3.4",
     "better-sqlite3": "^11.10.0",
     "crypto-js": "^4.2.0",
     "electron-squirrel-startup": "^1.0.1",

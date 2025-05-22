@@ -1,6 +1,7 @@
 import UserModel from "../mongodb/models/user_model.js";
 import bcrypt from "bcrypt";
 
+
 export class UserService {
   /**
    * @function find
@@ -58,6 +59,9 @@ export class UserService {
    * @returns {Promise<void>}
    */
   static async destroy(_id: string): Promise<void> {
-    await UserModel.deleteOne({ _id
+    await UserModel.deleteOne({ _id })
   }
 }
+
+
+function test( 
