@@ -16,7 +16,7 @@ const userAgentSessionSlice = createSlice({
   name: "user_agent_session",
   initialState: {
     embeddingModel: "Salesforce/codet5p-110m-embedding",
-    chunkMode: "language_model_augmentation",
+    chunkMode: "custom_code",
     searchMode: "vector_search",
     sessionTitle: null,
     sessionId: null,

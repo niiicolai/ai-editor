@@ -49,33 +49,61 @@ declare global {
       restoreWindow: () => void;
       closeWindow: () => void;
 
-      insertEmbeddedFile: (body: any) => void;
+      insertEmbeddedFile: (body: any, embeddingModel: string) => void;
       onInsertEmbeddedFile: (callback: (content: any) => void) => void;
 
-      updateEmbeddedFile: (id: string, body: any) => void;
+      updateEmbeddedFile: (
+        id: string,
+        body: any,
+        embeddingModel: string
+      ) => void;
       onUpdateEmbeddedFile: (callback: (content: any) => void) => void;
 
-      deleteEmbeddedFile: (id: number) => void;
+      deleteEmbeddedFile: (id: number, embeddingModel: string) => void;
       onDeleteEmbeddedFile: (callback: (content: any) => void) => void;
 
-      deleteAllEmbeddedFiles: (project_id: string) => void;
+      deleteAllEmbeddedFiles: (
+        project_id: string,
+        embeddingModel: string
+      ) => void;
       onDeleteAllEmbeddedFiles: (callback: (content: any) => void) => void;
 
       vectorSearchEmbeddedFiles: (
         project_id: string,
-        queryEmbedding: number[]
+        queryEmbedding: number[],
+        embeddingModel: string
       ) => void;
       onVectorSearchEmbeddedFiles: (callback: (content: any) => void) => void;
 
-      textSearchEmbeddedFiles: (project_id: string, query: string) => void;
+      textSearchEmbeddedFiles: (
+        project_id: string,
+        query: string,
+        embeddingModel: string
+      ) => void;
       onTextSearchEmbeddedFiles: (callback: (content: any) => void) => void;
 
       paginateEmbeddedFiles: (
         page: number,
         limit: number,
-        project_id: string
+        project_id: string,
+        embeddingModel: string
       ) => void;
       onPaginateEmbeddedFiles: (callback: (content: any) => void) => void;
+
+      findEmbeddedFileByHashAndProjectId: (
+        hash: string,
+        project_id: string,
+        embeddingModel: string
+      ) => void;
+      onFindEmbeddedFileByHashAndProjectId: (callback: (content: any) => void) => void;
+
+      findEmbeddedFileByFilepathAndProjectId: (
+        filepath: string,
+        project_id: string,
+        embeddingModel: string
+      ) => void;
+      onFindEmbeddedFileByFilepathAndProjectId: (callback: (content: any) => void) => void;
     };
   }
 }
+

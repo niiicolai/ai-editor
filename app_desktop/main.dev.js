@@ -15,6 +15,8 @@ import {
   vectorSearchEmbeddedFiles, 
   textSearchEmbeddedFiles, 
   paginateEmbeddedFiles, 
+  findEmbeddedFileByHashAndProjectId,
+  findEmbeddedFileByFilepathAndProjectId
 } from "./src/sqlite/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -302,9 +304,29 @@ async function createWindow() {
     console.log(searchPath, patternStr);
   });
 
-  ipcMain.on("insert-embedded-file", async (event, body) => {
+  ipcMain.on("find-embedded-file-by-hash-and-project-id", async (event, hash, project_id, embeddingModel) => {
     try {
-      const insertId = insertEmbeddedFile(body);
+      const file = findEmbeddedFileByHashAndProjectId(hash, project_id, embeddingModel);
+      event.reply("on-find-embedded-file-by-hash-and-project-id", { success: true, file: file });
+    } catch (error) {
+      console.error("Error finding embedded file by hash and project id:", error);
+      event.reply("on-find-embedded-file-by-hash-and-project-id", { success: false, error: error.message });
+    }
+  });
+
+  ipcMain.on("find-embedded-file-by-file-path-and-project-id", async (event, filepath, project_id, embeddingModel) => {
+    try {
+      const file = findEmbeddedFileByFilepathAndProjectId(filepath, project_id, embeddingModel);
+      event.reply("on-find-embedded-file-by-file-path-and-project-id", { success: true, file: file });
+    } catch (error) {
+      console.error("Error finding embedded file by filepath and project id:", error);
+      event.reply("on-find-embedded-file-by-file-path-and-project-id", { success: false, error: error.message });
+    }
+  });
+
+  ipcMain.on("insert-embedded-file", async (event, body, embeddingModel) => {
+    try {
+      const insertId = insertEmbeddedFile(body, embeddingModel);
       event.reply("on-insert-embedded-file", { success: true, id: insertId });
     } catch (error) {
       console.error("Error inserting embedded file:", error);
@@ -312,9 +334,9 @@ async function createWindow() {
     }
   });
 
-  ipcMain.on("update-embedded-file", async (event, id, body) => {
+  ipcMain.on("update-embedded-file", async (event, id, body, embeddingModel) => {
     try {
-      updateEmbeddedFile(id, body);
+      updateEmbeddedFile(id, body, embeddingModel);
       event.reply("on-update-embedded-file", { success: true });
     } catch (error) {
       console.error("Error updating embedded file:", error);
@@ -322,9 +344,9 @@ async function createWindow() {
     }
   });
 
-  ipcMain.on("delete-embedded-file", async (event, id) => {
+  ipcMain.on("delete-embedded-file", async (event, id, embeddingModel) => {
     try {
-      deleteEmbeddedFile(id);
+      deleteEmbeddedFile(id, embeddingModel);
       event.reply("on-delete-embedded-file", { success: true });
     } catch (error) {
       console.error("Error deleting embedded file:", error);
@@ -332,9 +354,9 @@ async function createWindow() {
     }
   });
 
-  ipcMain.on("delete-all-embedded-files", async (event, id) => {
+  ipcMain.on("delete-all-embedded-files", async (event, id, embeddingModel) => {
     try {
-      deleteAllEmbeddedFiles(id);
+      deleteAllEmbeddedFiles(id, embeddingModel);
       event.reply("on-delete-all-embedded-files", { success: true });
     } catch (error) {
       console.error("Error deleting all embedded files:", error);
@@ -342,9 +364,9 @@ async function createWindow() {
     }
   });
 
-  ipcMain.on("vector-search-embedded-files", async (event, project_id, queryEmbedding) => {
+  ipcMain.on("vector-search-embedded-files", async (event, project_id, queryEmbedding, embeddingModel) => {
     try {
-      const result = vectorSearchEmbeddedFiles(queryEmbedding, project_id);
+      const result = vectorSearchEmbeddedFiles(queryEmbedding, project_id, embeddingModel);
       event.reply("on-vector-search-embedded-files", { success: true, result });
     } catch (error) {
       console.error("Error vector searching embedded files:", error);
@@ -352,9 +374,9 @@ async function createWindow() {
     }
   });
 
-  ipcMain.on("text-search-embedded-files", async (event, project_id, query) => {
+  ipcMain.on("text-search-embedded-files", async (event, project_id, query, embeddingModel) => {
     try {
-      const result = textSearchEmbeddedFiles(query, project_id);
+      const result = textSearchEmbeddedFiles(query, project_id, embeddingModel);
       event.reply("on-text-search-embedded-files", { success: true, result });
     } catch (error) {
       console.error("Error text searching embedded files:", error);
@@ -362,9 +384,9 @@ async function createWindow() {
     }
   });
 
-  ipcMain.on("paginate-embedded-files", async (event, page, limit, project_id) => {
+  ipcMain.on("paginate-embedded-files", async (event, page, limit, project_id, embeddingModel) => {
     try {
-      const result = paginateEmbeddedFiles(page, limit, project_id);
+      const result = paginateEmbeddedFiles(page, limit, project_id, embeddingModel);
       event.reply("on-paginate-embedded-files", { success: true, result });
     } catch (error) {
       console.error("Error paginate embedded files:", error);

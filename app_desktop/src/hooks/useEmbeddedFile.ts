@@ -9,15 +9,20 @@ import { vectorSearchEmbeddedFiles } from '../electron/vectorSearchEmbeddedFiles
 import { textSearchEmbeddedFiles } from '../electron/textSearchEmbeddedFiles';
 import { paginateEmbeddedFiles } from '../electron/paginateEmbeddedFiles';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 export const useGetEmbeddedFiles = (page: number, limit: number, project_id: string) => {
+    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+
     return useQuery({ 
         queryKey: ['embedded_files', page, limit], 
-        queryFn: () => paginateEmbeddedFiles(page, limit, project_id)
+        queryFn: () => paginateEmbeddedFiles(page, limit, project_id, embeddingModel)
     });
 }
 
 export const useVectorSearchEmbeddedFiles = () => {
+    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -25,7 +30,7 @@ export const useVectorSearchEmbeddedFiles = () => {
         setIsLoading(true);
 
         try {
-            return await vectorSearchEmbeddedFiles(project_id, queryEmbedding);            
+            return await vectorSearchEmbeddedFiles(project_id, queryEmbedding, embeddingModel);            
         } catch (error: unknown) {
             if (error instanceof Error) setError(error.message);
             else setError("Something went wrong");
@@ -38,6 +43,7 @@ export const useVectorSearchEmbeddedFiles = () => {
 }
 
 export const useTextSearchEmbeddedFiles = () => {
+    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -45,7 +51,7 @@ export const useTextSearchEmbeddedFiles = () => {
         setIsLoading(true);
 
         try {
-            return await textSearchEmbeddedFiles(project_id, query);            
+            return await textSearchEmbeddedFiles(project_id, query, embeddingModel);            
         } catch (error: unknown) {
             if (error instanceof Error) setError(error.message);
             else setError("Something went wrong");
@@ -58,18 +64,20 @@ export const useTextSearchEmbeddedFiles = () => {
 }
 
 export const useCreateEmbeddedFile = () => {
+    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (body: EmbeddedFileType) => insertEmbeddedFile(body),
+        mutationFn: (body: EmbeddedFileType) => insertEmbeddedFile(body, embeddingModel),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['embedded_files'] })
     });
 }
 
 export const useUpdateEmbeddedFile = () => {
+    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: ({ id, body }: { id: string; body: EmbeddedFileType }) => {
-            updateEmbeddedFile(id, body);
+            updateEmbeddedFile(id, body, embeddingModel);
             return Promise.resolve({ id });
         },
         onSuccess: ({ id }) => {
@@ -80,11 +88,12 @@ export const useUpdateEmbeddedFile = () => {
 }
 
 export const useDestroyEmbeddedFile = () => {
+    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async (_id: number) => {
-            await deleteEmbeddedFile(_id)
+            await deleteEmbeddedFile(_id, embeddingModel)
             return _id;
         },
         onSuccess: (_id: number) => {
@@ -94,11 +103,12 @@ export const useDestroyEmbeddedFile = () => {
 }
 
 export const useDestroyEmbeddedFiles = () => {
+    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async (project_id: string) => {
-            await deleteAllEmbeddedFiles(project_id)
+            await deleteAllEmbeddedFiles(project_id, embeddingModel)
             return project_id;
         },
         onSuccess: () => {
