@@ -4,7 +4,7 @@ export default (doc) => {
         expires_at: doc.expires_at,
         user: doc.user,
         credit: doc.credit ? {
-            noOfCredits: credit.noOfCredits,
+            noOfCredits: doc.credit.noOfCredits,
         } : null,
         created_at: doc.created_at,
         updated_at: doc.updated_at,

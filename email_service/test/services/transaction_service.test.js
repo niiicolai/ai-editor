@@ -1,5 +1,5 @@
-import TransactionModel from "../../src/mongodb/models/transaction_model";
-import TransactionService from "../../src/services/transaction_service";
+import TransactionModel from "../../src/mongodb/models/transaction_model.js";
+import TransactionService from "../../src/services/transaction_service.js";
 import { expect, test, beforeAll } from "vitest";
 
 beforeAll(async () => {

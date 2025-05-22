@@ -15,10 +15,11 @@ export default class UserProductService {
      */
     static async find(_id, userId) {
         idValidator(_id);
+        idValidator(userId, "userId");
 
         const userProduct = await UserProductModel
             .findOne({ _id, user: userId });
-        if (!product) ClientError.notFound("user product not found");
+        if (!userProduct) ClientError.notFound("user product not found");
 
         return dto(userProduct);
     }
@@ -33,6 +34,7 @@ export default class UserProductService {
      */
     static async findAll(page = 1, limit = 10, userId) {
         paginatorValidator(page, limit);
+        idValidator(userId, "userId");
 
         const query = { user: userId };
         const userProducts = await UserProductModel
