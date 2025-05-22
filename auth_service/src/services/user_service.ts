@@ -27,6 +27,7 @@ interface UserResponse {
   _id: string;
   username: string;
   email: string;
+  role: string;
   logins?: {
     type: string;
     created_at: string;
@@ -68,7 +69,7 @@ export default class UserService {
 
     const user = await User
       .findOne({ _id, deleted_at: null })
-      .select(fields);
+      .select(fields.join(" "));
     if (!user) ClientError.notFound("user not found");
 
     return dto(user);

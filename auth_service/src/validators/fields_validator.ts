@@ -1,6 +1,6 @@
 import ClientError from '../errors/client_error';
 
-export const fieldsValidator = (fields, allowedFields) => {
+export const fieldsValidator = (fields: string[], allowedFields: string[]): string[] => {
   if (fields) {
     fields.forEach((field) => {
       if (!allowedFields.includes(field)) {
@@ -12,5 +12,5 @@ export const fieldsValidator = (fields, allowedFields) => {
   return (fields
         ? fields.filter((field) => allowedFields.includes(field))
         : allowedFields
-    ).join(" ");
+    );
 };

@@ -22,7 +22,7 @@ export default class JwtService {
      * @param {JWTPayload} payload
      * @returns {Promise<String>}
      */
-    static async sign(payload: JWTPayload, options: JWTSignOption = { expires: true }): Promise<string> {
+    static sign(payload: JWTPayload, options: JWTSignOption = { expires: true }): string {
         const signOptions = {
             ...(options.expires && { expiresIn: JWT_EXPIRES_IN }),
         };
@@ -35,7 +35,7 @@ export default class JwtService {
      * @param {String} token
      * @returns {Promise<JWTPayload>}
      */
-    static async verify(token: string): Promise<JWTPayload> {
+    static verify(token: string): JWTPayload {
         return jwt.verify(token, JWT_SECRET) as JWTPayload;
     }
 }

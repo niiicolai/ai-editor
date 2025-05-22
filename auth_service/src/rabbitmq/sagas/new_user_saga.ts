@@ -46,6 +46,7 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
     } catch (error) {
       await session.abortTransaction();
       console.error(error);
+      throw error;
     } finally {
       await session.endSession();
     }
@@ -110,3 +111,5 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
 
 export const produceNewUserSaga = async (body) => await producer.produce(body);
 export default async () => producer.addListeners();
+
+

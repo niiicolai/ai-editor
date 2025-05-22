@@ -8,7 +8,6 @@ import { stringValidator } from "../validators/string_validator";
 interface UserLoginBody {
   email: string;
   password: string;
-  token: string;
 }
 
 interface UserLoginResponse {
