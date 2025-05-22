@@ -56,7 +56,7 @@ export default class UserCreditModificationService {
         };
     }
 
-    static async create(file, body, userId, fields = null) {
+    static async create(body, userId, fields = null) {
         objectValidator(body, "body");
         stringValidator(body.user_product, "user_product");
         stringValidator(body.amount, "amount");

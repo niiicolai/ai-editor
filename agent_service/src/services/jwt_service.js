@@ -9,7 +9,7 @@ export default class JwtService {
      * @param {String} token
      * @returns {Promise<Object>}
      */
-    static async verify(token) {
+    static verify(token) {
         if (!token) throw new Error('Token is required');
         if (typeof token !== 'string') throw new Error('Token must be a string');
         
