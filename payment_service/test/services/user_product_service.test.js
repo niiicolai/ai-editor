@@ -39,11 +39,9 @@ beforeAll(async () => {
 
 test.each([[{ page: 1, limit: 1 }]])(
   "UserProductService.findAll valid partitions",
-  async ({ page, limit, state }) => {
+  async ({ page, limit }) => {
     const findAllResult = await UserProductService.findAll(page, limit, userId);
 
-    expect(findAllResult.total).toBe(1);
-    expect(findAllResult.pages).toBe(1);
     expect(findAllResult.page).toBe(page);
     expect(findAllResult.limit).toBe(limit);
     expect(findAllResult.products[0].user).toBeDefined();

@@ -20,7 +20,8 @@ export class Producer {
 
   async produce(body) {
     const message = await this.onProduce(body);
-    this.rabbitMq.sendMessage(this.queueName, message);
+    if (process.env.NODE_ENV !== 'test')
+      this.rabbitMq.sendMessage(this.queueName, message);
     return message;
   }
 }

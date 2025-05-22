@@ -1,10 +1,8 @@
 import CheckoutModel from "../mongodb/models/checkout_model.js";
 import UserModel from "../mongodb/models/user_model.js";
-import UserProductModel from "../mongodb/models/user_product_model.js";
 import dto from "../dto/checkout_dto.js";
 import ClientError from "../errors/client_error.js";
 import Stripe from "stripe";
-import mongoose from "mongoose";
 
 import { produceUserCreditModificationSaga } from "../rabbitmq/sagas/user_credit_modification_saga.js";
 import { produceSendEmailSaga } from "../rabbitmq/sagas/send_email_saga.js";
@@ -32,6 +30,7 @@ export default class CheckoutService {
    */
   static async find(_id, userId) {
     idValidator(_id);
+    idValidator(userId, "userId")
 
     const user = await UserModel.findOne({ _id: userId, deleted_at: null });
     if (!user) ClientError.notFound("user not found");
@@ -195,18 +194,24 @@ export default class CheckoutService {
       );
 
     try {
-      const mode = "payment";
-      const line_items = checkout.products.map((p) => {
-        return { price: p.product.stripePriceId, quantity: p.quantity };
-      });
-      const session = await stripe.checkout.sessions.create({
-        billing_address_collection: "auto",
-        line_items,
-        mode,
-        success_url: `${DOMAIN}/api/v1/checkout_success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${DOMAIN}/api/v1/checkout_cancel?session_id={CHECKOUT_SESSION_ID}`,
-        //automatic_tax: {enabled: true},
-      });
+      let session = null;
+      if (process.env.NODE_ENV === "test") session = {
+        id: new Date().toLocaleString(),
+        url: new Date().toLocaleString()
+      };
+      else {
+        const line_items = checkout.products.map((p) => {
+          return { price: p.product.stripePriceId, quantity: p.quantity };
+        });
+        session = await stripe.checkout.sessions.create({
+          billing_address_collection: "auto",
+          line_items,
+          mode: "payment",
+          success_url: `${DOMAIN}/api/v1/checkout_success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${DOMAIN}/api/v1/checkout_cancel?session_id={CHECKOUT_SESSION_ID}`,
+        });
+      }
+
       checkout.sessionId = session.id;
       checkout.state = "pending";
       await checkout.save();

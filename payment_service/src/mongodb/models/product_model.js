@@ -9,12 +9,12 @@ export const productSchema = new mongoose.Schema(
         },
         description: {
             type: String,
-            unique: true,
+            unique: false,
             required: true,
         },
         category: {
             type: String,
-            unique: true,
+            unique: false,
             required: true,
         },
         noOfCredits: {
