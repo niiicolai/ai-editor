@@ -12,7 +12,6 @@ import { fieldsValidator } from "../validators/fields_validator.js";
 import { paginatorValidator } from "../validators/paginator_validator.js";
 
 const prefix = "user_file";
-const categories = ['cv', 'cover_letter', 'portfolio', 'other'];
 const allowedFields = [
     "_id",
     "user",
@@ -95,10 +94,6 @@ export default class UserFileService {
         stringValidator(body.category, "category");
         stringValidator(body.title, "title");
         idValidator(userId, "userId");
-
-        if (!categories.includes(body.category)) {
-            ClientError.badRequest("category must be one of the following: cv, cover_letter, portfolio, other");
-        }
 
         if (file.size === 0) {
             ClientError.badRequest("file is required");

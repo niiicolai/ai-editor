@@ -15,9 +15,9 @@ interface UserAgentSession {
 const userAgentSessionSlice = createSlice({
   name: "user_agent_session",
   initialState: {
-    embeddingModel: "Salesforce/codet5p-110m-embedding",
+    embeddingModel: "all-MiniLM-L6-v2",
     chunkMode: "custom_code",
-    searchMode: "vector_search",
+    searchMode: "hybrid_search",
     sessionTitle: null,
     sessionId: null,
     operation: null,

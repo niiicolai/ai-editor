@@ -2,10 +2,10 @@ import asyncio
 import datetime
 import json
 from src.models.sample_model import insert_many, find, paginate, count
-from src.services.context_precision_service import cal_context_precision
-from src.services.faithfulness_service import cal_faithfulness
-from src.services.response_relevancy_service import cal_response_relevancy
+from src.ragas.main import cal_context_precision, cal_faithfulness, cal_response_relevancy
 from src.dto.sample_dto import dto
+from src.utils.stats import cal_stats
+        
 
 def get_sample(_id):
     if _id is None: raise Exception("id is required")
@@ -23,19 +23,6 @@ def get_samples(page, limit):
     samples = list(samples_cursor)
     total = count()
     pages = (total + limit - 1) // limit 
-    # Calculate averages for metrics across samples
-    if samples:
-        total_context_precision = sum(s.get("metrics", {}).get("context_precision", 0) for s in samples)
-        total_response_relevancy = sum(s.get("metrics", {}).get("response_relevancy", 0) for s in samples)
-        total_faithfulness = sum(s.get("metrics", {}).get("faithfulness", 0) for s in samples)
-        count_samples = len(samples)
-        average_context_precision = total_context_precision / count_samples
-        average_response_relevancy = total_response_relevancy / count_samples
-        average_faithfulness = total_faithfulness / count_samples
-    else:
-        average_context_precision = 0
-        average_response_relevancy = 0
-        average_faithfulness = 0
     
     return {
         "samples": [dto(s) for s in samples],
@@ -43,11 +30,7 @@ def get_samples(page, limit):
         "pages": pages,
         "page": page,
         "limit": limit,
-        "stats": {
-            "average_context_precision": average_context_precision,
-            "average_response_relevancy": average_response_relevancy,
-            "average_faithfulness": average_faithfulness
-        }
+        "stats": cal_stats(samples)
     }
 
 async def create_many(body):

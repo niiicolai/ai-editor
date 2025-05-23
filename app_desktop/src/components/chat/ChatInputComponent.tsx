@@ -10,6 +10,7 @@ import { useTextSearchEmbeddedFiles, useVectorSearchEmbeddedFiles } from "../../
 import EmbeddingService from "../../services/embeddingService";
 
 const actions = [
+    { label: 'rag_test', value: 'rag_test' },
     { label: 'ask', value: 'input_ask' },
     { label: 'agent', value: 'input_agent' },
 ];

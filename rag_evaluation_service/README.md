@@ -26,6 +26,13 @@ cp .env.example .env
 python main.py
 ```
 
+## Test
+
+### Run Test
+```
+pytest
+```
+
 ### Update requirements
 ```
 pip freeze > requirements.txt

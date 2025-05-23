@@ -126,15 +126,15 @@ export default function SampleIndexView() {
             <div className="flex flex-col gap-1 pb-3 border-b border-gray-300">
               <div className="mt-1 text-sm text-gray-500 w-full overflow-hidden truncate flex justify-between gap-1">
                 <span className="font-bold">Context Precision:</span>
-                <span>{sample.metrics.context_precision.toFixed(2)}</span>
+                <span>{sample.metrics.context_precision}</span>
               </div>
               <div className="mt-1 text-sm text-gray-500 w-full overflow-hidden truncate flex justify-between gap-1">
                 <span className="font-bold">Response Relevancy:</span>
-                <span>{sample.metrics.response_relevancy.toFixed(2)}</span>
+                <span>{sample.metrics.response_relevancy}</span>
               </div>
               <div className="mt-1 text-sm text-gray-500 w-full overflow-hidden truncate flex justify-between gap-1">
                 <span className="font-bold">Faithfulness:</span>
-                <span>{sample.metrics.faithfulness.toFixed(2)}</span>
+                <span>{sample.metrics.faithfulness}</span>
               </div>
             </div>
 
