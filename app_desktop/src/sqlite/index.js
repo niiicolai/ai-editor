@@ -181,7 +181,7 @@ export const vectorSearchEmbeddedFiles = (
         FROM ${table}
         WHERE embedding MATCH ? AND project_id = ?
         ORDER BY distance ASC
-        LIMIT 4
+        LIMIT 2
     `);
 
   const result = stmt.all(JSON.stringify(queryEmbedding), project_id);
@@ -224,7 +224,7 @@ export const textSearchEmbeddedFiles = (
             project_id = @project_id AND
             ${whereClauses}
         ORDER BY created_at DESC
-        LIMIT 4
+        LIMIT 2
     `;
 
   // Build params object

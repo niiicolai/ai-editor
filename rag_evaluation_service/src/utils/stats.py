@@ -3,7 +3,6 @@ import statistics
 def cal_stats(samples):
     if not samples:
         return {
-            "stats": {
                 "average_context_precision": 0,
                 "median_context_precision": 0,
                 "average_response_relevancy": 0,
@@ -17,7 +16,6 @@ def cal_stats(samples):
                 "min_faithfulnesses": 0,
                 "max_faithfulnesses": 0
             }
-        }
 
     context_precisions = [s.get("metrics", {}).get("context_precision", 0) for s in samples]
     response_relevancies = [s.get("metrics", {}).get("response_relevancy", 0) for s in samples]
@@ -25,7 +23,6 @@ def cal_stats(samples):
     count = len(samples)
 
     return {
-        "stats": {
             "average_context_precision": sum(context_precisions) / count,
             "median_context_precision": statistics.median(context_precisions),
             "average_response_relevancy": sum(response_relevancies) / count,
@@ -38,5 +35,5 @@ def cal_stats(samples):
             "max_response_relevancies": max(response_relevancies),
             "min_faithfulnesses": min(faithfulnesses),
             "max_faithfulnesses": max(faithfulnesses)
-        }
+      
     }

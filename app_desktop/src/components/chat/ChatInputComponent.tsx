@@ -44,7 +44,7 @@ function ChatInputComponent({
         ) {
             const queryEmbedding = await EmbeddingService.create({ chunks: [content], model: embeddingModel })
             embeddedFiles.push(...(await vectorSearch.search(projectIndex.meta._id, queryEmbedding[0].embedding))
-                ?.result?.sort((a:any, b:any) => a.distance - b.distance))
+                ?.result?.sort((a:any, b:any) => b.distance - a.distance))
         }
         if (projectIndex?.meta?._id && searchMode === 'text_search' ||
             projectIndex?.meta?._id && searchMode === 'hybrid_search'
@@ -58,7 +58,7 @@ function ChatInputComponent({
             (file, index, self) =>
             file.rowid &&
             self.findIndex(f => f.rowid === file.rowid) === index
-        );
+        ).map((ef) => ef.description);
 
         try {
             sendMessage(JSON.stringify({

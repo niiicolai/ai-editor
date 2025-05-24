@@ -17,7 +17,7 @@ const userAgentSessionSlice = createSlice({
   initialState: {
     embeddingModel: "all-MiniLM-L6-v2",
     chunkMode: "custom_code",
-    searchMode: "hybrid_search",
+    searchMode: "vector_search",
     sessionTitle: null,
     sessionId: null,
     operation: null,

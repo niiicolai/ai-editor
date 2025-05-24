@@ -1,15 +1,15 @@
 from ragas import SingleTurnSample
 from ragas.metrics import LLMContextPrecisionWithoutReference
 from ragas.llms import LangchainLLMWrapper
-from ragas.metrics import Faithfulness
+from ragas.metrics import Faithfulness, ResponseRelevancy
 from langchain_openai import ChatOpenAI
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
 from dotenv import load_dotenv
 import os
 load_dotenv()
 
 evaluator_llm = LangchainLLMWrapper(ChatOpenAI(model="gpt-4o-mini"))
-evaluator_embeddings = HuggingFaceEmbeddings('BAAI/bge-base-en')
+evaluator_embeddings = OpenAIEmbeddings()
 
 async def cal_context_precision(user_input, response, retrieved_contexts):
     if os.getenv("ENV") == "test": return 0

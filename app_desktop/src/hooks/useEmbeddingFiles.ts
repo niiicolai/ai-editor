@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useIgnoreAi } from "./useIgnoreAi";
 import { useHash } from "./useHash";
 import { useReadFile } from "./useReadFile";
-import { useParseFileContent } from "./useParseFileContent";
 import { useProjectIndexFile } from "./useProjectIndexFile";
 import { setMeta, setQueue } from "../features/projectIndex";
 import { insertEmbeddedFile } from "../electron/insertEmbeddedFile";
 import { updateEmbeddedFile } from "../electron/updateEmbeddedFile";
 import { findEmbeddedFileByFilepathAndProjectId } from "../electron/findEmbeddedFileByFilepathAndProjectId";
+import { parse } from "../parser/parser";
 import LlmService from "../services/llmService";
 import EmbeddingService from "../services/embeddingService";
 
@@ -17,7 +17,9 @@ export const useEmbeddingFiles = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { embeddingModel, chunkMode } = useSelector((state: RootState) => state.userAgentSession);
+  const { embeddingModel, chunkMode } = useSelector(
+    (state: RootState) => state.userAgentSession
+  );
   const { queue, meta } = useSelector((state: RootState) => state.projectIndex);
   const { currentPath } = useSelector((state: RootState) => state.hierarchy);
 
@@ -25,16 +27,15 @@ export const useEmbeddingFiles = () => {
   const ignoreAi = useIgnoreAi();
   const hashing = useHash();
   const readFile = useReadFile();
-  const parseFile = useParseFileContent();
   const dispatch = useDispatch();
 
   const describeFile = async (file: any, content:string, language:string) => {
     const { name, path } = file;
 
     if (chunkMode === 'custom_code') {
-      const parsed = parseFile.parse(content, language);
+      const parsed = parse(name, path, content, language) as any;
 
-      return `filename: ${name}\nfilepath: ${path}\nlanguage: ${language}\nlines: ${parsed?.lines}\ndescription: ${parsed?.description}${parsed?.vars && parsed?.vars?.length ? `\nvars: ${JSON.stringify(parsed?.vars || "[]")}` : '' }${parsed?.functions && parsed?.functions?.length ? `\nfunctions: ${JSON.stringify(parsed?.functions || "[]")}` : '' }${parsed?.classes && parsed?.classes?.length ? `\nclasses: ${JSON.stringify(parsed?.classes || "[]")}` : '' }${parsed?.comments && parsed?.comments?.length ? `\ncomments: ${JSON.stringify(parsed?.comments || "[]")}` : '' }${parsed?.syntaxError && parsed?.syntaxError?.length ? `\syntax error: ${parsed?.syntaxError}` : '' }`;
+      return parsed.doc;
         
     } else if (chunkMode === 'language_model_augmentation') {
       const llmContent = await LlmService.create({ event: chunkMode, messages: [{ 
@@ -42,7 +43,7 @@ export const useEmbeddingFiles = () => {
           content: `You describe a code file for a RAG app (max 250 chars). Highlight what it does, how it fits in, signs of too many responsibilities, if tests are missing, or if syntax errors exist. Consider the following areas: navigation; refactoring; testing; debugging;\nfilename: ${name}\nfilepath: ${path}\nlanguage: ${language}\n\nHere is the code:\n${content}`}
       ]})
       
-      return llmContent.content.message;
+      return `filename: ${name}\nfilepath: ${path}\nlanguage: ${language}\ndescription:${llmContent.content.message}`;
 
     } else {
       throw new Error("(useEmbeddingFiles): Chunk mode is not supported");
@@ -68,22 +69,25 @@ export const useEmbeddingFiles = () => {
 
       for (const file of queue) {
         const { name, path } = file;
-        if (ignoreFile?.includes(name) ||
-            ignoreFile?.includes(path)) {
-          console.log('skip file specified in ignore file');
+        if (ignoreFile?.includes(name) || ignoreFile?.includes(path)) {
+          console.log("skip file specified in ignore file");
           continue;
-        } 
+        }
 
         const fileInstance = await readFile.read(file);
         const content = fileInstance?.content || "";
         const language = fileInstance?.language || "plaintext";
         const hash = hashing.hash(`${path}:${content}:${project_id}`);
 
-        const existingFile = await findEmbeddedFileByFilepathAndProjectId(path, project_id, embeddingModel);
+        const existingFile = await findEmbeddedFileByFilepathAndProjectId(
+          path,
+          project_id,
+          embeddingModel
+        );
         if (existingFile?.file && existingFile?.file?.hash === hash) {
-          console.log('skip unchanged existing file');
+          console.log("skip unchanged existing file");
           continue;
-        } 
+        }
 
         const description = await describeFile(file, content, language);
         const embeddings = await EmbeddingService.create({ chunks: [description], model: embeddingModel });

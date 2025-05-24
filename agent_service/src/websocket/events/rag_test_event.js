@@ -30,8 +30,12 @@ export default class RagTestEvent extends WebsocketEvent {
         throw new Error("insufficient credits");
       }
 
+
       const documents = (await RankingService.rerank(content, embeddedFiles)).map((r) => r.text);
       const handler = new ChatHandler(connection, reply, data);
+      
+      console.log(`Use the following files for context if it's relevant: ${JSON.stringify(documents)}`)
+      console.log(`This is the user's message: ${content.trim()}`)
       
       await handler.fetchLastMessages({ page: 1, limit: 10 });
       await handler.createAndSendUserMessage();

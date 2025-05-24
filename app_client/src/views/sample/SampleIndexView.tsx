@@ -86,11 +86,9 @@ export default function SampleIndexView() {
                   sample.input_embedded_files.map((embeddedFile: any) => (
                     <div
                       key={embeddedFile._id}
-                      className="p-3 border border-gray-300 rounded-md bg-white text-xs overflow-hidden"
+                      className="p-3 border border-gray-300 rounded-md bg-white text-xs overflow-hidden break-words"
                     >
-                      {JSON.stringify(embeddedFile).length > 110
-                        ? JSON.stringify(embeddedFile).slice(0, 110) + "..."
-                        : JSON.stringify(embeddedFile)}
+                      {JSON.stringify(embeddedFile)}
                     </div>
                   ))}
               </span>
