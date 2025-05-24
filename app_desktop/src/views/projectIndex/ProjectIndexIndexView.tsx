@@ -10,6 +10,7 @@ import {
   useDestroyEmbeddedFiles,
 } from "../../hooks/useEmbeddedFile";
 import { EmbeddedFileType } from "../../types/embeddedFileType";
+import { QAType } from "../../types/qaType";
 
 function ProjectIndexIndexView() {
   const projectIndex = useSelector((state: RootState) => state.projectIndex);
@@ -23,7 +24,7 @@ function ProjectIndexIndexView() {
   );
   const destroyFile = useDestroyEmbeddedFile();
   const destroyFiles = useDestroyEmbeddedFiles();
-
+  console.log(data)
   const handleDestroyFile = async (id: number) => {
     try {
       await destroyFile.mutateAsync(id);
@@ -119,10 +120,16 @@ function ProjectIndexIndexView() {
                       </div>
                       <div className="flex flex-col gap-3 mb-3">
                         <div className="text-xs text-gray-400 flex flex-col gap-1">
-                          <div>Description: </div>
-                          <div className="border border-color p-3">
-                            {embeddedFile.description}
-                          </div>
+                          {embeddedFile?.question_answers?.map((qa:QAType) => (
+                            <div key={qa.rowid} className="border border-color p-3">
+                              {qa.qa}
+                            </div>
+                          ))}
+                          {!embeddedFile?.question_answers?.length && (
+                            <div className="border border-color p-3">
+                              No question and answers found
+                            </div>
+                          )}
                         </div>
                         <p className="text-xs text-gray-400">
                           Hash: {embeddedFile.hash}

@@ -6,7 +6,7 @@ import { FocusFileItemType } from "../../types/directoryInfoType";
 import { useFocusFiles } from "../../hooks/useFocusFiles";
 import { useGetAvailableLlms } from "../../hooks/useAvailableLlm";
 import { AvailableLlmType } from "../../types/availableLlmType";
-import { useTextSearchEmbeddedFiles, useVectorSearchEmbeddedFiles } from "../../hooks/useEmbeddedFile";
+import { useTextSearchQA, useVectorSearchQA } from "../../hooks/useQAFile";
 import EmbeddingService from "../../services/embeddingService";
 
 const actions = [
@@ -29,8 +29,8 @@ function ChatInputComponent({
     const [content, setContent] = useState("");
     const [selectedLlm, setSelectedLlm] = useState("");
     const [selectedAction, setSelectedAction] = useState(actions[0].value);
-    const vectorSearch = useVectorSearchEmbeddedFiles();
-    const textSearch = useTextSearchEmbeddedFiles();
+    const vectorSearch = useVectorSearchQA();
+    const textSearch = useTextSearchQA();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -58,7 +58,7 @@ function ChatInputComponent({
             (file, index, self) =>
             file.rowid &&
             self.findIndex(f => f.rowid === file.rowid) === index
-        ).map((ef) => ef.description);
+        ).map((ef) => ef.qa);
 
         try {
             sendMessage(JSON.stringify({

@@ -1,11 +1,11 @@
+import { QAType } from "./qaType";
 
 export interface EmbeddedFileType {
   rowid: number;
-  embedding: number[];
   project_id: string;
   filepath: string;
   filename: string;
-  description: string;
+  question_answers?: QAType[];
   hash: string;
   created_at: string;
   updated_at: string;

@@ -5,10 +5,7 @@ import { insertEmbeddedFile } from '../electron/insertEmbeddedFile';
 import { updateEmbeddedFile } from '../electron/updateEmbeddedFile';
 import { deleteEmbeddedFile } from '../electron/deleteEmbeddedFile';
 import { deleteAllEmbeddedFiles } from '../electron/deleteAllEmbeddedFiles';
-import { vectorSearchEmbeddedFiles } from '../electron/vectorSearchEmbeddedFiles';
-import { textSearchEmbeddedFiles } from '../electron/textSearchEmbeddedFiles';
 import { paginateEmbeddedFiles } from '../electron/paginateEmbeddedFiles';
-import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 
@@ -19,48 +16,6 @@ export const useGetEmbeddedFiles = (page: number, limit: number, project_id: str
         queryKey: ['embedded_files', page, limit], 
         queryFn: () => paginateEmbeddedFiles(page, limit, project_id, embeddingModel)
     });
-}
-
-export const useVectorSearchEmbeddedFiles = () => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
-
-    const search = async (project_id: string, queryEmbedding: number[]) => {
-        setIsLoading(true);
-
-        try {
-            return await vectorSearchEmbeddedFiles(project_id, queryEmbedding, embeddingModel);            
-        } catch (error: unknown) {
-            if (error instanceof Error) setError(error.message);
-            else setError("Something went wrong");
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
-    return { isLoading, error, search };
-}
-
-export const useTextSearchEmbeddedFiles = () => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
-
-    const search = async (project_id: string, query: string) => {
-        setIsLoading(true);
-
-        try {
-            return await textSearchEmbeddedFiles(project_id, query, embeddingModel);            
-        } catch (error: unknown) {
-            if (error instanceof Error) setError(error.message);
-            else setError("Something went wrong");
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
-    return { isLoading, error, search };
 }
 
 export const useCreateEmbeddedFile = () => {

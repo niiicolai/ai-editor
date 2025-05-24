@@ -8,6 +8,8 @@ import { useProjectIndexFile } from "./useProjectIndexFile";
 import { setMeta, setQueue } from "../features/projectIndex";
 import { insertEmbeddedFile } from "../electron/insertEmbeddedFile";
 import { updateEmbeddedFile } from "../electron/updateEmbeddedFile";
+import { insertQA } from "../electron/insertQA";
+import { deleteAllQA } from "../electron/deleteAllQA";
 import { findEmbeddedFileByFilepathAndProjectId } from "../electron/findEmbeddedFileByFilepathAndProjectId";
 import { parse } from "../parser/parser";
 import LlmService from "../services/llmService";
@@ -35,7 +37,7 @@ export const useEmbeddingFiles = () => {
     if (chunkMode === 'custom_code') {
       const parsed = parse(name, path, content, language) as any;
 
-      return parsed.doc;
+      return parsed.qaSections;
         
     } else if (chunkMode === 'language_model_augmentation') {
       const llmContent = await LlmService.create({ event: chunkMode, messages: [{ 
@@ -89,25 +91,39 @@ export const useEmbeddingFiles = () => {
           continue;
         }
 
-        const description = await describeFile(file, content, language);
-        const embeddings = await EmbeddingService.create({ chunks: [description], model: embeddingModel });
+        const qaSections = await describeFile(file, content, language);
+        if (!qaSections) continue;
+
+        const embeddings = await EmbeddingService.create({ chunks: qaSections, model: embeddingModel });
         const data = {
           project_id,
           filepath: path,
           filename: name,
-          description,
           hash,
-          embedding: embeddings[0].embedding,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
 
+        let file_id = existingFile?.file?.rowid;
         if (existingFile?.file) {
           console.log('updating file', data)
           await updateEmbeddedFile(existingFile?.file?.rowid, data, embeddingModel);
+          await deleteAllQA(existingFile?.file?.rowid, embeddingModel);
         } else {
           console.log('inserting file', data)
-          await insertEmbeddedFile(data, embeddingModel);
+          const result = await insertEmbeddedFile(data, embeddingModel);
+          file_id = result.id;
+        }
+
+        for (const e of embeddings) {
+          await insertQA({ 
+            embedding: e.embedding, 
+            project_id,
+            file_id, 
+            qa: e.chunk,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }, embeddingModel);
         }
       }
 

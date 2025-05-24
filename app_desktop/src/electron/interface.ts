@@ -1,6 +1,10 @@
 declare global {
   interface Window {
     electron: {
+      /**
+       * File methods
+       */
+
       openFolder: () => void;
       onOpenFolder: (callback: (path: string) => void) => void;
 
@@ -26,11 +30,6 @@ declare global {
       renameFile: (filePath: string, newName: string) => void;
       onRenameFile: (callback: (result: any) => void) => void;
 
-      terminalCmd: (cmd: string) => void;
-      onTerminalCmd: (callback: (response: string) => void) => void;
-
-      openExternalBrowser: (url: string) => void;
-
       writeFile: (path: string, content: string) => void;
       onWriteFile: (callback: () => void) => void;
 
@@ -45,9 +44,30 @@ declare global {
       moveItemToTrash: (path: string) => void;
       onMoveItemToTrash: (callback: () => void) => void;
 
+      /**
+       * Terminal methods
+       */
+      
+      terminalCmd: (cmd: string) => void;
+      onTerminalCmd: (callback: (response: string) => void) => void;
+
+      /**
+       * Window methods
+       */
+
       minimizeWindow: () => void;
       restoreWindow: () => void;
       closeWindow: () => void;
+
+      /**
+       * Browser methods
+       */
+      
+      openExternalBrowser: (url: string) => void;
+
+      /**
+       * Embedded files methods
+       */
 
       insertEmbeddedFile: (body: any, embeddingModel: string) => void;
       onInsertEmbeddedFile: (callback: (content: any) => void) => void;
@@ -68,20 +88,6 @@ declare global {
       ) => void;
       onDeleteAllEmbeddedFiles: (callback: (content: any) => void) => void;
 
-      vectorSearchEmbeddedFiles: (
-        project_id: string,
-        queryEmbedding: number[],
-        embeddingModel: string
-      ) => void;
-      onVectorSearchEmbeddedFiles: (callback: (content: any) => void) => void;
-
-      textSearchEmbeddedFiles: (
-        project_id: string,
-        query: string,
-        embeddingModel: string
-      ) => void;
-      onTextSearchEmbeddedFiles: (callback: (content: any) => void) => void;
-
       paginateEmbeddedFiles: (
         page: number,
         limit: number,
@@ -95,15 +101,63 @@ declare global {
         project_id: string,
         embeddingModel: string
       ) => void;
-      onFindEmbeddedFileByHashAndProjectId: (callback: (content: any) => void) => void;
+      onFindEmbeddedFileByHashAndProjectId: (
+        callback: (content: any) => void
+      ) => void;
 
       findEmbeddedFileByFilepathAndProjectId: (
         filepath: string,
         project_id: string,
         embeddingModel: string
       ) => void;
-      onFindEmbeddedFileByFilepathAndProjectId: (callback: (content: any) => void) => void;
+      onFindEmbeddedFileByFilepathAndProjectId: (
+        callback: (content: any) => void
+      ) => void;
+
+      /**
+       * QA methods
+       */
+
+      insertQA: (body: any, embeddingModel: string) => void;
+      onInsertQA: (callback: (content: any) => void) => void;
+
+      updateQA: (
+        id: string,
+        body: any,
+        embeddingModel: string
+      ) => void;
+      onUpdateQA: (callback: (content: any) => void) => void;
+
+      deleteQA: (id: number, embeddingModel: string) => void;
+      onDeleteQA: (callback: (content: any) => void) => void;
+
+      deleteAllQA: (
+        file_id: string,
+        embeddingModel: string
+      ) => void;
+      onDeleteAllQA: (callback: (content: any) => void) => void;
+
+      vectorSearchQA: (
+        file_id: string,
+        queryEmbedding: number[],
+        embeddingModel: string
+      ) => void;
+      onVectorSearchQA: (callback: (content: any) => void) => void;
+
+      textSearchQA: (
+        file_id: string,
+        query: string,
+        embeddingModel: string
+      ) => void;
+      onTextSearchQA: (callback: (content: any) => void) => void;
+
+      paginateQA: (
+        page: number,
+        limit: number,
+        file_id: string,
+        embeddingModel: string
+      ) => void;
+      onPaginateQA: (callback: (content: any) => void) => void;
     };
   }
 }
-

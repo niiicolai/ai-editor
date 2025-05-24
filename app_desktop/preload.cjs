@@ -6,6 +6,11 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
+
+    /**
+     * File methods
+     */
+
     openFolder: () => ipcRenderer.send('open-folder'),
     onOpenFolder: (callback) => ipcRenderer.on('on-open-folder', (event, path) => callback(path)),
     
@@ -38,17 +43,33 @@ contextBridge.exposeInMainWorld('electron', {
 
     search: (path, pattern) => ipcRenderer.send('search', path, pattern),
     onSearchComplete: (callback) => ipcRenderer.send('on-search-complete', (event, content) => callback(content)),
+
+    revealInExplorer: (path) => ipcRenderer.send('reveal-in-explorer', path),
+
+    /**
+     * Terminal methods
+     */
     
     terminalCmd: (cmd) => ipcRenderer.send('terminal-cmd', cmd),
     onTerminalCmd: (callback) => ipcRenderer.on('on-terminal-cmd', (event, content) => callback(content)),
+
+    /**
+     * Browser methods
+     */
     
     openExternalBrowser: (url) => ipcRenderer.send('open-external-browser', url),
 
-    revealInExplorer: (path) => ipcRenderer.send('reveal-in-explorer', path),
+    /**
+     * Window methods
+     */
 
     minimizeWindow: () => ipcRenderer.send('minimize-window'),
     restoreWindow: () => ipcRenderer.send('restore-window'),
     closeWindow: () => ipcRenderer.send('close-window'),
+
+    /**
+     * Embedded File methods
+     */
 
     findEmbeddedFileByHashAndProjectId: (hash, project_id, embeddingModel) => ipcRenderer.send('find-embedded-file-by-hash-and-project-id', hash, project_id, embeddingModel),
     onFindEmbeddedFileByHashAndProjectId: (callback) => ipcRenderer.on('on-find-embedded-file-by-hash-and-project-id', (event, content) => callback(content)),
@@ -68,12 +89,31 @@ contextBridge.exposeInMainWorld('electron', {
     deleteAllEmbeddedFiles: (project_id, embeddingModel) => ipcRenderer.send('delete-all-embedded-files', project_id, embeddingModel),
     onDeleteAllEmbeddedFiles: (callback) => ipcRenderer.on('on-delete-all-embedded-files', (event, content) => callback(content)),
 
-    vectorSearchEmbeddedFiles: (project_id, queryEmbedding, embeddingModel) => ipcRenderer.send('vector-search-embedded-files', project_id, queryEmbedding, embeddingModel),
-    onVectorSearchEmbeddedFiles: (callback) => ipcRenderer.on('on-vector-search-embedded-files', (event, content) => callback(content)),
-
-    textSearchEmbeddedFiles: (project_id, query, embeddingModel) => ipcRenderer.send('text-search-embedded-files', project_id, query, embeddingModel),
-    onTextSearchEmbeddedFiles: (callback) => ipcRenderer.on('on-text-search-embedded-files', (event, content) => callback(content)),
-
     paginateEmbeddedFiles: (page, limit, project_id, embeddingModel) => ipcRenderer.send('paginate-embedded-files', page, limit, project_id, embeddingModel),
     onPaginateEmbeddedFiles: (callback) => ipcRenderer.on('on-paginate-embedded-files', (event, content) => callback(content)),
+
+    /**
+     * QA methods
+     */
+
+    insertQA: (body, embeddingModel) => ipcRenderer.send('insert-qa', body, embeddingModel),
+    onInsertQA: (callback) => ipcRenderer.on('on-insert-qa', (event, content) => callback(content)),
+
+    updateQA: (id, body, embeddingModel) => ipcRenderer.send('update-qa', id, body, embeddingModel),
+    onUpdateQA: (callback) => ipcRenderer.on('on-update-qa', (event, content) => callback(content)),
+
+    deleteQA: (id, embeddingModel) => ipcRenderer.send('delete-qa', id, embeddingModel),
+    onDeleteQA: (callback) => ipcRenderer.on('on-delete-qa', (event, content) => callback(content)),
+
+    deleteAllQA: (project_id, embeddingModel) => ipcRenderer.send('delete-all-qa', project_id, embeddingModel),
+    onDeleteAllQA: (callback) => ipcRenderer.on('on-delete-all-qa', (event, content) => callback(content)),
+
+    vectorSearchQA: (project_id, queryEmbedding, embeddingModel) => ipcRenderer.send('vector-search-qa', project_id, queryEmbedding, embeddingModel),
+    onVectorSearchQA: (callback) => ipcRenderer.on('on-vector-search-qa', (event, content) => callback(content)),
+
+    textSearchQA: (project_id, query, embeddingModel) => ipcRenderer.send('text-search-qa', project_id, query, embeddingModel),
+    onTextSearchQA: (callback) => ipcRenderer.on('on-text-search-qa', (event, content) => callback(content)),
+
+    paginateQA: (page, limit, file_id, embeddingModel) => ipcRenderer.send('paginate-qa', page, limit, file_id, embeddingModel),
+    onPaginateQA: (callback) => ipcRenderer.on('on-paginate-qa', (event, content) => callback(content)),
 });
