@@ -4,7 +4,7 @@ import {
   updateQA, 
   deleteQA, 
   deleteAllQAByProjectId, 
-  paginateQAByFileId, 
+  paginateQAByProjectId, 
   vectorSearchQAByProjectId,
   textSearchQAByProjectId
 } from "../sqlite/services/qa_service.js";
@@ -88,12 +88,12 @@ export const qaIpc = (mainWindow) => {
 
   ipcMain.on(
     "paginate-qa",
-    async (event, page, limit, file_id, embeddingModel) => {
+    async (event, page, limit, project_id, embeddingModel) => {
       try {
-        const result = paginateQAByFileId(
+        const result = paginateQAByProjectId(
           page,
           limit,
-          file_id,
+          project_id,
           embeddingModel
         );
         event.reply("on-paginate-qa", { success: true, result });

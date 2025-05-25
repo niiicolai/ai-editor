@@ -11,10 +11,10 @@ def cal_stats(samples):
                 "median_faithfulness": 0,
                 "min_context_precision": 0,
                 "max_context_precision": 0,
-                "min_response_relevancies": 0,
-                "max_response_relevancies": 0,
-                "min_faithfulnesses": 0,
-                "max_faithfulnesses": 0
+                "min_response_relevancy": 0,
+                "max_response_relevancy": 0,
+                "min_faithfulness": 0,
+                "max_faithfulness": 0
             }
 
     context_precisions = [s.get("metrics", {}).get("context_precision", 0) for s in samples]
@@ -31,9 +31,9 @@ def cal_stats(samples):
             "median_faithfulness": statistics.median(faithfulnesses),
             "min_context_precision": min(context_precisions),
             "max_context_precision": max(context_precisions),
-            "min_response_relevancies": min(response_relevancies),
-            "max_response_relevancies": max(response_relevancies),
-            "min_faithfulnesses": min(faithfulnesses),
-            "max_faithfulnesses": max(faithfulnesses)
+            "min_response_relevancy": min(response_relevancies),
+            "max_response_relevancy": max(response_relevancies),
+            "min_faithfulness": min(faithfulnesses),
+            "max_faithfulness": max(faithfulnesses)
       
     }

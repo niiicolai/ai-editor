@@ -18,13 +18,13 @@ export const insertQA = (
 
   const stmt = db.prepare(`
         INSERT INTO ${table} (
-            embedding, qa, ${foreignKey}, project_id, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?)
+            embedding, qa, project_id, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?)
     `);
   const info = stmt.run(
     JSON.stringify(body.embedding),
     body.qa,
-    parseInt(body.file_id),
+    //parseInt(body.file_id),
     body.project_id,
     body.created_at,
     body.updated_at
@@ -42,13 +42,13 @@ export const updateQA = (
 
   const stmt = db.prepare(`
     UPDATE ${table}
-    SET embedding = ?, qa = ?, ${foreignKey} = ?, project_id = ?, created_at = ?, updated_at = ?
+    SET embedding = ?, qa = ?, project_id = ?, created_at = ?, updated_at = ?
     WHERE rowid = ?
   `);
   stmt.run(
     JSON.stringify(body.embedding),
     body.qa,
-    parseInt(body.file_id),
+    //parseInt(body.file_id),
     body.project_id,
     body.created_at,
     body.updated_at,
@@ -83,7 +83,7 @@ export const vectorSearchQAByProjectId = (
   const foreignKey = getForeignKey(embeddingModel);
   
   const stmt = db.prepare(`
-        SELECT rowid, qa, ${foreignKey}, created_at, updated_at, distance
+        SELECT rowid, qa, created_at, updated_at, distance
         FROM ${table}
         WHERE embedding MATCH ? AND project_id = ?
         ORDER BY distance ASC
@@ -102,51 +102,43 @@ export const textSearchQAByProjectId = (
   const table = getTable(embeddingModel);
   const foreignKey = getForeignKey(embeddingModel);
 
-  const terms = query
-    .split(" ")
-    .map((term) => term.trim().replace(/[?!.,;:]+$/, ""))
-    .filter((term) => term.length > 0);
+  // Initialize params before using it
+  const params = { project_id };
 
-  if (terms.length === 0) return [];
+  // Split the query into keywords and build a dynamic WHERE clause
+  // Remove punctuation like question marks, exclamation points, etc.
+  const cleanedQuery = query.replace(/[?!.,;:()\[\]{}'"`~@#$%^&*_+=<>\\/|-]/g, '');
+  const keywords = cleanedQuery
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((kw, idx) => {
+      params[`kw${idx}`] = `%${kw}%`;
+      return `qa LIKE @kw${idx}`;
+    });
 
-  // Build dynamic WHERE clause for each term
-  const whereClauses = terms
-    .map(
-      (_, i) => `
-        (
-            filename LIKE @q${i} OR
-            filepath LIKE @q${i} OR
-            description LIKE @q${i}
-        )
-    `
-    )
-    .join(" OR ");
+  const whereClause = keywords.length
+    ? `project_id = @project_id AND (${keywords.join(' OR ')})`
+    : `project_id = @project_id`;
 
   const sql = `
-        SELECT rowid, qa, ${foreignKey}, created_at, updated_at
+        SELECT rowid, qa, created_at, updated_at
         FROM ${table}
-        WHERE 
-            project_id = @project_id AND
-            ${whereClauses}
+        WHERE ${whereClause}
         ORDER BY created_at DESC
         LIMIT 2
     `;
 
-  // Build params object
-  const params = { project_id };
-  terms.forEach((term, i) => {
-    params[`q${i}`] = `%${term}%`;
-  });
+  // params mapping already added above
 
   const stmt = db.prepare(sql);
   const result = stmt.all(params);
   return result;
 };
 
-export const paginateQAByFileId = (
+export const paginateQAByProjectId = (
   page,
   limit,
-  file_id,
+  project_id,
   embeddingModel = "all-MiniLM-L6-v2"
 ) => {
   const offset = (page - 1) * limit;
@@ -156,20 +148,20 @@ export const paginateQAByFileId = (
   const totalStmt = db.prepare(`
         SELECT COUNT(*) as total
         FROM ${table}
-        WHERE ${foreignKey} = ?
+        WHERE project_id = ?
     `);
-  const total = totalStmt.get(file_id).total;
+  const total = totalStmt.get(project_id).total;
 
   const pages = Math.ceil(total / limit);
 
   const filesStmt = db.prepare(`
-        SELECT rowid, qa, ${foreignKey}, created_at, updated_at
+        SELECT rowid, qa, created_at, updated_at
         FROM ${table}
-        WHERE ${foreignKey} = ?
+        WHERE project_id = ?
         ORDER BY created_at DESC
         LIMIT ? OFFSET ?
     `);
-  const data = filesStmt.all(file_id, limit, offset);
+  const data = filesStmt.all(project_id, limit, offset);
 
   return {
     data,

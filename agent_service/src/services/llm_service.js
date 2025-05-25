@@ -1,11 +1,17 @@
 import { creatChatCompletion } from "../llm/index.js";
 import { objectValidator } from "../validators/object_validator.js";
 import { stringValidator } from "../validators/string_validator.js";
+import OpenAI from "openai";
 import LlmUsageService from "./llm_usage_service.js";
 import AvailableLlmService from "./available_llm_service.js";
 import UserModel from "../mongodb/models/user_model.js";
 import Decimal from "decimal.js";
 import ClientError from "../errors/client_error.js";
+
+const apiKey = process.env.OPENAI_API_KEY;
+if (!apiKey) console.error("OPENAI_API_KEY is not set");
+
+const openai = new OpenAI({ apiKey });
 
 export default class LlmService {
   static async createMessage(body, userId) {
@@ -31,19 +37,23 @@ export default class LlmService {
     if (!llm) ClientError.notFound("LLM not found");
 
     try {
-      const { content, usage } = await creatChatCompletion(body.messages, {
-        model,
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: body.messages,
         max_tokens: 10000,
         temperature: 0.7,
-        useTools: false,
+        ...(body.response_format && { response_format: body.response_format }),
       });
+
+      const choice = response.choices[0].message;
+      const content = choice.content;
 
       await LlmUsageService.create(
         {
           llm: llm._id.toString(),
-          prompt_tokens: usage.prompt_tokens,
-          completion_tokens: usage.completion_tokens,
-          total_tokens: usage.total_tokens,
+          prompt_tokens: response.usage.prompt_tokens,
+          completion_tokens: response.usage.completion_tokens,
+          total_tokens: response.usage.total_tokens,
           messages: [],
           context_messages: [],
           event: body.event,

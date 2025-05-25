@@ -114,6 +114,6 @@ contextBridge.exposeInMainWorld('electron', {
     textSearchQA: (project_id, query, embeddingModel) => ipcRenderer.send('text-search-qa', project_id, query, embeddingModel),
     onTextSearchQA: (callback) => ipcRenderer.on('on-text-search-qa', (event, content) => callback(content)),
 
-    paginateQA: (page, limit, file_id, embeddingModel) => ipcRenderer.send('paginate-qa', page, limit, file_id, embeddingModel),
+    paginateQA: (page, limit, project_id, embeddingModel) => ipcRenderer.send('paginate-qa', page, limit, project_id, embeddingModel),
     onPaginateQA: (callback) => ipcRenderer.on('on-paginate-qa', (event, content) => callback(content)),
 });

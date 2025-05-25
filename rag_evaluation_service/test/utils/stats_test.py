@@ -28,10 +28,10 @@ import pytest
                 "median_faithfulness": 0.75,
                 "min_context_precision": 0.5,
                 "max_context_precision": 1,
-                "min_response_relevancies": 0.5,
-                "max_response_relevancies": 1,
-                "min_faithfulnesses": 0.5,
-                "max_faithfulnesses": 1
+                "min_response_relevancy": 0.5,
+                "max_response_relevancy": 1,
+                "min_faithfulness": 0.5,
+                "max_faithfulness": 1
         }),
     ]
 )
@@ -46,7 +46,7 @@ def test_cal_stats_valid_partitions(samples, results):
     assert stats["median_faithfulness"] == results["median_faithfulness"]
     assert stats["min_context_precision"] == results["min_context_precision"]
     assert stats["max_context_precision"] == results["max_context_precision"]
-    assert stats["min_response_relevancies"] == results["min_response_relevancies"]
-    assert stats["max_response_relevancies"] == results["max_response_relevancies"]
-    assert stats["min_faithfulnesses"] == results["min_faithfulnesses"]
-    assert stats["max_faithfulnesses"] == results["max_faithfulnesses"]
+    assert stats["min_response_relevancy"] == results["min_response_relevancy"]
+    assert stats["max_response_relevancy"] == results["max_response_relevancy"]
+    assert stats["min_faithfulness"] == results["min_faithfulness"]
+    assert stats["max_faithfulness"] == results["max_faithfulness"]

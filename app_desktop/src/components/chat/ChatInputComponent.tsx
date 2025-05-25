@@ -42,15 +42,21 @@ function ChatInputComponent({
         if (projectIndex?.meta?._id && searchMode === 'vector_search' ||
             projectIndex?.meta?._id && searchMode === 'hybrid_search'
         ) {
-            const queryEmbedding = await EmbeddingService.create({ chunks: [content], model: embeddingModel })
-            embeddedFiles.push(...(await vectorSearch.search(projectIndex.meta._id, queryEmbedding[0].embedding))
-                ?.result?.sort((a:any, b:any) => b.distance - a.distance))
+            const embeddingResult = await EmbeddingService.create({ chunks: [content], model: embeddingModel })
+            const queryEmbedding = embeddingResult[0].embedding;
+            const searchResponse = await vectorSearch.search(projectIndex.meta._id, queryEmbedding);
+            const sortedResult = searchResponse?.result?.sort((a:any, b:any) => b.distance - a.distance);
+            if (sortedResult) embeddedFiles.push(...sortedResult);
+            else console.log('No vector search result', searchResponse, embeddingResult);
         }
         if (projectIndex?.meta?._id && searchMode === 'text_search' ||
             projectIndex?.meta?._id && searchMode === 'hybrid_search'
         ) {
-            embeddedFiles.push(...(await textSearch.search(projectIndex.meta._id, content))
-                ?.result)
+            const searchResponse = await textSearch.search(projectIndex.meta._id, content);
+            const searchResult = searchResponse?.result;
+            console.log(searchResult)
+            if (searchResult) embeddedFiles.push(...searchResult)
+            else console.log('No text search result', searchResponse);
         }
 
         // filter duplicate embeddedFiles by rowid

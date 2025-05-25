@@ -42,10 +42,43 @@ export const useEmbeddingFiles = () => {
     } else if (chunkMode === 'language_model_augmentation') {
       const llmContent = await LlmService.create({ event: chunkMode, messages: [{ 
           role: 'user', 
-          content: `You describe a code file for a RAG app (max 250 chars). Highlight what it does, how it fits in, signs of too many responsibilities, if tests are missing, or if syntax errors exist. Consider the following areas: navigation; refactoring; testing; debugging;\nfilename: ${name}\nfilepath: ${path}\nlanguage: ${language}\n\nHere is the code:\n${content}`}
-      ]})
+          content: `You are writing question and answers for a file part of a coding project. You carefully look for different features of the file you can describe. For example, is the file a package.json file and if yes, what dependencies does it contain or what is the entry point? Another example is checking if a file is having too much responsiblity or the purpose of the file. You could also look into test features, such as test framework, test cases or test classes. Additionally, you could write a question categorizing the file as module, config, test file or similar.
+Use this format:
+Q: your yes-question about ${name};
+A: your yes-answer about ${name};
+
+Here is the context:
+filename: ${name}
+filepath: ${path}
+language: ${language}
+content:
+${content}
+`}
+      ], response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "qa",
+          schema: {
+            type: "object",
+            properties: {
+              items: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    question: { type: "string" },
+                    answer: { type: "string" },
+                  },
+                },
+              },
+            }
+          },
+        },
+      }})
       
-      return `filename: ${name}\nfilepath: ${path}\nlanguage: ${language}\ndescription:${llmContent.content.message}`;
+      const qaSections = JSON.parse(llmContent.content).items.map((i:any)=>JSON.stringify(`Q:${i.question};\nA:${i.answer};`));
+      console.log(llmContent, qaSections)
+      return qaSections;
 
     } else {
       throw new Error("(useEmbeddingFiles): Chunk mode is not supported");

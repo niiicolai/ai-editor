@@ -7,7 +7,7 @@ import RequireRoleComponent from "../../components/RequireRoleComponent";
 import LineChartComponent from "../../components/LineChartComponent";
 
 export default function SampleIndexView() {
-  const { page, limit, nextPage, prevPage, setLimit } = usePagination();
+  const { page, limit, nextPage, prevPage, setLimit } = usePagination(8);
   const { data, isLoading, error } = useGetSamples(page, limit);
 
   const downloadCSV = () => {
@@ -16,6 +16,7 @@ export default function SampleIndexView() {
     const headers = [
       "Question",
       "Answer",
+      "Retrieved Documents",
       "Event",
       "LLM",
       "Embedding Model",
@@ -31,6 +32,7 @@ export default function SampleIndexView() {
     const rows = data.samples.map((sample: SampleType) => [
       `"${sample.input_prompt.replace(/"/g, '""')}"`,
       `"${sample.output_response.replace(/"/g, '""')}"`,
+      `"${JSON.stringify(sample.input_embedded_files).replace(/"/g, '""')}"`,
       `"${sample.event}"`,
       `"${sample.config.llm}"`,
       `"${sample.config.embedding_model}"`,
@@ -192,33 +194,122 @@ export default function SampleIndexView() {
                       <div className="flex gap-4">
                         {data && (
                           <div className="flex gap-1 text-xs text-center">
-                            <div className="w-24 flex flex-col gap-3 p-3 border border-gray-300 bg-emerald-400 text-white rounded-md">
+                            <div className="w-24 flex flex-col gap-1 p-3 border border-gray-300 bg-emerald-400 text-white rounded-md">
                               <div className="font-bold h-12 flex flex-col items-center justify-center">
-                                Average Context Precision
+                                Context Precision
                               </div>
                               <div>
-                                {data.stats.average_context_precision.toFixed(
-                                  2
-                                )}
+                                <div className="flex justify-between gap-1">
+                                  <span>Average:</span>
+                                  <span>
+                                    {data.stats.average_context_precision.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between gap-1">
+                                  <span>Median:</span>
+                                  <span>
+                                    {data.stats.median_context_precision.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between gap-1">
+                                  <span>Min:</span>
+                                  <span>
+                                    {data.stats.min_context_precision.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between gap-1">
+                                  <span>Max:</span>
+                                  <span>
+                                    {data.stats.max_context_precision.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
                               </div>
                             </div>
 
-                            <div className="w-24 flex flex-col gap-3 p-3 border border-gray-300 bg-red-400 text-white rounded-md">
+                            <div className="w-24 flex flex-col gap-1 p-3 border border-gray-300 bg-red-400 text-white rounded-md">
                               <div className="font-bold h-12 flex flex-col items-center justify-center">
-                                Average Response Relevancy
+                                Response Relevancy
                               </div>
                               <div>
-                                {data.stats.average_response_relevancy.toFixed(
-                                  2
-                                )}
+                                <div className="flex justify-between gap-1">
+                                  <span>Average:</span>
+                                  <span>
+                                    {data.stats.average_response_relevancy.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between gap-1">
+                                  <span>Median:</span>
+                                  <span>
+                                    {data.stats.median_response_relevancy.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between gap-1">
+                                  <span>Min:</span>
+                                  <span>
+                                    {data.stats.min_response_relevancy.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between gap-1">
+                                  <span>Max:</span>
+                                  <span>
+                                    {data.stats.max_response_relevancy.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                            <div className="w-24 flex flex-col gap-3 p-3 border border-gray-300 bg-blue-400 text-white rounded-md">
+                            <div className="w-24 flex flex-col gap-1 p-3 border border-gray-300 bg-blue-400 text-white rounded-md">
                               <div className="font-bold h-12 flex flex-col items-center justify-center">
-                                Average Faithfulness
+                                Faithfulness
                               </div>
                               <div>
-                                {data.stats.average_faithfulness.toFixed(2)}
+                                <div className="flex justify-between gap-1">
+                                  <span>Average:</span>
+                                  <span>
+                                    {data.stats.average_faithfulness.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between gap-1">
+                                  <span>Median:</span>
+                                  <span>
+                                    {data.stats.median_faithfulness.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between gap-1">
+                                  <span>Min:</span>
+                                  <span>
+                                    {data.stats.min_faithfulness.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between gap-1">
+                                  <span>Max:</span>
+                                  <span>
+                                    {data.stats.max_faithfulness.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -266,8 +357,8 @@ export default function SampleIndexView() {
                                 y1Label="Context Precision"
                                 y2Label="Response Relevancy"
                                 y3Label="Faithfulness"
-                                data={data.samples.map(
-                                  (sample: SampleType, index: number) => {
+                                data={data.samples
+                                  .map((sample: SampleType, index: number) => {
                                     return {
                                       x: index,
                                       y1: sample.metrics.context_precision,
@@ -279,8 +370,8 @@ export default function SampleIndexView() {
                                           ? "..."
                                           : ""),
                                     };
-                                  }
-                                ).reverse()}
+                                  })
+                                  .reverse()}
                               />
                             )}
                           </div>

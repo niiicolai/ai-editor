@@ -10,11 +10,9 @@ export default class LlmService {
   static async create(body: {
     event: string;
     messages: { role: string; content: string }[];
+    response_format?: any
   }): Promise<{
-    content: {
-        message: string;
-        code: string;
-    };
+    content: any;
   }> {
     const response = await fetch(`${API_URL}/api/v1/create_llm_message`, {
       method: "POST",

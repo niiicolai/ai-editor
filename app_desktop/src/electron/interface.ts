@@ -154,7 +154,7 @@ declare global {
       paginateQA: (
         page: number,
         limit: number,
-        file_id: string,
+        project_id: string,
         embeddingModel: string
       ) => void;
       onPaginateQA: (callback: (content: any) => void) => void;

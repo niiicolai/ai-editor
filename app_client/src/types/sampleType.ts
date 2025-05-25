@@ -29,5 +29,14 @@ export interface SamplesType {
         average_context_precision: number;
         average_response_relevancy: number;
         average_faithfulness: number;
+        min_context_precision: number;
+        max_context_precision: number;        
+        min_response_relevancy: number;       
+        max_response_relevancy: number;               
+        min_faithfulness: number;
+        max_faithfulness: number;
+        median_context_precision: number;
+        median_response_relevancy: number;
+        median_faithfulness: number;
     }
 }

@@ -11,13 +11,19 @@ import {
 } from "../../hooks/useEmbeddedFile";
 import { EmbeddedFileType } from "../../types/embeddedFileType";
 import { QAType } from "../../types/qaType";
+import { useGetQAs } from "../../hooks/useQAFile";
 
 function ProjectIndexIndexView() {
   const projectIndex = useSelector((state: RootState) => state.projectIndex);
   const hierarchy = useSelector((state: RootState) => state.hierarchy);
   const projectId = projectIndex.meta?._id as string;
   const { page, limit, prevPage, nextPage } = usePagination(10);
-  const { data, isLoading, error } = useGetEmbeddedFiles(
+  /*const { data, isLoading, error } = useGetEmbeddedFiles(
+    page,
+    limit,
+    projectId
+  );*/
+  const { data, isLoading, error } = useGetQAs(
     page,
     limit,
     projectId
@@ -50,7 +56,7 @@ function ProjectIndexIndexView() {
                   : hierarchy.currentPath}
               </h3>
               <div className="flex justify-start items-center gap-3">
-                {data?.success && data?.result.files.length > 0 && (
+                {data?.success && data?.result.data.length > 0 && (
                   <button
                     onClick={handleDestroyFiles}
                     className="px-4 py-2 rounded-md button-main"
@@ -99,55 +105,24 @@ function ProjectIndexIndexView() {
                     <p>{error.message}</p>
                   </div>
                 )}
-                {data?.success && data?.result.files.length === 0 && (
+                {data?.success && data?.result.data.length === 0 && (
                   <div className="p-3">
                     <p>No files found</p>
                   </div>
                 )}
                 {data?.success &&
-                  data?.result.files.map((embeddedFile: EmbeddedFileType) => (
+                  data?.result.data.map((qa: QAType) => (
                     <div
-                      key={embeddedFile.rowid}
+                      key={qa.rowid}
                       className="px-4 py-2 border-b border-color"
                     >
                       <div className="flex items-center justify-between">
                         <h4 className="text-sm font-medium main-color">
-                          {embeddedFile.filename}
+                          {qa.rowid}
                         </h4>
                         <p className="text-sm text-gray-500">
-                          {embeddedFile.filepath}
+                          {qa.qa}
                         </p>
-                      </div>
-                      <div className="flex flex-col gap-3 mb-3">
-                        <div className="text-xs text-gray-400 flex flex-col gap-1">
-                          {embeddedFile?.question_answers?.map((qa:QAType) => (
-                            <div key={qa.rowid} className="border border-color p-3">
-                              {qa.qa}
-                            </div>
-                          ))}
-                          {!embeddedFile?.question_answers?.length && (
-                            <div className="border border-color p-3">
-                              No question and answers found
-                            </div>
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-400">
-                          Hash: {embeddedFile.hash}
-                        </p>
-                        <div>
-                          <button
-                            onClick={() =>
-                              handleDestroyFile(embeddedFile.rowid)
-                            }
-                            className="px-4 py-2 rounded-md button-main"
-                          >
-                            {destroyFile.isPending ? (
-                              <Loader className="w-4 h-4" />
-                            ) : (
-                              "Delete"
-                            )}
-                          </button>
-                        </div>
                       </div>
                     </div>
                   ))}

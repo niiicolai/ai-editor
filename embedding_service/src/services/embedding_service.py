@@ -1,3 +1,4 @@
+import torch
 from transformers import AutoModel, AutoTokenizer
 from sentence_transformers import SentenceTransformer
 
@@ -6,8 +7,17 @@ def codeT5p(chunks, device='cpu'):
     tokenizer = AutoTokenizer.from_pretrained(checkpoint, trust_remote_code=True)
     model = AutoModel.from_pretrained(checkpoint, trust_remote_code=True).to(device)
     inputs = tokenizer(chunks, return_tensors="pt", padding=True, truncation=True).to(device)
-    embeddings = model(**inputs)[0]
-    return embeddings.tolist()
+    with torch.no_grad():
+        outputs = model(**inputs)
+    # If model returns a tuple, take the first element (the embeddings)
+    if isinstance(outputs, tuple):
+        embeddings = outputs[0]
+    else:
+        embeddings = outputs
+    # If embeddings is a tensor, convert to list
+    if hasattr(embeddings, "tolist"):
+        embeddings = embeddings.tolist()
+    return embeddings
 
 def allMiniLmL6v2(chunks):
     model = SentenceTransformer('all-MiniLM-L6-v2')

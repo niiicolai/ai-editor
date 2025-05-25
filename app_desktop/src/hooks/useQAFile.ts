@@ -12,12 +12,12 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 
-export const useGetQAs = (page: number, limit: number, file_id: string) => {
+export const useGetQAs = (page: number, limit: number, project_id: string) => {
     const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
 
     return useQuery({ 
         queryKey: ['qas', page, limit], 
-        queryFn: () => paginateQA(page, limit, file_id, embeddingModel)
+        queryFn: () => paginateQA(page, limit, project_id, embeddingModel)
     });
 }
 
