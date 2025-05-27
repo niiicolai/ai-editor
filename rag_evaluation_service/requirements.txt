@@ -168,6 +168,8 @@ tenacity==9.1.2
 tensorboard==2.19.0
 tensorboard-data-server==0.7.2
 termcolor==2.5.0
+# Editable install with no version control (test-mandatory-backend==1.0)
+-e c:\users\niiic\desktop\test_mandatory_one_backend
 threadpoolctl==3.6.0
 tiktoken==0.9.0
 tokenizers==0.21.1
