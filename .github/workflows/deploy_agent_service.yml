@@ -75,7 +75,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd ./agent_service
-          npm ci
+          npm install
         
       - name: Wait for dependencies (mongodb and rabbitmq)
         run: |
@@ -90,7 +90,7 @@ jobs:
       - name: Install frontend dependencies
         run: |
           cd ./app_client
-          npm ci
+          npm install
 
       - name: Add .env file to frontend
         run: |
