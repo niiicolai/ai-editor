@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: | 
           cd ./agent_service
-          npm ci
+          npm install
 
       - name: Remove .env file
         run: |
