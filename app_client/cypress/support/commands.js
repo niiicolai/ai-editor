@@ -39,34 +39,70 @@
 // A method for handling login and goto by base url.
 // Inspired by https://github.com/OliverRoat/kea_car_frontend/blob/main/cypress/support/commands.js
 
-Cypress.Commands.add('login', () => {
-    cy.fixture('config').then(({ baseURL }) => {
-        cy.fixture('user').then(({ email, password }) => {
-            // Load the login page.
-            cy.visit(`${baseURL}/user/login`);
+Cypress.Commands.add("login", () => {
+  cy.fixture("config").then(({ baseURL }) => {
+    cy.fixture("user").then(({ email, password }) => {
+      // Load the login page.
+      cy.visit(`${baseURL}/user/login`);
 
-            // Fill in the email information.
-            cy.get('[data-testid=email-login-input] input').type(email);
-            cy.get('[data-testid=email-login-input] input').should('have.value', email);
+      // Fill in the email information.
+      cy.get("[data-testid=email-login-input] input").type(email);
+      cy.get("[data-testid=email-login-input] input").should(
+        "have.value",
+        email
+      );
 
-            // Fill in the password information.
-            cy.get('[data-testid=password-login-input] input').type(password);
-            cy.get('[data-testid=password-login-input] input').should('have.value', password);
+      // Fill in the password information.
+      cy.get("[data-testid=password-login-input] input").type(password);
+      cy.get("[data-testid=password-login-input] input").should(
+        "have.value",
+        password
+      );
 
-            // Click the login button.
-            cy.get('[data-testid=login-button]').click();
-        });
+      // Click the login button.
+      cy.get("[data-testid=login-button]").click();
     });
-})
+  });
+});
 
-Cypress.Commands.add('goto', (path) => {
-    cy.fixture('config').then(({ baseURL }) => {
-        cy.visit(`${baseURL}${path}`);
-    });
-})
+Cypress.Commands.add("signup", (username, email, password) => {
+  cy.fixture("config").then(({ baseURL }) => {
+    // Load the signup page.
+    cy.visit(`${baseURL}/user/signup`);
 
-Cypress.Commands.add('urlShould', (path) => {
-    cy.fixture('config').then(({ baseURL }) => {
-        cy.url().should('eq', `${baseURL}${path}`);
-    });
-})
+    cy.get("[data-testid=username-signup-input] input").type(username);
+    cy.get("[data-testid=username-signup-input] input").should(
+      "have.value",
+      username
+    );
+
+    // Fill in the email information.
+    cy.get("[data-testid=email-signup-input] input").type(email);
+    cy.get("[data-testid=email-signup-input] input").should(
+      "have.value",
+      email
+    );
+
+    // Fill in the password information.
+    cy.get("[data-testid=password-signup-input] input").type(password);
+    cy.get("[data-testid=password-signup-input] input").should(
+      "have.value",
+      password
+    );
+
+    // Click the signup button.
+    cy.get("[data-testid=signup-button]").click();
+  });
+});
+
+Cypress.Commands.add("goto", (path) => {
+  cy.fixture("config").then(({ baseURL }) => {
+    cy.visit(`${baseURL}${path}`);
+  });
+});
+
+Cypress.Commands.add("urlShould", (path) => {
+  cy.fixture("config").then(({ baseURL }) => {
+    cy.url().should("eq", `${baseURL}${path}`);
+  });
+});
