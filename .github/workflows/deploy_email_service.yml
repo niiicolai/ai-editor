@@ -1,9 +1,9 @@
-name: Deploy Docs Service
+name: Deploy Email Service
 
 on:
   push:
     branches:
-      - release-docs-service
+      - release-email-service
 
 jobs:
   build:
@@ -16,17 +16,17 @@ jobs:
 
       - name: Create .env file
         run: | 
-          cd ./docs_service
-          echo "${{ secrets.DOCS_ENV_FILE }}" > .env    
+          cd ./email_service
+          echo "${{ secrets.EMAIL_ENV_FILE }}" > .env    
 
       - name: Install dependencies
         run: | 
-          cd ./docs_service
+          cd ./email_service
           npm install
 
       - name: Remove .env file
         run: |
-          cd ./docs_service
+          cd ./email_service
           rm .env
   
   test:
@@ -34,6 +34,18 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MONGO_HOST: 127.0.0.1 
+      RABBITMQ_HOST: 127.0.0.1
+    services:
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672  
+          - 15672:15672 
+        options: >-
+          --health-cmd "rabbitmqctl status"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -51,8 +63,8 @@ jobs:
 
       - name: Create .env file
         run: |
-          cd ./docs_service
-          echo "${{ secrets.DOCS_TEST_ENV_FILE }}" > .env   
+          cd ./email_service
+          echo "${{ secrets.EMAIL_TEST_ENV_FILE }}" > .env   
 
       - name: Install mongosh
         run: |
@@ -63,22 +75,22 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd ./docs_service
+          cd ./email_service
           npm install
         
       - name: Wait for dependencies (mongodb and rabbitmq)
         run: |
-          cd ./docs_service
+          cd ./email_service
           sh ./wait_for_dependencies.sh
 
       - name: Run tests
         run: |
-          cd ./docs_service
+          cd ./email_service
           npm test  
 
       - name: Remove .env file
         run: |
-          cd ./docs_service
+          cd ./email_service
           rm .env
          
   deploy:
@@ -92,8 +104,8 @@ jobs:
 
     - name: Create .env file
       run: |
-          cd ./docs_service
-          echo "${{ secrets.AUTH_ENV_FILE }}" > .env
+          cd ./email_service
+          echo "${{ secrets.EMAIL_ENV_FILE }}" > .env
 
     - name: SSH and Remove old files
       uses: appleboy/ssh-action@master
@@ -102,7 +114,7 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          rm -rf ${{ secrets.SERVER_LOCATION }}/github/workspace/docs_service
+          rm -rf ${{ secrets.SERVER_LOCATION }}/github/workspace/email_service
     
     - name: SCP files to server
       uses: appleboy/scp-action@v0.1.7
@@ -110,7 +122,7 @@ jobs:
         host: "${{ secrets.SERVER_HOST }}"
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "${{ github.workspace }}/docs_service"
+        source: "${{ github.workspace }}/email_service"
         target: "${{ secrets.SERVER_LOCATION }}"
     
     - name: SSH and Docker build
@@ -120,11 +132,11 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd ${{ secrets.SERVER_LOCATION }}/github/workspace/docs_service
-          docker build -t ${{ secrets.DOCS_IMAGE_NAME }}:${{ secrets.DOCS_IMAGE_TAG }} .
+          cd ${{ secrets.SERVER_LOCATION }}/github/workspace/email_service
+          docker build -t ${{ secrets.EMAIL_IMAGE_NAME }}:${{ secrets.EMAIL_IMAGE_TAG }} .
           docker image prune -f
     
     - name: Remove .env file
       run: |
-          cd ./docs_service
+          cd ./email_service
           rm .env
