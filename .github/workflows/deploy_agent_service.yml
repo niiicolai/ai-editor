@@ -103,7 +103,9 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Create .env file
-      run: echo "${{ secrets.AGENT_ENV_FILE }}" > .env
+      run: |
+          cd ./app_client
+          echo "${{ secrets.AGENT_ENV_FILE }}" > .env
 
     - name: SSH and Remove old files
       uses: appleboy/ssh-action@master
