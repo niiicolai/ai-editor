@@ -34,6 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MONGO_HOST: 127.0.0.1 
+      RABBITMQ_HOST: 127.0.0.1
     services:
       rabbitmq:
         image: rabbitmq:3-management
