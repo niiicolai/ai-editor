@@ -111,6 +111,7 @@ The Email Service is a backend microservice focused on handling email-related op
 | **Docker**             | Dockerfile                          |   [ ]   |
 
 ## Embedding Service
+[![Deploy Embedding Service](https://github.com/niiicolai/ai-editor/actions/workflows/deploy_embedding_service.yml/badge.svg)](https://github.com/niiicolai/ai-editor/actions/workflows/deploy_embedding_service.yml)
 
 ## RAG Evaluation Service
 [![Deploy RAG Evaluation Service](https://github.com/niiicolai/ai-editor/actions/workflows/deploy_rag_evaluation_service.yml/badge.svg)](https://github.com/niiicolai/ai-editor/actions/workflows/deploy_rag_evaluation_service.yml)

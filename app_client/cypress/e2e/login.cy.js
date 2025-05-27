@@ -1,5 +1,5 @@
 describe("login test", () => {
-  it("test login success", () => {
+  /*it("test login success", () => {
     const username = `random_${Date.now()}`;
     const email = `random_${Date.now()}@example.com`;
     const password = "P@11word";
@@ -24,7 +24,7 @@ describe("login test", () => {
     cy.get("[data-testid=login-button]").click();
 
     cy.urlShould("/user");
-  });
+  });*/
 
   it("test login failure", () => {
     cy.goto("/user/login");

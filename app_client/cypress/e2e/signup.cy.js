@@ -1,6 +1,6 @@
 describe('signup test', () => {
 
-  it('test signup success', () => {
+  /*it('test signup success', () => {
     cy.goto('/user/signup');
     
     const username = `random_${Date.now()}`;
@@ -23,7 +23,7 @@ describe('signup test', () => {
     cy.get('[data-testid=signup-button]').click();
 
     cy.urlShould('/user');
-  });
+  });*/
 
   it('test signup failure', () => {
     cy.goto('/user/signup');

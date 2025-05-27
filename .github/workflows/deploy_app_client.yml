@@ -71,7 +71,7 @@ jobs:
       - name: Create .env file
         run: |
           cd ./agent_service
-          echo "${{ secrets.TEST_APP_CLIENT_ENV_FILE }}" > .env   
+          echo "${{ secrets.APP_CLIENT_TEST_ENV_FILE }}" > .env   
 
       - name: Install dependencies
         run: |
@@ -109,7 +109,6 @@ jobs:
       - name: Start agent service in the background
         run: |
           cd ./agent_service
-          sh ./wait_for_dependencies.sh
           npm start &
 
       - name: Wait for agent service server to be ready
@@ -138,7 +137,6 @@ jobs:
       - name: Start payment service in the background
         run: |
           cd ./payment_service
-          sh ./wait_for_dependencies.sh
           npm start &
           
       - name: Wait for payment service server to be ready
