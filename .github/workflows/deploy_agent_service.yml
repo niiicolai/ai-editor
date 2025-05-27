@@ -114,7 +114,7 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          rm -rf ${{ secrets.SERVER_LOCATION }}/github/workspace
+          rm -rf ${{ secrets.SERVER_LOCATION }}/agent_service/github/workspace
     
     - name: SCP files to server
       uses: appleboy/scp-action@v0.1.7
@@ -123,7 +123,7 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: "${{ github.workspace }}/agent_service"
-        target: "${{ secrets.SERVER_LOCATION }}"
+        target: "${{ secrets.SERVER_LOCATION }}/agent_service"
     
     - name: SSH and Docker build
       uses: appleboy/ssh-action@master
@@ -132,7 +132,7 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd ${{ secrets.SERVER_LOCATION }}/github/workspace
+          cd ${{ secrets.SERVER_LOCATION }}/agent_service/github/workspace
           docker build -t ${{ secrets.AGENT_IMAGE_NAME }}:${{ secrets.AGENT_IMAGE_TAG }} .
           docker image prune -f
     
