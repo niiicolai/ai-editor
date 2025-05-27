@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "package": "npm run build && electron-builder",
-    "postinstall": "electron-rebuild -v 35.1.2"
+    "postinstall": "electron-rebuild -v 35.1.2",
+    "cy:run": "npx cypress run",
+    "cy:open": "npx cypress open"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
@@ -22,6 +24,7 @@
     "acorn-walk": "^8.3.4",
     "better-sqlite3": "^11.10.0",
     "crypto-js": "^4.2.0",
+    "cypress": "^14.4.0",
     "electron-squirrel-startup": "^1.0.1",
     "lucide-react": "^0.488.0",
     "monaco-editor": "^0.52.2",

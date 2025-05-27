@@ -7,12 +7,15 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cy:run": "npx cypress run",
+    "cy:open": "npx cypress open"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.4",
     "@tanstack/react-query": "^5.74.3",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "cypress": "^14.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",

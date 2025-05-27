@@ -43,6 +43,12 @@ To build the application for production, use:
 npm run build
 ```
 
+# Cypress End-to-end test
+```bash
+npm run cy:run
+npm run cy:open
+```
+
 ### Linting
 To lint the code, run:
 ```bash

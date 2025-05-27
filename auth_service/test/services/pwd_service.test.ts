@@ -21,6 +21,8 @@ test.each([
     [{ password: "aaaaaaaa1", e: "Password must contain at least one upper case letter" }],
     [{ password: "aaaaaaaA1", e: "Password must contain at least one special character" }],
     [{ password: "1111111!11", e: "Password must contain at least one lower case letter" }],
+    [{ password: "etheltgenerisDbru2ern!vnsomhar50tegnpræcistetheltgeneriskbrugernavnsomhar50tegnpræcist2", 
+       e: "Password must be at most 100 characters long" }],
 ])(
   "PwdService.hashPassword invalid partitions",
   async ({ password, e }) => {

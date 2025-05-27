@@ -13,6 +13,11 @@ npm install
 npm run dev
 ```
 
+# Cypress End-to-end test
+```bash
+npm run cy:run
+npm run cy:open
+```
 
 # Docker
 

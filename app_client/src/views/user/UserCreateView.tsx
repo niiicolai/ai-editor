@@ -22,7 +22,8 @@ function UserCreateView() {
             });
             navigate('/user');
         } catch (err) {
-            setFormError(err as string);
+            const message = JSON.parse((err as any)?.message).error
+            setFormError(message as string);
         }
     }
 
@@ -42,7 +43,7 @@ function UserCreateView() {
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="rounded-md shadow-sm -space-y-px">
-                        <div>
+                        <div data-testid="username-signup-input">
                             <label htmlFor="username" className="sr-only">Username</label>
                             <input
                                 id="username"
@@ -53,7 +54,7 @@ function UserCreateView() {
                                 placeholder="Username"
                             />
                         </div>
-                        <div>
+                        <div data-testid="email-signup-input">
                             <label htmlFor="email" className="sr-only">Email address</label>
                             <input
                                 id="email"
@@ -64,7 +65,7 @@ function UserCreateView() {
                                 placeholder="Email address"
                             />
                         </div>
-                        <div>
+                        <div data-testid="password-signup-input">
                             <label htmlFor="password" className="sr-only">Password</label>
                             <input
                                 id="password"
@@ -78,13 +79,14 @@ function UserCreateView() {
                     </div>
 
                     {(error || formError) && (
-                        <div className="text-red-500 text-sm text-center">
+                        <div className="text-red-500 text-sm text-center" data-testid="signup-error">
                             {formError || "An error occurred during signup"}
                         </div>
                     )}
 
                     <div>
                         <button
+                            data-testid="signup-button"
                             type="submit"
                             disabled={isPending}
                             className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
