@@ -6,9 +6,9 @@
   "scripts": {
     "start": "tsx index.ts",
     "test": "vitest",
-    "mongo:generate:migration": "node ./src/mongodb/migration.ts generate",
-    "mongo:migrate": "node ./src/mongodb/migration.ts up",
-    "mongo:migrate:undo": "node ./src/mongodb/migration.ts down"
+    "mongo:generate:migration": "tsx ./src/mongodb/migration.ts generate",
+    "mongo:migrate": "tsx ./src/mongodb/migration.ts up",
+    "mongo:migrate:undo": "tsx ./src/mongodb/migration.ts down"
   },
   "author": "",
   "license": "ISC",
