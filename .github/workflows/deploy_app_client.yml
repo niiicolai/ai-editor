@@ -1,0 +1,252 @@
+name: Deploy App Client
+
+on:
+  push:
+    branches:
+      - release-app-client
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Create .env file
+        run: | 
+          cd ./app_client
+          echo "${{ secrets.APP_CLIENT_ENV_FILE }}" > .env    
+
+      - name: Install dependencies
+        run: | 
+          cd ./app_client
+          npm install
+
+      - name: Remove .env file
+        run: |
+          cd ./app_client
+          rm .env
+  
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      MONGO_HOST: 127.0.0.1 
+      RABBITMQ_HOST: 127.0.0.1
+    services:
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672  
+          - 15672:15672 
+        options: >-
+          --health-cmd "rabbitmqctl status"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # https://engineering.synatic.com/a-simple-way-to-run-a-mongodb-replica-set-in-github-actions
+      - name: Start mongo
+        id: start-mongo
+        run: docker run --rm -d -p 27017:27017 --name mongo  mongo:4.4.9 --replSet test --bind_ip_all
+      - name: Initialize MongoDB Replica Set
+        run: |
+          sleep 5 # Give mongo a chance to start up
+          docker run --rm mongo:6.0 mongosh --host 172.17.0.1 --eval 'rs.initiate({_id: "test", members: [{_id: 0, host: "172.17.0.1:27017"}]})'
+          
+      - name: Install mongosh
+        run: |
+          wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+          echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+          sudo apt-get update
+          sudo apt-get install -y mongodb-mongosh
+
+      - name: Create .env file
+        run: |
+          cd ./agent_service
+          echo "${{ secrets.TEST_APP_CLIENT_ENV_FILE }}" > .env   
+
+      - name: Install dependencies
+        run: |
+          cd ./app_client
+          npm install
+
+      - name: Start frontend server in the background
+        run: |
+          cd ./app_client
+          npm run dev &
+
+      - name: Wait for frontend server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:5173 > /dev/null; then
+              echo "Frontend server is ready!"
+              exit 0
+            fi
+            echo "Waiting for frontend server to be ready..."
+            sleep 2
+          done
+          echo "Frontend server did not become ready in time!"
+          exit 1
+
+      - name: Create agent service .env file
+        run: |
+          cd ./agent_service
+          echo "${{ secrets.AGENT_TEST_ENV_FILE }}" > .env   
+        
+      - name: Install agent service dependencies
+        run: |
+          cd ./agent_service
+          npm install
+
+      - name: Start agent service in the background
+        run: |
+          cd ./agent_service
+          sh ./wait_for_dependencies.sh
+          npm start &
+
+      - name: Wait for agent service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3001 > /dev/null; then
+              echo "Frontend server is ready!"
+              exit 0
+            fi
+            echo "Waiting for agent service server to be ready..."
+            sleep 2
+          done
+          echo "agent service server did not become ready in time!"
+          exit 1
+
+      - name: Create payment service .env file
+        run: |
+          cd ./payment_service
+          echo "${{ secrets.PAYMENT_TEST_ENV_FILE }}" > .env   
+        
+      - name: Install payment service dependencies
+        run: |
+          cd ./payment_service
+          npm install
+
+      - name: Start payment service in the background
+        run: |
+          cd ./payment_service
+          sh ./wait_for_dependencies.sh
+          npm start &
+          
+      - name: Wait for payment service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3002 > /dev/null; then
+              echo "Frontend server is ready!"
+              exit 0
+            fi
+            echo "Waiting for payment service server to be ready..."
+            sleep 2
+          done
+          echo "payment service server did not become ready in time!"
+          exit 1
+      
+      - name: Create auth service .env file
+        run: |
+          cd ./auth_service
+          echo "${{ secrets.AUTH_TEST_ENV_FILE }}" > .env   
+        
+      - name: Install auth service dependencies
+        run: |
+          cd ./auth_service
+          npm install
+
+      - name: Start auth service in the background
+        run: |
+          cd ./auth_service
+          sh ./wait_for_dependencies.sh
+          npm start &
+          
+      - name: Wait for auth service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3000 > /dev/null; then
+              echo "Frontend server is ready!"
+              exit 0
+            fi
+            echo "Waiting for auth service server to be ready..."
+            sleep 2
+          done
+          echo "auth service server did not become ready in time!"
+          exit 1
+
+      - name: Run E2E tests
+        run: |
+          cd ./app_client
+          npx cypress run
+
+      - name: Remove agent .env file
+        run: |
+          cd ./agent_service
+          rm .env
+      - name: Remove payment .env file
+        run: |
+          cd ./payment_service
+          rm .env
+      - name: Remove auth .env file
+        run: |
+          cd ./auth_service
+          rm .env
+      - name: Remove frontend .env file
+        run: |
+          cd ./app_client
+          rm .env
+         
+  deploy:
+    needs: 
+      - build
+      - test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Create .env file
+      run: |
+          cd ./app_client
+          echo "${{ secrets.AGENT_ENV_FILE }}" > .env
+
+    - name: SSH and Remove old files
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          rm -rf ${{ secrets.SERVER_LOCATION }}/github/workspace
+    
+    - name: SCP files to server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: "${{ secrets.SERVER_HOST }}"
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "${{ github.workspace }}/app_client"
+        target: "${{ secrets.SERVER_LOCATION }}"
+    
+    - name: SSH and Docker build
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd ${{ secrets.SERVER_LOCATION }}/github/workspace
+          docker build -t ${{ secrets.AGENT_IMAGE_NAME }}:${{ secrets.AGENT_IMAGE_TAG }} .
+          docker image prune -f
+    
+    - name: Remove .env file
+      run: rm .env
