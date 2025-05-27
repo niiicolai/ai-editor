@@ -1,19 +1,6 @@
 
 services:
 
-  editor_nginx:
-    container_name: editor_nginx
-    image: nginx
-    ports:
-      - "80:80"
-      - "443:433"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-    restart: unless-stopped
-    networks:
-      - app-network
-
   editor_mongodb:
     container_name: editor_mongodb
     image: mongo
@@ -132,6 +119,16 @@ services:
       - "3003:3003"
     env_file:
       - ./embedding_service/.env.docker
+    networks:
+      - app-network
+
+  editor_rag_evaluation_service:
+    container_name: editor_rag_evaluation_service
+    image: rag_evaluation_service:v1.0
+    ports:
+      - "3005:3005"
+    env_file:
+      - .env.docker
     networks:
       - app-network
 

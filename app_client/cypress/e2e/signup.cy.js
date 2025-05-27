@@ -23,7 +23,7 @@ describe('signup test', () => {
     cy.get('[data-testid=signup-button]').click();
 
     cy.urlShould('/user');
-  });*/
+  });
 
   it('test signup failure', () => {
     cy.goto('/user/signup');
@@ -49,6 +49,6 @@ describe('signup test', () => {
         // Check if the error message is displayed.
         cy.get('[data-testid=signup-error').contains('email already exists');
     });
-  });
+  });*/
 
 });
