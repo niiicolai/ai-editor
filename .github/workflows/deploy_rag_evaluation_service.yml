@@ -1,0 +1,152 @@
+name: Deploy RAG Evaluation Service
+
+on:
+  push:
+    branches:
+      - release-rag-evaluation-service
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Create .env file
+        run: | 
+          cd ./rag_evaluation_service
+          echo "${{ secrets.RAG_EVALUATION_ENV_FILE }}" > .env    
+
+      - name: Install dependencies
+        run: | 
+          cd ./rag_evaluation_service
+          python -m pip install --upgrade pip
+          pip install wheel
+          pip install "fastapi[standard]"
+          pip install -r requirements.txt
+
+      - name: Remove .env file
+        run: |
+          cd ./rag_evaluation_service
+          rm .env
+  
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      MONGO_HOST: 127.0.0.1 
+      RABBITMQ_HOST: 127.0.0.1
+    services:
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672  
+          - 15672:15672 
+        options: >-
+          --health-cmd "rabbitmqctl status"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      # https://engineering.synatic.com/a-simple-way-to-run-a-mongodb-replica-set-in-github-actions
+      - name: Start mongo
+        id: start-mongo
+        run: docker run --rm -d -p 27017:27017 --name mongo  mongo:4.4.9 --replSet test --bind_ip_all
+      - name: Initialize MongoDB Replica Set
+        run: |
+          sleep 5 # Give mongo a chance to start up
+          docker run --rm mongo:6.0 mongosh --host 172.17.0.1 --eval 'rs.initiate({_id: "test", members: [{_id: 0, host: "172.17.0.1:27017"}]})'
+
+      - name: Create .env file
+        run: |
+          cd ./rag_evaluation_service
+          echo "${{ secrets.RAG_EVALUATION_TEST_ENV_FILE }}" > .env   
+
+      - name: Install mongosh
+        run: |
+          wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+          echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+          sudo apt-get update
+          sudo apt-get install -y mongodb-mongosh
+
+      - name: Install dependencies
+        run: | 
+          cd ./rag_evaluation_service
+          python -m pip install --upgrade pip
+          pip install wheel
+          pip install "fastapi[standard]"
+          pip install -r requirements.txt
+        
+      - name: Wait for dependencies (mongodb and rabbitmq)
+        run: |
+          cd ./rag_evaluation_service
+          sh ./wait_for_dependencies.sh
+
+      - name: Run tests
+        run: |
+          cd ./rag_evaluation_service
+          pytest
+
+      - name: Remove .env file
+        run: |
+          cd ./rag_evaluation_service
+          rm .env
+         
+  deploy:
+    needs: 
+      - build
+      - test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Create .env file
+      run: |
+          cd ./rag_evaluation_service
+          echo "${{ secrets.RAG_EVALUATION_ENV_FILE }}" > .env
+
+    - name: SSH and Remove old files
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          rm -rf ${{ secrets.SERVER_LOCATION }}/github/workspace/rag_evaluation_service
+    
+    - name: SCP files to server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: "${{ secrets.SERVER_HOST }}"
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "${{ github.workspace }}/rag_evaluation_service"
+        target: "${{ secrets.SERVER_LOCATION }}"
+    
+    - name: SSH and Docker build
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd ${{ secrets.SERVER_LOCATION }}/github/workspace/rag_evaluation_service
+          docker build -t ${{ secrets.RAG_EVALUATION_IMAGE_NAME }}:${{ secrets.RAG_EVALUATION_IMAGE_TAG }} .
+          docker image prune -f
+    
+    - name: Remove .env file
+      run: |
+          cd ./rag_evaluation_service
+          rm .env
