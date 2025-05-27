@@ -1,9 +1,9 @@
-name: Deploy Payment Service
+name: Deploy Docs Service
 
 on:
   push:
     branches:
-      - release-payment-service
+      - release-docs-service
 
 jobs:
   build:
@@ -16,17 +16,17 @@ jobs:
 
       - name: Create .env file
         run: | 
-          cd ./payment_service
-          echo "${{ secrets.PAYMENT_ENV_FILE }}" > .env    
+          cd ./docs_service
+          echo "${{ secrets.DOCS_ENV_FILE }}" > .env    
 
       - name: Install dependencies
         run: | 
-          cd ./payment_service
+          cd ./docs_service
           npm install
 
       - name: Remove .env file
         run: |
-          cd ./payment_service
+          cd ./docs_service
           rm .env
   
   test:
@@ -63,8 +63,8 @@ jobs:
 
       - name: Create .env file
         run: |
-          cd ./payment_service
-          echo "${{ secrets.PAYMENT_TEST_ENV_FILE }}" > .env   
+          cd ./docs_service
+          echo "${{ secrets.DOCS_TEST_ENV_FILE }}" > .env   
 
       - name: Install mongosh
         run: |
@@ -75,22 +75,22 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd ./payment_service
+          cd ./docs_service
           npm install
         
       - name: Wait for dependencies (mongodb and rabbitmq)
         run: |
-          cd ./payment_service
+          cd ./docs_service
           sh ./wait_for_dependencies.sh
 
       - name: Run tests
         run: |
-          cd ./payment_service
+          cd ./docs_service
           npm test  
 
       - name: Remove .env file
         run: |
-          cd ./payment_service
+          cd ./docs_service
           rm .env
          
   deploy:
@@ -104,7 +104,7 @@ jobs:
 
     - name: Create .env file
       run: |
-          cd ./payment_service
+          cd ./docs_service
           echo "${{ secrets.AUTH_ENV_FILE }}" > .env
 
     - name: SSH and Remove old files
@@ -114,7 +114,7 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          rm -rf ${{ secrets.SERVER_LOCATION }}/github/workspace/payment_service
+          rm -rf ${{ secrets.SERVER_LOCATION }}/github/workspace/docs_service
     
     - name: SCP files to server
       uses: appleboy/scp-action@v0.1.7
@@ -122,7 +122,7 @@ jobs:
         host: "${{ secrets.SERVER_HOST }}"
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "${{ github.workspace }}/payment_service"
+        source: "${{ github.workspace }}/docs_service"
         target: "${{ secrets.SERVER_LOCATION }}"
     
     - name: SSH and Docker build
@@ -132,11 +132,11 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd ${{ secrets.SERVER_LOCATION }}/github/workspace/payment_service
-          docker build -t ${{ secrets.AGENT_IMAGE_NAME }}:${{ secrets.AGENT_IMAGE_TAG }} .
+          cd ${{ secrets.SERVER_LOCATION }}/github/workspace/docs_service
+          docker build -t ${{ secrets.DOCS_IMAGE_NAME }}:${{ secrets.DOCS_IMAGE_TAG }} .
           docker image prune -f
     
     - name: Remove .env file
       run: |
-          cd ./payment_service
+          cd ./docs_service
           rm .env

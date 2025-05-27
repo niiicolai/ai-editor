@@ -133,7 +133,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd ${{ secrets.SERVER_LOCATION }}/github/workspace/auth_service
-          docker build -t ${{ secrets.AGENT_IMAGE_NAME }}:${{ secrets.AGENT_IMAGE_TAG }} .
+          docker build -t ${{ secrets.AUTH_IMAGE_NAME }}:${{ secrets.AUTH_IMAGE_TAG }} .
           docker image prune -f
     
     - name: Remove .env file
