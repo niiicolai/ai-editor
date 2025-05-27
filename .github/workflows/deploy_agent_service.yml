@@ -1,4 +1,4 @@
-name: Agent Service CI/CD 
+name: Deploy Agent Service
 
 on:
   push:
