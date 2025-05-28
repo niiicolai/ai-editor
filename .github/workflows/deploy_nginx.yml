@@ -31,4 +31,5 @@ jobs:
           cd ${{ secrets.SERVER_LOCATION }}/github/workspace/nginx
           docker build -t ${{ secrets.NGINX_IMAGE_NAME }}:${{ secrets.NGINX_IMAGE_TAG }} .
           docker image prune -f
+          k3d image import ${{ secrets.NGINX_IMAGE_NAME }}:${{ secrets.NGINX_IMAGE_TAG }}
     

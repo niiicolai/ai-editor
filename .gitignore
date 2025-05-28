@@ -1,5 +1,6 @@
 .env
 .env.docker
+.env.prod
 node_modules
 package-lock.json
 gmail_credentials.json

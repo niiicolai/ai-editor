@@ -246,6 +246,7 @@ jobs:
           cd ${{ secrets.SERVER_LOCATION }}/github/workspace/app_client
           docker build -t ${{ secrets.APP_CLIENT_IMAGE_NAME }}:${{ secrets.APP_CLIENT_IMAGE_TAG }} .
           docker image prune -f
+          k3d image import ${{ secrets.APP_CLIENT_IMAGE_NAME }}:${{ secrets.APP_CLIENT_IMAGE_TAG }}
     
     - name: Remove .env file
       run: |

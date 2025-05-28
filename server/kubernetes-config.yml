@@ -1,0 +1,733 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-agent-service
+  name: editor-agent-service
+spec:
+  ports:
+    - name: "3001"
+      port: 3001
+      targetPort: 3001
+    - name: "4001"
+      port: 4001
+      targetPort: 4001
+  selector:
+    io.kompose.service: editor-agent-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-app-client
+  name: editor-app-client
+spec:
+  ports:
+    - name: "5174"
+      port: 5174
+      targetPort: 5174
+  selector:
+    io.kompose.service: editor-app-client
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-auth-service
+  name: editor-auth-service
+spec:
+  ports:
+    - name: "3000"
+      port: 3000
+      targetPort: 3000
+  selector:
+    io.kompose.service: editor-auth-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-documentation-service
+  name: editor-documentation-service
+spec:
+  ports:
+    - name: "3004"
+      port: 3004
+      targetPort: 3004
+  selector:
+    io.kompose.service: editor-documentation-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-email-service
+  name: editor-email-service
+spec:
+  ports:
+    - name: "3006"
+      port: 3006
+      targetPort: 3006
+  selector:
+    io.kompose.service: editor-email-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-embedding-service
+  name: editor-embedding-service
+spec:
+  ports:
+    - name: "3003"
+      port: 3003
+      targetPort: 3003
+  selector:
+    io.kompose.service: editor-embedding-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-mongodb
+  name: editor-mongodb
+spec:
+  ports:
+    - name: "27017"
+      port: 27017
+      targetPort: 27017
+  selector:
+    io.kompose.service: editor-mongodb
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-nginx
+  name: editor-nginx
+spec:
+  type: LoadBalancer
+  ports:
+    - name: "80"
+      port: 80
+      targetPort: 80
+    - name: "443"
+      port: 443
+      targetPort: 443
+  selector:
+    io.kompose.service: editor-nginx
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-payment-service
+  name: editor-payment-service
+spec:
+  ports:
+    - name: "3002"
+      port: 3002
+      targetPort: 3002
+  selector:
+    io.kompose.service: editor-payment-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-rabbitmq
+  name: editor-rabbitmq
+spec:
+  ports:
+    - name: "5672"
+      port: 5672
+      targetPort: 5672
+    - name: "15672"
+      port: 15672
+      targetPort: 15672
+  selector:
+    io.kompose.service: editor-rabbitmq
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-rag-evaluation-service
+  name: editor-rag-evaluation-service
+spec:
+  ports:
+    - name: "3005"
+      port: 3005
+      targetPort: 3005
+  selector:
+    io.kompose.service: editor-rag-evaluation-service
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-agent-service
+  name: editor-agent-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: editor-agent-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o ./kubernetes-files
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: editor-agent-service
+    spec:
+      containers:
+        - args:
+            - sh
+            - wait_for_start.sh
+          env:
+            - name: MONGO_HOST
+              value: editor-mongodb
+            - name: MONGO_PORT
+              value: "27017"
+            - name: RABBITMQ_HOST
+              value: editor-rabbitmq
+            - name: RABBITMQ_PORT
+              value: "5672"
+          image: agent_service:v1.0
+          name: editor-agent-service
+          ports:
+            - containerPort: 3001
+              protocol: TCP
+            - containerPort: 4001
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-app-client
+  name: editor-app-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: editor-app-client
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o ./kubernetes-files
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: editor-app-client
+    spec:
+      containers:
+        - image: app_client:v1.0
+          name: editor-app-client
+          ports:
+            - containerPort: 5174
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-auth-service
+  name: editor-auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: editor-auth-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o ./kubernetes-files
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: editor-auth-service
+    spec:
+      containers:
+        - args:
+            - sh
+            - wait_for_start.sh
+          env:
+            - name: MONGO_HOST
+              value: editor_mongodb
+            - name: MONGO_PORT
+              value: "27017"
+            - name: RABBITMQ_HOST
+              value: editor-rabbitmq
+            - name: RABBITMQ_PORT
+              value: "5672"
+          image: auth_service:v1.0
+          name: editor-auth-service
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-documentation-service
+  name: editor-documentation-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: editor-documentation-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o ./kubernetes-files
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: editor-documentation-service
+    spec:
+      containers:
+        - args:
+            - sh
+            - wait_for_start.sh
+          env:
+            - name: MONGO_HOST
+              value: editor-mongodb
+            - name: MONGO_PORT
+              value: "27017"
+          image: documentation_service:v1.0
+          name: editor-documentation-service
+          ports:
+            - containerPort: 3004
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-email-service
+  name: editor-email-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: editor-email-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o ./kubernetes-files
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: editor-email-service
+    spec:
+      containers:
+        - args:
+            - sh
+            - wait_for_start.sh
+          env:
+            - name: MONGO_HOST
+              value: editor-mongodb
+            - name: MONGO_PORT
+              value: "27017"
+            - name: RABBITMQ_HOST
+              value: editor-rabbitmq
+            - name: RABBITMQ_PORT
+              value: "5672"
+          image: email_service:v1.0
+          name: editor-email-service
+          ports:
+            - containerPort: 3006
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-embedding-service
+  name: editor-embedding-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: editor-embedding-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o ./kubernetes-files
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: editor-embedding-service
+    spec:
+      containers:
+        - image: embedding_service:v1.0
+          name: editor-embedding-service
+          ports:
+            - containerPort: 3003
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-mongodb
+  name: editor-mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: editor-mongodb
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o ./kubernetes-files
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: editor-mongodb
+    spec:
+      containers:
+        - args:
+            - mongod
+            - --replSet
+            - rs0
+            - --bind_ip_all
+          image: mongo
+          name: editor-mongodb
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: editor-nginx
+  labels:
+    io.kompose.service: editor-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: editor-nginx
+  template:
+    metadata:
+      labels:
+        io.kompose.service: editor-nginx
+    spec:
+      containers:
+        - image: editor_nginx:v1.0
+          name: editor-nginx
+          ports:
+            - containerPort: 80
+              protocol: TCP
+            - containerPort: 443
+              protocol: TCP
+          volumeMounts:
+            - name: certs
+              mountPath: /etc/letsencrypt
+              readOnly: true
+      volumes:
+        - name: certs
+          hostPath:
+            path: /etc/letsencrypt
+            type: Directory
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-payment-service
+  name: editor-payment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: editor-payment-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o ./kubernetes-files
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: editor-payment-service
+    spec:
+      containers:
+        - args:
+            - sh
+            - wait_for_start.sh
+          env:
+            - name: MONGO_HOST
+              value: editor-mongodb
+            - name: MONGO_PORT
+              value: "27017"
+            - name: RABBITMQ_HOST
+              value: editor-rabbitmq
+            - name: RABBITMQ_PORT
+              value: "5672"
+          image: payment_service:v1.0
+          name: editor-payment-service
+          ports:
+            - containerPort: 3002
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-rabbitmq
+  name: editor-rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: editor-rabbitmq
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o ./kubernetes-files
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: editor-rabbitmq
+    spec:
+      containers:
+        - image: rabbitmq:3-management
+          name: editor-rabbitmq
+          ports:
+            - containerPort: 5672
+              protocol: TCP
+            - containerPort: 15672
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o ./kubernetes-files
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: editor-rag-evaluation-service
+  name: editor-rag-evaluation-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: editor-rag-evaluation-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o ./kubernetes-files
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: editor-rag-evaluation-service
+    spec:
+      containers:
+        - image: rag_evaluation_service:v1.0
+          name: editor-rag-evaluation-service
+          ports:
+            - containerPort: 3005
+              protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: editor-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  tls:
+    - hosts:
+        - editor-agent.c7pixel.com
+      secretName: agent-tls
+    - hosts:
+        - editor-payment.c7pixel.com
+      secretName: payment-tls
+    - hosts:
+        - editor-auth.c7pixel.com
+      secretName: auth-tls
+    - hosts:
+        - editor-docs.c7pixel.com
+      secretName: docs-tls
+    - hosts:
+        - editor-email.c7pixel.com
+      secretName: email-tls
+    - hosts:
+        - editor-embedding.c7pixel.com
+      secretName: embedding-tls
+    - hosts:
+        - editor-rag-evaluation.c7pixel.com
+      secretName: rag-evaluation-tls
+    - hosts:
+        - demo.c7pixel.com
+      secretName: app-client-tls
+
+  rules:
+    - host: editor-agent.c7pixel.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: editor-nginx
+                port:
+                  number: 80
+    - host: editor-payment.c7pixel.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: editor-nginx
+                port:
+                  number: 80
+    - host: editor-auth.c7pixel.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: editor-nginx
+                port:
+                  number: 80
+    - host: editor-docs.c7pixel.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: editor-nginx
+                port:
+                  number: 80
+    - host: editor-email.c7pixel.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: editor-nginx
+                port:
+                  number: 80
+    - host: editor-embedding.c7pixel.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: editor-nginx
+                port:
+                  number: 80
+    - host: editor-rag-evaluation.c7pixel.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: editor-nginx
+                port:
+                  number: 80
+    - host: demo.c7pixel.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: editor-nginx
+                port:
+                  number: 80

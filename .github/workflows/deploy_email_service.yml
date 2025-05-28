@@ -135,6 +135,7 @@ jobs:
           cd ${{ secrets.SERVER_LOCATION }}/github/workspace/email_service
           docker build -t ${{ secrets.EMAIL_IMAGE_NAME }}:${{ secrets.EMAIL_IMAGE_TAG }} .
           docker image prune -f
+          k3d image import ${{ secrets.EMAIL_IMAGE_NAME }}:${{ secrets.EMAIL_IMAGE_TAG }}
     
     - name: Remove .env file
       run: |

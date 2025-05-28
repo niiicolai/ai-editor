@@ -123,6 +123,7 @@ jobs:
           cd ${{ secrets.SERVER_LOCATION }}/github/workspace/docs_service
           docker build -t ${{ secrets.DOCS_IMAGE_NAME }}:${{ secrets.DOCS_IMAGE_TAG }} .
           docker image prune -f
+          k3d image import ${{ secrets.DOCS_IMAGE_NAME }}:${{ secrets.DOCS_IMAGE_TAG }}
     
     - name: Remove .env file
       run: |

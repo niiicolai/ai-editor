@@ -124,6 +124,7 @@ jobs:
           cd ${{ secrets.SERVER_LOCATION }}/github/workspace/embedding_service
           docker build -t ${{ secrets.EMBEDDING_IMAGE_NAME }}:${{ secrets.EMBEDDING_IMAGE_TAG }} .
           docker image prune -f
+          k3d image import ${{ secrets.EMBEDDING_IMAGE_NAME }}:${{ secrets.EMBEDDING_IMAGE_TAG }}
     
     - name: Remove .env file
       run: |

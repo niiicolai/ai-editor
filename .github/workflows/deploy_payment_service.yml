@@ -135,6 +135,7 @@ jobs:
           cd ${{ secrets.SERVER_LOCATION }}/github/workspace/payment_service
           docker build -t ${{ secrets.PAYMENT_IMAGE_NAME }}:${{ secrets.PAYMENT_IMAGE_TAG }} .
           docker image prune -f
+          k3d image import ${{ secrets.PAYMENT_IMAGE_NAME }}:${{ secrets.PAYMENT_IMAGE_TAG }}
     
     - name: Remove .env file
       run: |

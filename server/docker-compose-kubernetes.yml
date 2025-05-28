@@ -1,18 +1,18 @@
 
 services:
 
-  editor_nginx:
-    container_name: editor_nginx
+  editor-nginx:
+    container_name: editor-nginx
     image: editor_nginx:v1.0
     ports:
       - "80:80"
       - "443:443"
-    restart: unless-stopped
+    restart: always
     networks:
       - app-network
 
-  editor_mongodb:
-    container_name: editor_mongodb
+  editor-mongodb:
+    container_name: editor-mongodb
     image: mongo
     ports:
       - "27017"
@@ -20,8 +20,8 @@ services:
       - app-network
     command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
 
-  editor_rabbitmq:
-    container_name: editor_rabbitmq
+  editor-rabbitmq:
+    container_name: editor-rabbitmq
     image: rabbitmq:3-management
     ports:
       - "5672"
@@ -29,107 +29,107 @@ services:
     networks:
       - app-network
 
-  editor_payment_service:
-    container_name: editor_payment_service
+  editor-payment-service:
+    container_name: editor-payment-service
     image: payment_service:v1.0
     ports:
       - "3002:3002"
     depends_on:
-      - editor_mongodb
-      - editor_rabbitmq
+      - editor-mongodb
+      - editor-rabbitmq
     environment:
-      - MONGO_HOST=editor_mongodb
+      - MONGO_HOST=editor-mongodb
       - MONGO_PORT=27017
-      - RABBITMQ_HOST=editor_rabbitmq
+      - RABBITMQ_HOST=editor-rabbitmq
       - RABBITMQ_PORT=5672
     networks:
       - app-network
     command: ["sh", "wait_for_start.sh"]
 
-  editor_documentation_service:
-    container_name: editor_documentation_service
+  editor-documentation-service:
+    container_name: editor-documentation-service
     image: documentation_service:v1.0
     ports:
       - "3004:3004"
     depends_on:
-      - editor_mongodb
+      - editor-mongodb
     environment:
-      - MONGO_HOST=editor_mongodb
+      - MONGO_HOST=editor-mongodb
       - MONGO_PORT=27017
     networks:
       - app-network
     command: ["sh", "wait_for_start.sh"]
 
-  editor_auth_service:
-    container_name: editor_auth_service
+  editor-auth-service:
+    container_name: editor-auth-service
     image: auth_service:v1.0
     ports:
       - "3000:3000"
     depends_on:
-      - editor_mongodb
-      - editor_rabbitmq
+      - editor-mongodb
+      - editor-rabbitmq
     environment:
       - MONGO_HOST=editor_mongodb
       - MONGO_PORT=27017
-      - RABBITMQ_HOST=editor_rabbitmq
+      - RABBITMQ_HOST=editor-rabbitmq
       - RABBITMQ_PORT=5672
     networks:
       - app-network
     command: ["sh", "wait_for_start.sh"]
 
-  editor_agent_service:
-    container_name: editor_agent_service
+  editor-agent-service:
+    container_name: editor-agent-service
     image: agent_service:v1.0
     ports:
       - "3001:3001"
       - "4001:4001"
     depends_on:
-      - editor_mongodb
-      - editor_rabbitmq
+      - editor-mongodb
+      - editor-rabbitmq
     environment:
-      - MONGO_HOST=editor_mongodb
+      - MONGO_HOST=editor-mongodb
       - MONGO_PORT=27017
-      - RABBITMQ_HOST=editor_rabbitmq
+      - RABBITMQ_HOST=editor-rabbitmq
       - RABBITMQ_PORT=5672
     networks:
       - app-network
     command: ["sh", "wait_for_start.sh"]
 
-  editor_email_service:
-    container_name: editor_email_service
+  editor-email-service:
+    container_name: editor-email-service
     image: email_service:v1.0
     ports:
       - "3006:3006"
     depends_on:
-      - editor_mongodb
-      - editor_rabbitmq
+      - editor-mongodb
+      - editor-rabbitmq
     environment:
-      - MONGO_HOST=editor_mongodb
+      - MONGO_HOST=editor-mongodb
       - MONGO_PORT=27017
-      - RABBITMQ_HOST=editor_rabbitmq
+      - RABBITMQ_HOST=editor-rabbitmq
       - RABBITMQ_PORT=5672
     networks:
       - app-network
     command: ["sh", "wait_for_start.sh"]
 
-  editor_embedding_service:
-    container_name: editor_embedding_service
+  editor-embedding-service:
+    container_name: editor-embedding-service
     image: embedding_service:v1.0
     ports:
       - "3003:3003"
     networks:
       - app-network
 
-  editor_rag_evaluation_service:
-    container_name: editor_rag_evaluation_service
+  editor-rag-evaluation-service:
+    container_name: editor-rag-evaluation-service
     image: rag_evaluation_service:v1.0
     ports:
       - "3005:3005"
     networks:
       - app-network
 
-  editor_app_client:
-    container_name: editor_app_client
+  editor-app-client:
+    container_name: editor-app-client
     image: app_client:v1.0
     ports:
       - "5174:5174"

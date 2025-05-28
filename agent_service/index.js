@@ -2,7 +2,7 @@ import "dotenv/config";
 import { mongoConnect } from "./src/mongodb/index.js";
 import { setupControllers } from "./src/controllers/index.js";
 import { setupRabbitMq } from "./src/rabbitmq/index.js";
-import { setupCron } from "./src/jobs/index.js";
+//import { setupCron } from "./src/jobs/index.js";
 import { setupSwagger } from "./src/controllers/swagger/swagger_controller.js";
 import { rateLimit } from 'express-rate-limit'
 import { setupWebsocket } from "./src/websocket/index.js";
@@ -31,7 +31,7 @@ mongoConnect()
     setupSwagger(app);
     setupRabbitMq();
     setupWebsocket();
-    setupCron();
+    //setupCron();
 
     app.listen(PORT, () => {
       console.log("INFO: MongoDB connected successfully");

@@ -216,16 +216,8 @@ The App Desktop is a full-featured desktop application built with React, Vite, a
 | **AI Code Completions**|                                     |   [ ]   |
 | **Docker**             | Dockerfile                          |   [ ]   |
 
-# Install Ubuntu Server
-1. Configure OpenSSH
-2. Install Docker (https://docs.docker.com/engine/install/ubuntu/)
-3. Install K3d (https://k3d.io/stable/#installation)
-4. Konvert `docker-compose-kubernetes.yml` to Kubernetes files using Kompose
-```
-# Install kompose.io (https://kompose.io/installation/)
-curl -L https://github.com/kubernetes/kompose/releases/download/v1.36.0/kompose-linux-amd64 -o kompose
-# Configure permissions
-chmod +x ./kompose
-# Convert Docker Compose file to Kubernetes config files
-./kompose convert
-``` 
+# Sample Projects
+
+# Sample Results
+
+# Server

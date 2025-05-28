@@ -135,6 +135,7 @@ jobs:
           cd ${{ secrets.SERVER_LOCATION }}/github/workspace/agent_service
           docker build -t ${{ secrets.AGENT_IMAGE_NAME }}:${{ secrets.AGENT_IMAGE_TAG }} .
           docker image prune -f
+          k3d image import ${{ secrets.AGENT_IMAGE_NAME }}:${{ secrets.AGENT_IMAGE_TAG }}
     
     - name: Remove .env file
       run: |
