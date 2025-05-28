@@ -27,5 +27,5 @@ docker build -t app_client:v1.0 .
 ```
 ## Run Docker Container
 ```bash
-docker run -d -p 5174:5174 app_client:v1.0
+docker run -d -p 5173:5173 app_client:v1.0
 ```
