@@ -93,7 +93,7 @@ jobs:
     - name: Create .env file
       run: |
           cd ./docs_service
-          echo "${{ secrets.AUTH_ENV_FILE }}" > .env
+          echo "${{ secrets.DOCS_ENV_FILE }}" > .env
 
     - name: SSH and Remove old files
       uses: appleboy/ssh-action@master
