@@ -25,4 +25,4 @@ RUN npm run build
 EXPOSE 5173
 
 # Define the command to serve your built static files
-CMD ["npx", "serve", "-s", "dist", "-l", "5173"]
+CMD ["npx", "serve", "-s", "dist", "-l", "0.0.0.0:5173"]
