@@ -1,9 +1,9 @@
 #!/bin/sh
 
-MONGO_HOST=${MONGO_HOST:-"editor-mongodb"}
+MONGO_HOST=${MONGO_HOST:-"mongodb"}
 MONGO_PORT=${MONGO_PORT:-"27017"}
 
-RABBITMQ_HOST=${RABBITMQ_HOST:-"editor-rabbitmq"}
+RABBITMQ_HOST=${RABBITMQ_HOST:-"rabbitmq"}
 RABBITMQ_PORT=${RABBITMQ_PORT:-"5672"}
 
 until mongosh --host "$MONGO_HOST" --port "$MONGO_PORT" --eval "db.adminCommand('ping')" >/dev/null 2>&1; do

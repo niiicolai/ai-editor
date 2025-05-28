@@ -311,7 +311,7 @@ spec:
             - wait_for_start.sh
           env:
             - name: MONGO_HOST
-              value: editor_mongodb
+              value: editor-mongodb
             - name: MONGO_PORT
               value: "27017"
             - name: RABBITMQ_HOST
