@@ -1,6 +1,6 @@
 describe('signup test', () => {
 
-  /*it('test signup success', () => {
+  it('test signup success', () => {
     cy.goto('/user/signup');
     
     const username = `random_${Date.now()}`;
@@ -49,6 +49,6 @@ describe('signup test', () => {
         // Check if the error message is displayed.
         cy.get('[data-testid=signup-error').contains('email already exists');
     });
-  });*/
+  });
 
 });

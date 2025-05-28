@@ -70,7 +70,7 @@ jobs:
 
       - name: Create .env file
         run: |
-          cd ./agent_service
+          cd ./app_client
           echo "${{ secrets.APP_CLIENT_TEST_ENV_FILE }}" > .env   
 
       - name: Install dependencies

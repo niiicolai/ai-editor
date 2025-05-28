@@ -153,3 +153,14 @@ The App Desktop is a full-featured desktop application built with React, Vite, a
 |                        | Research                            |   [ ]   |
 | **AI Code Completions**|                                     |   [ ]   |
 | **Docker**             | Dockerfile                          |   [ ]   |
+
+# Docker compose kubernetes
+1. Use docker-compose-kubernetes.yml
+```
+# Install kompose.io (https://kompose.io/installation/)
+curl -L https://github.com/kubernetes/kompose/releases/download/v1.36.0/kompose-linux-amd64 -o kompose
+# Configure permissions
+chmod +x ./kompose
+# Convert Docker Compose file to Kubernetes config files
+./kompose convert
+``` 

@@ -65,36 +65,6 @@ Cypress.Commands.add("login", () => {
   });
 });
 
-Cypress.Commands.add("signup", (username, email, password) => {
-  cy.fixture("config").then(({ baseURL }) => {
-    // Load the signup page.
-    cy.visit(`${baseURL}/user/signup`);
-
-    cy.get("[data-testid=username-signup-input] input").type(username);
-    cy.get("[data-testid=username-signup-input] input").should(
-      "have.value",
-      username
-    );
-
-    // Fill in the email information.
-    cy.get("[data-testid=email-signup-input] input").type(email);
-    cy.get("[data-testid=email-signup-input] input").should(
-      "have.value",
-      email
-    );
-
-    // Fill in the password information.
-    cy.get("[data-testid=password-signup-input] input").type(password);
-    cy.get("[data-testid=password-signup-input] input").should(
-      "have.value",
-      password
-    );
-
-    // Click the signup button.
-    cy.get("[data-testid=signup-button]").click();
-  });
-});
-
 Cypress.Commands.add("goto", (path) => {
   cy.fixture("config").then(({ baseURL }) => {
     cy.visit(`${baseURL}${path}`);
