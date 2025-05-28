@@ -7,3 +7,4 @@ gmail_token.json
 __pycache__
 venv
 .palm_project_index
+certs

@@ -116,7 +116,12 @@ The Email Service is a backend microservice focused on handling email-related op
 ## RAG Evaluation Service
 [![Deploy RAG Evaluation Service](https://github.com/niiicolai/ai-editor/actions/workflows/deploy_rag_evaluation_service.yml/badge.svg)](https://github.com/niiicolai/ai-editor/actions/workflows/deploy_rag_evaluation_service.yml)
 
+## Nginx
+
+
 ## App Client
+[![Deploy App Client](https://github.com/niiicolai/ai-editor/actions/workflows/deploy_app_client.yml/badge.svg)](https://github.com/niiicolai/ai-editor/actions/workflows/deploy_app_client.yml)
+
 The App Client is a modern frontend application built with React, featuring dynamic routing via React Router and styled using Tailwind CSS for a clean and responsive UI. While the core UI stack is fully implemented, Docker support for streamlined deployment is planned.
 
 ### Features

@@ -1,6 +1,16 @@
 
 services:
 
+  editor_nginx:
+    container_name: editor_nginx
+    image: editor_nginx:v1.0
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+    networks:
+      - app-network
+
   editor_mongodb:
     container_name: editor_mongodb
     image: mongo
