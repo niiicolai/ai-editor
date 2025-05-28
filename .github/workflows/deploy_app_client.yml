@@ -216,7 +216,7 @@ jobs:
     - name: Create .env file
       run: |
           cd ./app_client
-          echo "${{ secrets.AGENT_ENV_FILE }}" > .env
+          echo "${{ secrets.APP_CLIENT_ENV_FILE }}" > .env
 
     - name: SSH and Remove old files
       uses: appleboy/ssh-action@master
