@@ -12,7 +12,7 @@ import helmet from "helmet";
 mongoConnect()
   .then(() => {
     const app = express();
-    const PORT = process.env.WEB_PORT || 3001;
+    const PORT = process.env.WEB_PORT || 3002;
     const limiter = rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
       limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
@@ -21,10 +21,10 @@ mongoConnect()
     })
 
     app.use(cors({ origin: '*' }));
-    app.use(helmet());
+    //app.use(helmet());
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-    app.use(limiter);
+    //app.use(limiter);
     
     setupControllers(app);
     setupSwagger(app);
