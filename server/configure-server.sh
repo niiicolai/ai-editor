@@ -61,6 +61,7 @@ echo "k3d image import app_client:v1.0"
 
 echo "2. obtain TLS certificates using sudo certbot certonly --standalone -d domain"
 echo "sudo certbot certonly --standalone -d editor-agent.c7pixel.com"
+echo "sudo certbot certonly --standalone -d editor-agent-ws.c7pixel.com"
 echo "sudo certbot certonly --standalone -d editor-payment.c7pixel.com"
 echo "sudo certbot certonly --standalone -d editor-auth.c7pixel.com"
 echo "sudo certbot certonly --standalone -d editor-docs.c7pixel.com"
@@ -68,6 +69,7 @@ echo "sudo certbot certonly --standalone -d editor-email.c7pixel.com"
 echo "sudo certbot certonly --standalone -d editor-embedding.c7pixel.com"
 echo "sudo certbot certonly --standalone -d editor-rag-evaluation.c7pixel.com"
 echo "sudo certbot certonly --standalone -d demo.c7pixel.com"
+
 
 echo "3. add TLS secrets"
 echo "./kubectl create secret tls agent-tls \
@@ -94,6 +96,9 @@ echo "./kubectl create secret tls rag-evaluation-tls \
 echo "./kubectl create secret tls app-client-tls \
   --cert=/etc/letsencrypt/live/demo.c7pixel.com/fullchain.pem \
   --key=/etc/letsencrypt/live/demo.c7pixel.com/privkey.pem"
+echo "./kubectl create secret tls agent-ws-tls \
+  --cert=/etc/letsencrypt/live/editor-agent-ws.c7pixel.com/fullchain.pem \
+  --key=/etc/letsencrypt/live/editor-agent-ws.c7pixel.com/privkey.pem"
 
 echo "4 apply `kubernetes-config.yml`:"
 echo "./kubectl apply -f ./kubernetes-config.yml"

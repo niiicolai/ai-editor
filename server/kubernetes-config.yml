@@ -649,7 +649,9 @@ spec:
     - hosts:
         - demo.c7pixel.com
       secretName: app-client-tls
-
+    - hosts:
+        - editor-agent-ws.c7pixel.com
+      secretName: agent-ws-tls
   rules:
     - host: editor-agent.c7pixel.com
       http:
@@ -722,6 +724,16 @@ spec:
                 port:
                   number: 80
     - host: demo.c7pixel.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: editor-nginx
+                port:
+                  number: 80
+    - host: editor-agent-ws.c7pixel.com
       http:
         paths:
           - path: /
