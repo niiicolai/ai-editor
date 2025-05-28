@@ -31,9 +31,9 @@ metadata:
   name: editor-app-client
 spec:
   ports:
-    - name: "5174"
-      port: 5174
-      targetPort: 5174
+    - name: "5173"
+      port: 5173
+      targetPort: 5173
   selector:
     io.kompose.service: editor-app-client
 
@@ -278,7 +278,7 @@ spec:
         - image: app_client:v1.0
           name: editor-app-client
           ports:
-            - containerPort: 5174
+            - containerPort: 5173
               protocol: TCP
       restartPolicy: Always
 

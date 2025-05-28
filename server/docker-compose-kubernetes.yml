@@ -132,7 +132,7 @@ services:
     container_name: editor-app-client
     image: app_client:v1.0
     ports:
-      - "5174:5174"
+      - "5173:5173"
     networks:
       - app-network
 
