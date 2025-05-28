@@ -96,7 +96,6 @@ mpmath==1.3.0
 multidict==6.2.0
 multiprocess==0.70.16
 mypy_extensions==1.1.0
-mysqlclient==2.2.5
 namex==0.0.8
 nest-asyncio==1.6.0
 networkx==3.4.2
