@@ -247,7 +247,8 @@ jobs:
           docker build -t ${{ secrets.APP_CLIENT_IMAGE_NAME }}:${{ secrets.APP_CLIENT_IMAGE_TAG }} .
           docker image prune -f
           k3d image import ${{ secrets.APP_CLIENT_IMAGE_NAME }}:${{ secrets.APP_CLIENT_IMAGE_TAG }}
-          kubectl rollout restart editor-app-client
+          cd ${{ secrets.SERVER_LOCATION }}
+          ./kubectl rollout restart editor-app-client
     
     - name: Remove .env file
       run: |
