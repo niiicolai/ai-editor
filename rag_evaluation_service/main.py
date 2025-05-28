@@ -7,6 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.controllers.sample_controller import sample_controller
 from src.rabbitmq.sagas.new_sample_saga import start_consumer_thread
 
+load_dotenv()
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
