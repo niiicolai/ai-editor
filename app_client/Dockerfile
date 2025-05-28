@@ -22,7 +22,7 @@ RUN npm run build
 # RUN npm run sitemap
 
 # Expose the port your app runs on (if needed)
-EXPOSE 5174
+EXPOSE 5173
 
 # Define the command to serve your built static files
-CMD ["npx", "serve", "-s", "dist", "-l", "5174"]
+CMD ["npx", "serve", "-s", "dist", "-l", "5173"]
