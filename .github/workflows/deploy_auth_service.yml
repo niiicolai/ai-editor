@@ -77,6 +77,11 @@ jobs:
         run: |
           cd ./auth_service
           npm install
+        
+      - name: Wait for dependencies (mongodb and rabbitmq)
+        run: |
+          cd ./auth_service
+          sh ./wait_for_dependencies.sh
 
       - name: Run tests
         run: |
