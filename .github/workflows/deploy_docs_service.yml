@@ -124,6 +124,8 @@ jobs:
           docker build -t ${{ secrets.DOCS_IMAGE_NAME }}:${{ secrets.DOCS_IMAGE_TAG }} .
           docker image prune -f
           k3d image import ${{ secrets.DOCS_IMAGE_NAME }}:${{ secrets.DOCS_IMAGE_TAG }}
+          cd ${{ secrets.SERVER_LOCATION }}
+          ./kubectl get pods | grep documentation-service | awk '{print $1}' | xargs ./kubectl delete pod
     
     - name: Remove .env file
       run: |

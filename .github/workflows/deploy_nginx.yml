@@ -32,4 +32,6 @@ jobs:
           docker build -t ${{ secrets.NGINX_IMAGE_NAME }}:${{ secrets.NGINX_IMAGE_TAG }} .
           docker image prune -f
           k3d image import ${{ secrets.NGINX_IMAGE_NAME }}:${{ secrets.NGINX_IMAGE_TAG }}
+          cd ${{ secrets.SERVER_LOCATION }}
+          ./kubectl get pods | grep editor-nginx | awk '{print $1}' | xargs ./kubectl delete pod
     

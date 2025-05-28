@@ -136,6 +136,8 @@ jobs:
           docker build -t ${{ secrets.AUTH_IMAGE_NAME }}:${{ secrets.AUTH_IMAGE_TAG }} .
           docker image prune -f
           k3d image import ${{ secrets.AUTH_IMAGE_NAME }}:${{ secrets.AUTH_IMAGE_TAG }}
+          cd ${{ secrets.SERVER_LOCATION }}
+          ./kubectl get pods | grep auth-service | awk '{print $1}' | xargs ./kubectl delete pod
     
     - name: Remove .env file
       run: |

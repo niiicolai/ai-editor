@@ -125,6 +125,8 @@ jobs:
           docker build -t ${{ secrets.EMBEDDING_IMAGE_NAME }}:${{ secrets.EMBEDDING_IMAGE_TAG }} .
           docker image prune -f
           k3d image import ${{ secrets.EMBEDDING_IMAGE_NAME }}:${{ secrets.EMBEDDING_IMAGE_TAG }}
+          cd ${{ secrets.SERVER_LOCATION }}
+          ./kubectl get pods | grep embedding-service | awk '{print $1}' | xargs ./kubectl delete pod
     
     - name: Remove .env file
       run: |
