@@ -19,7 +19,7 @@ mongoConnect()
       legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
     })
 
-    app.use(cors({ origin: 'http://web.localhost' }));
+    app.use(cors({ origin: '*' }));
     //app.use(helmet());
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
