@@ -86,10 +86,22 @@
     "win": {
       "target": "nsis"
     },
+    "linux": [
+      "AppImage",
+      {
+        "target": "snap",
+        "publish": null
+      }
+    ],
     "files": [
       "dist/**/*",
       "main.prod.cjs",
       "preload.cjs"
+    ],
+    "publish": [
+      {
+        "provider": "github"
+      }
     ]
   }
 }
