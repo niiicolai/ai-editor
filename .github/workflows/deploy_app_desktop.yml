@@ -18,13 +18,19 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd ./app_desktop
+          npm install
 
       - name: Build Electron app
-        run: npm run build
+        run: |
+          cd ./app_desktop
+          npm run build
 
       - name: Publish release
-        run: npm exec electron-builder -- --publish always
+        run: |
+          cd ./app_desktop
+          npm exec electron-builder -- --publish always
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
