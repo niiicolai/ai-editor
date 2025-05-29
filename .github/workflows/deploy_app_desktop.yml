@@ -22,6 +22,12 @@ jobs:
           cd ./app_desktop
           npm install
 
+      - name: Install snapcraft
+        run: |
+          sudo apt update
+          sudo apt install -y snapd
+          sudo snap install snapcraft --classic
+
       - name: Build Electron app
         run: |
           cd ./app_desktop
@@ -33,4 +39,3 @@ jobs:
           npm exec electron-builder -- --publish always
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
