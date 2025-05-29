@@ -87,13 +87,7 @@
       "target": "nsis"
     },
     "linux": {
-      "target": [
-        "AppImage",
-        {
-          "target": "snap",
-          "publish": null
-        }
-      ]
+      "target": "AppImage"
     },
     "files": [
       "dist/**/*",
