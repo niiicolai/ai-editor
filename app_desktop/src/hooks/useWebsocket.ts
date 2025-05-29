@@ -7,9 +7,12 @@ import userInputReplyEvent from '../websocket_events/user_input_reply';
 import userInputReplyUpdateEvent from '../websocket_events/user_input_reply_update';
 import sessionOperationEvent from '../websocket_events/session_operation';
 
+const WS_URL = import.meta.env.VITE_AGENT_WS_API;
+if (!WS_URL) console.error('CONFIGURATION ERROR(useWebsocket.ts): VITE_AGENT_WS_API should be set in the .env file');
+
 export const useWebsocket = (sessionId: string) => {
     const [messageHistory] = useState<any>([]);
-    const { sendMessage, lastMessage, readyState } = useWebSocket('ws://localhost:4001', { protocols: "echo-protocol" });
+    const { sendMessage, lastMessage, readyState } = useWebSocket(WS_URL, { protocols: "echo-protocol" });
     const userInputReply = userInputReplyEvent();
     const userInputReplyUpdate = userInputReplyUpdateEvent();
     const sessionOperation = sessionOperationEvent();    
