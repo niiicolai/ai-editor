@@ -1,16 +1,13 @@
-import { setCurrentFile, setDirectoryState } from "../features/hierarchy";
-import { setFile } from "../features/editor";
+import { setDirectoryState } from "../features/hierarchy";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { renameDir } from "../electron/renameDir";
-import { useGetLanguage } from "./useGetLanguage";
 import { RootState } from "../store";
 import { FileItemType } from "../types/directoryInfoType";
 
 export const useRenameDir = () => {
   const hierarchy = useSelector((state: RootState) => state.hierarchy);
   const [isLoading, setIsLoading] = useState(false);
-  const { getLanguageFromFile } = useGetLanguage();
   const dispatch = useDispatch();
 
   const rename = async (dirPath: string, newName: string) => {

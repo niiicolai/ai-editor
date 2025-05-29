@@ -5,11 +5,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { usePagination } from "../../hooks/usePagination";
 import {
-  useGetEmbeddedFiles,
   useDestroyEmbeddedFile,
   useDestroyEmbeddedFiles,
 } from "../../hooks/useEmbeddedFile";
-import { EmbeddedFileType } from "../../types/embeddedFileType";
 import { QAType } from "../../types/qaType";
 import { useGetQAs } from "../../hooks/useQAFile";
 
@@ -31,11 +29,11 @@ function ProjectIndexIndexView() {
   const destroyFile = useDestroyEmbeddedFile();
   const destroyFiles = useDestroyEmbeddedFiles();
   console.log(data)
-  const handleDestroyFile = async (id: number) => {
+  /*const handleDestroyFile = async (id: number) => {
     try {
       await destroyFile.mutateAsync(id);
     } catch {}
-  };
+  };*/
 
   const handleDestroyFiles = async () => {
     try {
