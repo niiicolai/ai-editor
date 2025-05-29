@@ -192,6 +192,13 @@ git push origin release-app-client
 ## App Desktop
 The App Desktop is a full-featured desktop application built with React, Vite, and Electron, offering a rich developer experience with integrated tools like Monaco Editor, terminal with tab support, file explorer, search, and keyboard shortcuts. It uses React Router for navigation, Redux for state management, and Tailwind CSS for styling. AI integration is available through a chat interface with “Ask” functionality, with future plans for Agent, Research, and AI-driven code completions. Extension support and Docker deployment are also planned for future updates.
 
+### Deploy
+
+```bash
+git tag editor-v*.*.*
+git push origin editor-v*.*.*
+```
+
 ### Features
 | Feature                | Subfeature                          | Status  |
 |------------------------|-------------------------------------|---------|

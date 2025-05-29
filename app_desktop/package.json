@@ -1,8 +1,15 @@
 {
   "name": "app_desktop",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "author": {
+    "name": "Nicolai Andersen"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username-or-org/your-repo-name.git"
+  },
   "scripts": {
     "start": "electron ./main.dev.js",
     "dev": "vite",
