@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "main": "main.prod.cjs",
   "author": {
     "name": "Nicolai Andersen"
   },
