@@ -72,6 +72,9 @@
     "directories": {
       "output": "dist_electron"
     },
+    "mac": {
+      "target": "dmg"
+    },
     "win": {
       "target": "nsis"
     },
