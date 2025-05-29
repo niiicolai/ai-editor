@@ -2,8 +2,8 @@ name: Deploy App Desktop
 
 on:
   push:
-    branches:
-      - release-app-desktop
+    tags:
+      - 'v*.*.*'
 
 jobs:
   release:
