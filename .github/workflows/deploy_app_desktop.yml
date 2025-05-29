@@ -6,7 +6,7 @@ on:
       - 'editor-v*.*.*'
 
 jobs:
-  release:
+  release-linux:
     runs-on: ubuntu-latest
     steps:
       - name: Clone repo
@@ -22,20 +22,70 @@ jobs:
           cd ./app_desktop
           npm install
 
-      - name: Install snapcraft
-        run: |
-          sudo apt update
-          sudo apt install -y snapd
-          sudo snap install snapcraft --classic
-
-      - name: Build Electron app
+      - name: Build Electron app (Linux)
         run: |
           cd ./app_desktop
           npm run build
 
-      - name: Publish release
+      - name: Publish Linux release
         run: |
           cd ./app_desktop
-          npm exec electron-builder -- --publish always
+          npm exec electron-builder -- --linux --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  release-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          cd ./app_desktop
+          npm install
+
+      - name: Build Electron app (macOS)
+        run: |
+          cd ./app_desktop
+          npm run build
+
+      - name: Publish macOS release
+        run: |
+          cd ./app_desktop
+          npm exec electron-builder -- --mac --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  release-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          cd ./app_desktop
+          npm install
+
+      - name: Build Electron app (Windows)
+        run: |
+          cd ./app_desktop
+          npm run build
+
+      - name: Publish Windows release
+        run: |
+          cd ./app_desktop
+          npm exec electron-builder -- --win --publish always
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
