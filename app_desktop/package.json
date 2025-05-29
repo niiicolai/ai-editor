@@ -86,13 +86,15 @@
     "win": {
       "target": "nsis"
     },
-    "linux": [
-      "AppImage",
-      {
-        "target": "snap",
-        "publish": null
-      }
-    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        {
+          "target": "snap",
+          "publish": null
+        }
+      ]
+    },
     "files": [
       "dist/**/*",
       "main.prod.cjs",
