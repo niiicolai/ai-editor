@@ -9,14 +9,14 @@ const queryClient = new QueryClient({
     queries: {
       retry: true,
       retryDelay: 5000,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity
     }
   }
 });
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <QueryClientProvider client={queryClient}>
-    <>
-      <RouterProvider router={router} />
-    </>
+    <RouterProvider router={router} />
   </QueryClientProvider>
 )
