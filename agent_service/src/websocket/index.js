@@ -1,8 +1,6 @@
 import 'dotenv/config'
 import WebSocketServer from 'websocket';
 import http from 'http';
-import JwtService from '../services/jwt_service.js';
-import UserAgentSessionMessageService from '../services/user_agent_session_message_service.js';
 import fs from "fs";
 import path from "path";
 import { pathToFileURL } from "url";
@@ -22,7 +20,7 @@ export const setupWebsocket = async () => {
         }
     }
 
-    const port = process.env.WEBSOCKET_PORT || 3001;
+    const port = process.env.WEBSOCKET_PORT || 4001;
     const requestListeners = (req, res) => {
         res.writeHead(404)
         res.end()
