@@ -35,7 +35,7 @@ export const defineQA = (info: QAInfo) => {
             `Q: Can you identify the file responsible for launching the app?\nA: Yes, it’s the entry file "${info.name}".`,
             `Q: In which file does the application boot up?\nA: The file "${info.name}" is responsible for bootstrapping the application.`,
         ];
-        qaSections.push(pickRandom(entryVariants));
+        qaSections.push(...entryVariants);
     }
 
     // 2. Dependency Setup
@@ -47,7 +47,7 @@ export const defineQA = (info: QAInfo) => {
             `Q: Where can I see which libraries the app depends on?\nA: Check "${info.name}" for the application's dependency setup.`,
             `Q: Which part of the codebase configures third-party modules?\nA: The file "${info.name}" includes the dependency configuration.`,
         ];
-        qaSections.push(pickRandom(dependencyVariants));
+        qaSections.push(...dependencyVariants);
     }
 
     // 3. Large Functions and Refactoring
@@ -60,7 +60,7 @@ export const defineQA = (info: QAInfo) => {
             `Q: Are there parts of the code with functions longer than usual?\nA: "${info.name}" has functions that are quite long and may need to be split.`,
             `Q: Any suggestions for files needing functional decomposition?\nA: "${info.name}" contains large functions that could benefit from being broken into smaller units.`,
         ];
-        qaSections.push(pickRandom(refactorVariants));
+        qaSections.push(...refactorVariants);
     }
 
     // 4. Large File Cleanup Needed
@@ -73,7 +73,7 @@ export const defineQA = (info: QAInfo) => {
             `Q: Which parts of the codebase may be too big to manage easily?\nA: "${info.name}" is a large file and may benefit from cleanup.`,
             `Q: Can you identify files that might be too bloated?\nA: Yes, "${info.name}" has ${info.lines} lines and could use some streamlining.`,
         ];
-        qaSections.push(pickRandom(cleanupVariants));
+        qaSections.push(...cleanupVariants);
     }
 
     // 5. Test File Identification
@@ -86,19 +86,23 @@ export const defineQA = (info: QAInfo) => {
             `Q: Are there any files focused on automated tests?\nA: Yes, "${info.name}" serves as a test file${framework}`,
             `Q: Which file is responsible for testing parts of the application?\nA: The file "${info.name}" is dedicated to testing.${framework}`,
         ];
-        qaSections.push(pickRandom(testVariants));
+        qaSections.push(...testVariants);
     }
 
     // 6. Known Issues or Bug Fixes
-    if ((info.comments ?? []).some((c) => /(fixme|todo|bug|hack)/i.test(c.text))) {
-        const issuesVariants = [
-            `Q: What parts of the project have known issues or recent bug fixes?\nA: The file "${info.name}" contains comments mentioning issues or fixes.`,
-            `Q: Where are development issues or TODOs mentioned in the code?\nA: "${info.name}" contains inline comments about issues or planned fixes.`,
-            `Q: Which files contain notes about bugs or unfinished work?\nA: "${info.name}" includes developer comments related to bugs or TODOs.`,
-            `Q: Are any files marked with bug-related comments?\nA: Yes, issues are noted in the file "${info.name}" via comments.`,
-            `Q: Can I find FIXMEs or TODOs in any files?\nA: Yes, there are such notes in "${info.name}".`,
-        ];
-        qaSections.push(pickRandom(issuesVariants));
+    if (info.comments) {
+        info.comments.forEach((c) => {
+            if (/(fixme|todo|bug|hack)/i.test(c.text)) {
+                const issuesVariants = [
+                    `Q: Is there a known issue or bug noted in this file?\nA: Yes, at lines ${c.line_start}-${c.line_end} in "${info.name}": "${c.text.trim()}"`,
+                    `Q: Where are TODOs or BUG or HACK or FIXMEs mentioned in the code?\nA: In "${info.name}", lines ${c.line_start}-${c.line_end} contain: "${c.text.trim()}"`,
+                    `Q: Are there developer notes about bugs or unfinished work?\nA: "${info.name}" has a comment at lines ${c.line_start}-${c.line_end}: "${c.text.trim()}"`,
+                    `Q: Can I find any bug-related comments in this file?\nA: Yes, at lines ${c.line_start}-${c.line_end} in "${info.name}": "${c.text.trim()}"`,
+                    `Q: Which lines mention issues or planned fixes?\nA: Lines ${c.line_start}-${c.line_end} in "${info.name}" include: "${c.text.trim()}"`,
+                ];
+                qaSections.push(...issuesVariants);
+            }
+        });
     }
 
     // 7. Syntax Errors
@@ -110,7 +114,7 @@ export const defineQA = (info: QAInfo) => {
             `Q: Where can I find a syntax issue in the codebase?\nA: A syntax problem was found in "${info.name}": ${info.error}`,
             `Q: What files are causing compilation issues?\nA: The file "${info.name}" has a syntax error: ${info.error}`,
         ];
-        qaSections.push(pickRandom(errorVariants));
+        qaSections.push(...errorVariants);
     }
 
     // 8. Class Definitions
@@ -123,20 +127,26 @@ export const defineQA = (info: QAInfo) => {
             `Q: Which file includes object-oriented code?\nA: Object-oriented code is found in "${info.name}", which defines these classes: ${classNames}.`,
             `Q: What object structures or classes are defined in this file?\nA: "${info.name}" defines the following class structures: ${classNames}.`,
         ];
-        qaSections.push(pickRandom(classVariants));
+        qaSections.push(...classVariants);
     }
 
     // 9. Function Definitions
     if (info.functions?.length > 0) {
         const fnCount = info.functions.length;
+        const fnLines = info.functions.map(f => f.line_end - f.line_start + 1);
+        const totalFnLines = fnLines.reduce((a, b) => a + b, 0);
+        const avgFnLines = fnCount > 0 ? Math.round(totalFnLines / fnCount) : 0;
         const fnVariants = [
             `Q: Are there any functions defined in this file?\nA: Yes, "${info.name}" defines ${fnCount} function${fnCount > 1 ? "s" : ""}.`,
             `Q: Where can I find the functions implemented in this codebase?\nA: The file "${info.name}" contains ${fnCount} function${fnCount > 1 ? "s" : ""}.`,
             `Q: Which file includes actual function implementations?\nA: "${info.name}" has ${fnCount} function${fnCount > 1 ? "s" : ""} defined in it.`,
             `Q: Does this file contribute logic through custom functions?\nA: Yes, it defines ${fnCount} function${fnCount > 1 ? "s" : ""} in "${info.name}".`,
             `Q: What functions are implemented here?\nA: The file "${info.name}" includes ${fnCount} implemented function${fnCount > 1 ? "s" : ""}.`,
+            `Q: How many lines do the functions in this file have?\nA: The functions in "${info.name}" have an average of ${avgFnLines} line${avgFnLines !== 1 ? "s" : ""} each.`,
+            `Q: Are there any particularly long or short functions in this file?\nA: In "${info.name}", function lengths range from ${Math.min(...fnLines)} to ${Math.max(...fnLines)} lines.`,
+            `Q: Can you give examples of function names and their lengths?\nA: For example, ${info.functions.slice(0, 3).map(f => `"${f.name}" (${f.line_end - f.line_start + 1} lines)`).join(", ")}.`,
         ];
-        qaSections.push(pickRandom(fnVariants));
+        qaSections.push(...fnVariants);
     }
 
     // 10. Variable Declarations
@@ -150,7 +160,7 @@ export const defineQA = (info: QAInfo) => {
             `Q: What are some variables declared in this file?\nA: "${info.name}" defines variables like ${varNames}${varCount > 5 ? ", and more" : ""}.`,
             `Q: Is this file responsible for setting up any key variables?\nA: Yes, it includes variables such as ${varNames}${varCount > 5 ? ", etc." : ""}.`,
         ];
-        qaSections.push(pickRandom(varVariants));
+        qaSections.push(...varVariants);
     }
 
     // 11. Function Calls
@@ -164,7 +174,7 @@ export const defineQA = (info: QAInfo) => {
             `Q: What are some of the function calls made in this file?\nA: "${info.name}" calls functions such as ${callNames}${callCount > 5 ? ", etc." : ""}.`,
             `Q: Is this file dependent on external or internal function calls?\nA: It includes calls to functions like ${callNames}${callCount > 5 ? ", and others" : ""}.`,
         ];
-        qaSections.push(pickRandom(callVariants));
+        qaSections.push(...callVariants);
     }
 
     // 12. Import Statements
@@ -178,7 +188,7 @@ export const defineQA = (info: QAInfo) => {
             `Q: Where can I find files that use external modules?\nA: "${info.name}" imports modules like ${importNames}${importCount > 5 ? ", among others" : ""}.`,
             `Q: Is this file dependent on any external code?\nA: Yes, it imports modules including ${importNames}${importCount > 5 ? ", and more" : ""}.`,
         ];
-        qaSections.push(pickRandom(importVariants));
+        qaSections.push(...importVariants);
     }
 
     // 13. Export Statements
@@ -192,7 +202,7 @@ export const defineQA = (info: QAInfo) => {
             `Q: Where can I find files that expose modules to other files?\nA: "${info.name}" is one such file; it exports ${exportCount} item${exportCount > 1 ? "s" : ""}, like ${exportNames}${exportCount > 5 ? ", and more" : ""}.`,
             `Q: Is this file responsible for providing reusable logic?\nA: Yes, it exports items such as ${exportNames}${exportCount > 5 ? ", among others" : ""}.`,
         ];
-        qaSections.push(pickRandom(exportVariants));
+        qaSections.push(...exportVariants);
     }
 
     // 14. Language Statements
@@ -205,7 +215,7 @@ export const defineQA = (info: QAInfo) => {
             `Q: Is this a TypeScript or JavaScript file?\nA: "${info.name}" is a ${language} file.`,
             `Q: What's the file type of "${info.name}"?\nA: It’s a ${language} file based on its extension.`,
         ];
-        qaSections.push(pickRandom(langVariants));
+        qaSections.push(...langVariants);
     }
 
     // 15. Type Statements
@@ -218,7 +228,7 @@ export const defineQA = (info: QAInfo) => {
             `Q: What kind of file is "${info.name}"?\nA: It is considered a "${type}" file in the codebase.`,
             `Q: Is this file a source, test, config, or other type?\nA: "${info.name}" is a "${type}" file.`,
         ];
-        qaSections.push(pickRandom(typeVariants));
+        qaSections.push(...typeVariants);
     }
 
     return qaSections;
