@@ -37,7 +37,7 @@ export default class RagTestEvent extends WebsocketEvent {
       console.log(`Use the following files for context if it's relevant: ${JSON.stringify(documents)}`)
       console.log(`This is the user's message: ${content.trim()}`)
       
-      await handler.fetchLastMessages({ page: 1, limit: 10 });
+      //await handler.fetchLastMessages({ page: 1, limit: 10 }); Only consider user question.
       await handler.createAndSendUserMessage();
       await handler.createInstruction()
             .setAct("Act as a helpful assistant.")

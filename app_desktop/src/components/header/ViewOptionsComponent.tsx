@@ -54,6 +54,12 @@ function ViewOptionsComponent() {
           >
             Shortcuts
           </button>
+          <button
+            onClick={() => navigate("/rag")}
+            className="button-main w-full text-left px-2 py-1"
+          >
+            RAG Settings
+          </button>
           <hr className="border-color" />
           <button
             onClick={() => dispatch(

@@ -13,7 +13,7 @@ import { getEntryFile } from "./get_entry_file";
 import { defineQA } from "./define_qa";
 import { getTestFramework } from "./get_test_framework";
 
-export const parse = (
+export const parseCustomCode = (
   name: string,
   path: string,
   content: string,

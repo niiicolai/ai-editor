@@ -87,7 +87,7 @@ export const vectorSearchQAByProjectId = (
         FROM ${table}
         WHERE embedding MATCH ? AND project_id = ?
         ORDER BY distance ASC
-        LIMIT 4
+        LIMIT 2
     `);
 
   const result = stmt.all(JSON.stringify(queryEmbedding), project_id);
@@ -125,7 +125,7 @@ export const textSearchQAByProjectId = (
         FROM ${table}
         WHERE ${whereClause}
         ORDER BY created_at DESC
-        LIMIT 4
+        LIMIT 2
     `;
 
   // params mapping already added above

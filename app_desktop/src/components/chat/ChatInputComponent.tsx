@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { Check, FileIcon, Folder } from "lucide-react";
+import { Check, FileIcon, Folder, Loader } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { FocusFileItemType } from "../../types/directoryInfoType";
 import { useFocusFiles } from "../../hooks/useFocusFiles";
 import { useGetAvailableLlms } from "../../hooks/useAvailableLlm";
 import { AvailableLlmType } from "../../types/availableLlmType";
-import { useTextSearchQA, useVectorSearchQA } from "../../hooks/useQAFile";
-import EmbeddingService from "../../services/embeddingService";
+import { useRagSearch } from "../../hooks/useRagSearch";
+import { useAutoEvaluation } from "../../hooks/useAutoEvaluation";
 
 const actions = [
     { label: 'rag_test', value: 'rag_test' },
@@ -20,8 +20,9 @@ function ChatInputComponent({
 }: {
     sendMessage: (content:string) => void;
 }) {
-    const projectIndex = useSelector((state: RootState) => state.projectIndex);
-    const { sessionId, embeddingModel, chunkMode, searchMode } = useSelector((state: RootState) => state.userAgentSession);
+    const { meta } = useSelector((state: RootState) => state.projectIndex);
+    const { embeddingModel, chunkMode, searchMode, autoEvaluation } = useSelector((state: RootState) => state.rag);
+    const { sessionId } = useSelector((state: RootState) => state.userAgentSession);
     const { currentFile, directoryState, currentPath } = useSelector((state: RootState) => state.hierarchy);
     const { focusFiles, removeFocusFile } = useFocusFiles();
     const { data: llms } = useGetAvailableLlms(1, 10);
@@ -29,55 +30,28 @@ function ChatInputComponent({
     const [content, setContent] = useState("");
     const [selectedLlm, setSelectedLlm] = useState("");
     const [selectedAction, setSelectedAction] = useState(actions[0].value);
-    const vectorSearch = useVectorSearchQA();
-    const textSearch = useTextSearchQA();
+    const ragSearch = useRagSearch();
+    const autoEval = useAutoEvaluation();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setFormError(null);
 
         if (!content) return setFormError("message is required");
-
-        const embeddedFiles = [];
-        if (projectIndex?.meta?._id && searchMode === 'vector_search' ||
-            projectIndex?.meta?._id && searchMode === 'hybrid_search'
-        ) {
-            const embeddingResult = await EmbeddingService.create({ chunks: [content], model: embeddingModel })
-            const queryEmbedding = embeddingResult[0].embedding;
-            const searchResponse = await vectorSearch.search(projectIndex.meta._id, queryEmbedding);
-            const sortedResult = searchResponse?.result?.sort((a:any, b:any) => b.distance - a.distance);
-            if (sortedResult) embeddedFiles.push(...sortedResult);
-            else console.log('No vector search result', searchResponse, embeddingResult);
-        }
-        if (projectIndex?.meta?._id && searchMode === 'text_search' ||
-            projectIndex?.meta?._id && searchMode === 'hybrid_search'
-        ) {
-            const searchResponse = await textSearch.search(projectIndex.meta._id, content);
-            const searchResult = searchResponse?.result;
-            console.log(searchResult)
-            if (searchResult) embeddedFiles.push(...searchResult)
-            else console.log('No text search result', searchResponse);
-        }
-
-        // filter duplicate embeddedFiles by rowid
-        const uniqueEmbeddedFiles = embeddedFiles.filter(
-            (file, index, self) =>
-            file.rowid &&
-            self.findIndex(f => f.rowid === file.rowid) === index
-        ).map((ef) => ef.qa);
+        const embeddedFiles = await ragSearch.search([content]);
 
         try {
             sendMessage(JSON.stringify({
                 event: selectedAction,
                 data: {
                     content,
-                    embeddedFiles: uniqueEmbeddedFiles,
+                    embeddedFiles,
                     currentFile,
                     focusFiles,
                     directoryInfo: directoryState,
                     user_agent_session_id: sessionId,
                     selected_llm: selectedLlm,
-                    ...(projectIndex?.meta?._id && { projectIndexId: projectIndex?.meta?._id }),
+                    ...(meta?._id && { projectIndexId: meta?._id }),
                     embeddingModel, 
                     chunkMode, 
                     searchMode
@@ -143,7 +117,24 @@ function ChatInputComponent({
                 >
                     <Check className="h-4 w-4" />
                 </button>
+                {selectedAction === 'rag_test' && (
+                    <button
+                        onClick={() => autoEval.execute(selectedAction, selectedLlm, sendMessage)}
+                        type="button"
+                        className="button-main rounded-md border border-color  px-2 py-1 cursor-pointer focus:outline-none"
+                    >                    
+                        {autoEval.activeRef.current 
+                            ? <div className="flex gap-1 items-center">
+                                <Loader className="w-4 h-4 animate-spin" />
+                                <span>{autoEval.questionNoRef.current}/{autoEvaluation.questions.length}</span>
+                                </div>
+                            : 'Auto RAG Test'
+                        }
+                    </button>
+                )}
             </form>
+
+            
 
             <div className={`text-xs flex gap-1 mt-1`}>
                 <select

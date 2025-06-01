@@ -20,6 +20,7 @@ import terminalSettings from './features/terminalSettings';
 import tabs from './features/tabs';
 import projectIndex from './features/projectIndex';
 import theme from './features/theme';
+import rag from './features/rag';
 
 const store = configureStore({
     reducer: {
@@ -34,6 +35,7 @@ const store = configureStore({
         editor,
         tabs,
         theme,
+        rag,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

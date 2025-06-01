@@ -37,7 +37,7 @@ export const createDB = (db) => {
       created_at TEXT,
       updated_at TEXT
     );
-    `//code_t5_file_id FLOAT NULL,
+    `
   ).run();
 
   db.prepare(
@@ -50,6 +50,6 @@ export const createDB = (db) => {
       created_at TEXT,
       updated_at TEXT
     );
-    `//all_minilm_l6_v2_file_id INTEGER NULL,
+    `
   ).run();
 };
