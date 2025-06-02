@@ -5,6 +5,7 @@ import { authenticate } from "@google-cloud/local-auth";
 import { google } from "googleapis";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+import { stringValidator } from "../validators/string_validator";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -68,13 +69,18 @@ export class GmailService {
       console.warn(
         "WARNING: No emails will be sent. However, for testing, you can find the e-mail content in the console."
       );
-      return;
+      return null;
     }
-
+    
     console.log("INFO: Gmail API access configured and ready to send e-mails.");
+    return auth;
   }
 
   static async sendMail(textContent, subject, to) {
+    stringValidator(textContent, "textContent");
+    stringValidator(subject, "subject");
+    stringValidator(to, "to");
+
     console.warn(`DEBUG: Sending new e-mail...`);
     console.warn(`DEBUG: Email subject: ${subject}`);
     console.warn(`DEBUG: Email content: ${textContent}`);
@@ -83,7 +89,7 @@ export class GmailService {
     const environment = process.env.NODE_ENV || "development";
     if (environment !== "production") {
       console.warn("WARNING: E-mails are only sent in production mode.");
-      return;
+      return false;
     }
 
     if (!auth) {
@@ -91,7 +97,7 @@ export class GmailService {
         'WARNING: No saved credentials found. Run "npm run configure:gmail" to set up Gmail API access.'
       );
       console.warn("WARNING: Unable to send e-mail.");
-      return;
+      return false;
     }
 
     const gmail = google.gmail({ version: "v1", auth });
@@ -105,5 +111,7 @@ export class GmailService {
         raw,
       },
     });
+
+    return true;
   }
 }
