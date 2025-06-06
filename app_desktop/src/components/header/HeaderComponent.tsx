@@ -3,7 +3,8 @@ import FileOptionsComponent from "./FileOptionsComponent";
 import EditOptionsComponent from "./EditOptionsComponent";
 import SelectionOptionsComponent from "./SelectionOptionsComponent";
 import ViewOptionsComponent from "./ViewOptionsComponent";
-import editorAvatar from '../../assets/editorAvatar.png';
+import ResponsiveOptionsComponent from "./ResponsiveOptionsComponent";
+import editorAvatar from "../../assets/editorAvatar.png";
 
 function HeaderComponent() {
   return (
@@ -19,12 +20,11 @@ function HeaderComponent() {
           </div>
         </div>
         <div className="flex-1 h-full w-full p-1 secondary-bgg rounded-md draggable-region">
-          <div className="main-color text-xs text-center">
-            Palm Editor
-          </div>
+          <div className="main-color text-xs text-center">Palm Editor</div>
         </div>
 
         <div className="flex gap-1 justify-end items-center">
+          <ResponsiveOptionsComponent />
           <WindowOptionsComponent />
         </div>
       </div>

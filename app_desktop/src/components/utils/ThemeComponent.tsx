@@ -133,7 +133,7 @@ export default function ThemeComponent() {
         }
 
         .highlight-color {
-            color: var(--highlight-color);
+            color: var(--highlight-color) !important;
         }
 
         .highlight-bgg {

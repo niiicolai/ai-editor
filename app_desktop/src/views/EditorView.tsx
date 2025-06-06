@@ -15,7 +15,7 @@ import { Lock } from "lucide-react";
 
 function EditorView() {
   const { data: isAuthorized } = useIsAuthorized();
-  const { sessionId } = useSelector(
+  const { sessionId, responsiveActive } = useSelector(
     (state: RootState) => state.userAgentSession
   );
 
@@ -24,11 +24,14 @@ function EditorView() {
       <HeaderComponent />
       <SearchComponent />
 
-      <div className="flex-1 flex flex-col lg:flex-row">
+      <div className="flex-1 flex flex-col lg:flex-row relative">
         <div
-          className={`h-full relative main-bgg text-white ${
-            isAuthorized ? "lg:w-96" : ""
+          className={`hidden absolute left-0 right-0 bottom-0 top-0 lg:static lg:h-full main-bgg text-white lg:block ${
+            isAuthorized ? "w-full lg:w-96" : ""
           }`}
+          style={
+            responsiveActive ? { display: "block", zIndex: 99 } : {}
+          }
         >
           <div
             className={`h-full flex-1 flex flex-col ${
@@ -39,8 +42,12 @@ function EditorView() {
             {isAuthorized && !sessionId && <SessionsComponent />}
             {!isAuthorized && (
               <div
-                className={`h-full flex items-center justify-end border-r border-color`}
+                className={`h-full flex flex-col lg:flex-row items-center justify-center gap-3 lg:gap-auto lg:justify-end border-r border-color`}
               >
+                <p className="lg:hidden text-sm text-white text-center">
+                  Please login to access the AI Assistant<br /> by clicking the lock icon.
+                </p>
+                
                 <Link
                   title="Login"
                   to="/user/login"
@@ -53,7 +60,7 @@ function EditorView() {
           </div>
         </div>
 
-        <div className="flex-1 flex">
+        <div className="flex-1 flex h-full">
           <div className="h-full w-full flex-1 flex flex-col border-r border-color main-bgg">
             <EditorTabsComponent />
             <EditorCodeComponent />

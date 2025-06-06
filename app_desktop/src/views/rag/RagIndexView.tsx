@@ -11,6 +11,8 @@ import {
 import Scrollbar from "react-scrollbars-custom";
 import { useState } from "react";
 
+const ENV = import.meta.env.VITE_ENV || "development";
+
 function RagIndexView() {
   const rag = useSelector((state: RootState) => state.rag);
   const [questions, setQuestions] = useState([...rag.autoEvaluation.questions]);
@@ -98,7 +100,7 @@ function RagIndexView() {
                 </select>
               </div>
             </div>
-            <div className="flex justify-between items-center gap-3 p-3 border-color border-b">
+            <div className={`flex justify-between items-center gap-3 p-3 ${ENV !== "production" ? "border-color border-b" : ""}`}>
               <div>Search Mode</div>
               <div>
                 <select
@@ -116,7 +118,7 @@ function RagIndexView() {
                 </select>
               </div>
             </div>
-            <div className="flex flex-col justify-between items-start gap-3 w-full p-3">
+            <div className={`flex flex-col justify-between items-start gap-3 w-full p-3 ${ENV === "production" ? "hidden" : ""}`}>
               <div className="text-lg">Auto Evaluation Questions</div>
               <div className="w-full flex flex-col gap-1">
                 {questions.map((q: string, index: number) => (

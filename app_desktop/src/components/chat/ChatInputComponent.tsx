@@ -9,8 +9,10 @@ import { AvailableLlmType } from "../../types/availableLlmType";
 import { useRagSearch } from "../../hooks/useRagSearch";
 import { useAutoEvaluation } from "../../hooks/useAutoEvaluation";
 
+const ENV = import.meta.env.VITE_ENV || "development";
+
 const actions = [
-    { label: 'rag_test', value: 'rag_test' },
+    ...(ENV !== 'production' ? [{ label: 'rag_test', value: 'rag_test' }] : []),
     { label: 'ask', value: 'input_ask' },
     { label: 'agent', value: 'input_agent' },
 ];

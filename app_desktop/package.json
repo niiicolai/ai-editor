@@ -104,7 +104,8 @@
       "dist/**/*",
       "electron_main/**/*",
       "main.prod.cjs",
-      "preload.cjs"
+      "preload.cjs",
+      ".env"
     ],
     "publish": [
       {
