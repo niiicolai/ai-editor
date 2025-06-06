@@ -1,4 +1,4 @@
-import { XIcon } from "lucide-react";
+import { Circle, CircleAlert, XIcon } from "lucide-react";
 import { TabType } from "../../types/fileTabType";
 import { useFileTabs } from "../../hooks/useFileTabs";
 import { setInspectorMenu } from "../../features/tabs";
@@ -42,9 +42,12 @@ function EditorTabsComponent() {
                 <button
                   title={t.file.path}
                   onClick={() => viewTab(t)}
-                  className="px-4 py-1 cursor-pointer view-tab-button overflow-hidden truncate"
+                  className="px-4 py-1 cursor-pointer view-tab-button overflow-hidden truncate flex items-center gap-2"
                 >
-                  {t.file.name}
+                  {t.contentIsChanged && (
+                    <Circle className="w-2 h-2 highlight-color" />
+                  )}
+                  <span>{t.file.name}</span>
                 </button>
                 <div className="px-3 py-1 flex justify-center">
                   <button

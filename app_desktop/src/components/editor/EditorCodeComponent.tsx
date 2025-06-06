@@ -9,6 +9,7 @@ import { useWriteFile } from "../../hooks/useFiles";
 import { useSaveAs } from "../../hooks/useSaveAs";
 import { useFocusFiles } from "../../hooks/useFocusFiles";
 import themesJson from "../../assets/themes.json";
+import { setTabs } from "../../features/tabs";
 
 function EditorCodeComponent() {
   const { name: themeName } = useSelector((state: RootState) => state.theme);
@@ -16,6 +17,7 @@ function EditorCodeComponent() {
   const { minimized: terminalIsMinimized, disabled: terminalIsDisabled } = useSelector((state: RootState) => state.terminalSettings);
   const { minimized: hierarchyIsMinimized } = useSelector((state: RootState) => state.hierarchySettings);
   const { minimized: agentIsMinimized } = useSelector((state: RootState) => state.userAgentSessionSettings);
+  const { tabs } = useSelector((state: RootState) => state.tabs);
   const theme = themesJson.find((t) => t.name === themeName)?.editor;
 
   //const shortcuts = useSelector((state: RootState) => state.shortcuts);
@@ -75,6 +77,17 @@ function EditorCodeComponent() {
 
   const handleEditorChange = (value?: string) => {
     if (value !== undefined) {
+      const updatedTabs = tabs.map((tab) => {
+        if (tab.file.path === file.path) {
+          return {
+            ...tab,
+            content: value,
+            contentIsChanged: true,
+          };
+        }
+        return tab;
+      });
+      dispatch(setTabs(updatedTabs));
       dispatch(setFile({ ...file, content: value }));
     }
   };
