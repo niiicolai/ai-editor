@@ -62,6 +62,12 @@ function HierarchyComponent() {
                     <span>{currentFolder}</span>
                   </h2>
                 )}
+                <button
+                  onClick={() => dispatch(hierarchySettingsActions.setHierarchyMinimized(true))}
+                  className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
             <div>

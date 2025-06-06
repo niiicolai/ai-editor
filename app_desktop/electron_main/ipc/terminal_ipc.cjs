@@ -4,9 +4,9 @@ const path = require('path');
 
 
 const terminalIpc = (mainWindow) => {
-  ipcMain.on("terminal-cmd", async (event, cmd) => {
+  ipcMain.on("terminal-cmd", async (event, cmd, cwd) => {
       const worker = new Worker(path.join(__dirname, "../workers/executeTerminalCmdWorker.js"), {
-        workerData: { cmd },
+        workerData: { cmd, cwd },
       });
     
       worker.on("message", (msg) => {

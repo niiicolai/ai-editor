@@ -7,7 +7,6 @@ interface UserAgentSession {
   sessionId: string | null;
   operation: UserAgentSessionOperationType | null;
   messages: UserAgentSessionMessageType[];
-  responsiveActive: boolean;
 }
 
 const userAgentSessionSlice = createSlice({
@@ -17,7 +16,6 @@ const userAgentSessionSlice = createSlice({
     sessionId: null,
     operation: null,
     messages: [],
-    responsiveActive: false,
   } as UserAgentSession,
   reducers: {
     setSessionTitle: (state: any, action: PayloadAction<string | null>) => {
@@ -47,9 +45,6 @@ const userAgentSessionSlice = createSlice({
     ) => {
       state.messages = action.payload;
     },
-    setResponsiveActive: (state: any, action: PayloadAction<boolean>) => {
-      state.responsiveActive = action.payload;
-    },
   },
 });
 
@@ -60,6 +55,5 @@ export const {
   clearMessages,
   setOperation,
   setMessages,
-  setResponsiveActive,
 } = userAgentSessionSlice.actions;
 export default userAgentSessionSlice.reducer;

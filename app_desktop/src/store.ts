@@ -11,6 +11,7 @@ import {
 
 import shortcuts from './features/shortcuts';
 import userAgentSession from './features/userAgentSession';
+import userAgentSessionSettings from './features/userAgentSessionSettings';
 import search from './features/search';
 import hierarchySettings from './features/hierarchySettings';
 import hierarchy from './features/hierarchy';
@@ -26,6 +27,7 @@ const store = configureStore({
     reducer: {
         projectIndex,
         userAgentSession,
+        userAgentSessionSettings,
         shortcuts,
         search,
         hierarchySettings,

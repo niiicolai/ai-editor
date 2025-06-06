@@ -2,14 +2,14 @@ import { Computer, FolderArchive } from "lucide-react";
 import { hierarchySettingsActions } from "../../features/hierarchySettings";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
-import { setResponsiveActive } from "../../features/userAgentSession";
+import { userAgentSessionSettingsActions } from "../../features/userAgentSessionSettings";
 
 function ResponsiveOptionsComponent() {
   const { responsiveActive: hierarchActive } = useSelector(
     (state: RootState) => state.hierarchySettings
   );
   const { responsiveActive: agentActive } = useSelector(
-    (state: RootState) => state.userAgentSession
+    (state: RootState) => state.userAgentSessionSettings
   );
   const dispatch = useDispatch();
 
@@ -17,11 +17,11 @@ function ResponsiveOptionsComponent() {
     dispatch(
       hierarchySettingsActions.setHierarchyResponsiveActive(!hierarchActive)
     );
-    if (agentActive) dispatch(setResponsiveActive(false));
+    if (agentActive) dispatch(userAgentSessionSettingsActions.setResponsiveActive(false));
   };
 
   const toggleAgentResponsive = () => {
-    dispatch(setResponsiveActive(!agentActive));
+    dispatch(userAgentSessionSettingsActions.setResponsiveActive(!agentActive));
     if (hierarchActive)
       dispatch(hierarchySettingsActions.setHierarchyResponsiveActive(false));
   };

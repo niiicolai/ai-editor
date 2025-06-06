@@ -46,11 +46,14 @@ contextBridge.exposeInMainWorld('electron', {
 
     revealInExplorer: (path) => ipcRenderer.send('reveal-in-explorer', path),
 
+    fileOrDirExists: (path) => ipcRenderer.send('file-or-dir-exists', path),
+    onFileOrDirExists: (callback) => ipcRenderer.on('on-file-or-dir-exists', (event, content) => callback(content)),
+
     /**
      * Terminal methods
      */
     
-    terminalCmd: (cmd) => ipcRenderer.send('terminal-cmd', cmd),
+    terminalCmd: (cmd, cwd) => ipcRenderer.send('terminal-cmd', cmd, cwd),
     onTerminalCmd: (callback) => ipcRenderer.on('on-terminal-cmd', (event, content) => callback(content)),
 
     /**

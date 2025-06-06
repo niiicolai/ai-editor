@@ -13,6 +13,9 @@ import themesJson from "../../assets/themes.json";
 function EditorCodeComponent() {
   const { name: themeName } = useSelector((state: RootState) => state.theme);
   const { file, tabSize, nextEditorCommand } = useSelector((state: RootState) => state.editor);
+  const { minimized: terminalIsMinimized, disabled: terminalIsDisabled } = useSelector((state: RootState) => state.terminalSettings);
+  const { minimized: hierarchyIsMinimized } = useSelector((state: RootState) => state.hierarchySettings);
+  const { minimized: agentIsMinimized } = useSelector((state: RootState) => state.userAgentSessionSettings);
   const theme = themesJson.find((t) => t.name === themeName)?.editor;
 
   //const shortcuts = useSelector((state: RootState) => state.shortcuts);
@@ -177,7 +180,25 @@ function EditorCodeComponent() {
     }
   }, [file]);
 
-  
+  const handleResize = () => {      
+      if (editorRef.current) {
+        editorRef.current.layout({
+              width: 100, 
+              height: 100,
+          });
+      }
+    };
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    handleResize();
+  }, [terminalIsMinimized, terminalIsDisabled, hierarchyIsMinimized, agentIsMinimized]);
 
   return (
     <div className="flex-1">
