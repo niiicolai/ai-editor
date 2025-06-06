@@ -1,4 +1,4 @@
-import { db } from '../index.js'
+const { db } = require('../index.cjs');
 
 const getTable = (embeddingModel) =>
     embeddingModel === "all-MiniLM-L6-v2"
@@ -9,7 +9,7 @@ const getForeignKey = (embeddingModel) =>
       ? "all_minilm_l6_v2_file_id"
       : "code_t5_file_id";
 
-export const insertQA = (
+const insertQA = (
   body,
   embeddingModel = "all-MiniLM-L6-v2"
 ) => {
@@ -32,7 +32,7 @@ export const insertQA = (
   return info.lastInsertRowid;
 };
 
-export const updateQA = (
+const updateQA = (
   id,
   body,
   embeddingModel = "all-MiniLM-L6-v2"
@@ -56,13 +56,13 @@ export const updateQA = (
   );
 };
 
-export const deleteQA = (id, embeddingModel = "all-MiniLM-L6-v2") => {
+const deleteQA = (id, embeddingModel = "all-MiniLM-L6-v2") => {
   const table = getTable(embeddingModel);
   const stmt = db.prepare(`DELETE FROM ${table} WHERE rowid = ?`);
   stmt.run(id);
 };
 
-export const deleteAllQAByProjectId = (
+const deleteAllQAByProjectId = (
   project_id,
   embeddingModel = "all-MiniLM-L6-v2"
 ) => {
@@ -74,7 +74,7 @@ export const deleteAllQAByProjectId = (
   stmt.run(project_id);
 };
 
-export const vectorSearchQAByProjectId = (
+const vectorSearchQAByProjectId = (
   queryEmbedding,
   project_id,
   embeddingModel = "all-MiniLM-L6-v2"
@@ -94,7 +94,7 @@ export const vectorSearchQAByProjectId = (
   return result;
 };
 
-export const textSearchQAByProjectId = (
+const textSearchQAByProjectId = (
   query,
   project_id,
   embeddingModel = "all-MiniLM-L6-v2"
@@ -135,7 +135,7 @@ export const textSearchQAByProjectId = (
   return result;
 };
 
-export const paginateQAByProjectId = (
+const paginateQAByProjectId = (
   page,
   limit,
   project_id,
@@ -170,4 +170,14 @@ export const paginateQAByProjectId = (
     pages,
     total,
   };
+};
+
+module.exports = {
+  insertQA,
+  updateQA,
+  deleteQA,
+  deleteAllQAByProjectId,
+  paginateQAByProjectId,
+  vectorSearchQAByProjectId,
+  textSearchQAByProjectId
 };

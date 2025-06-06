@@ -1,4 +1,4 @@
-export const createDB = (db) => {
+const createDB = (db) => {
   db.prepare(
     `
     CREATE TABLE IF NOT EXISTS all_minilm_l6_v2_files (
@@ -52,4 +52,8 @@ export const createDB = (db) => {
     );
     `
   ).run();
+};
+
+module.exports = {
+  createDB
 };

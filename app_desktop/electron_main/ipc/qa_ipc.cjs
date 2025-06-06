@@ -1,15 +1,17 @@
-import { ipcMain } from "electron";
-import { 
+const { ipcMain } = require('electron');
+
+const {
   insertQA,
-  updateQA, 
-  deleteQA, 
-  deleteAllQAByProjectId, 
-  paginateQAByProjectId, 
+  updateQA,
+  deleteQA,
+  deleteAllQAByProjectId,
+  paginateQAByProjectId,
   vectorSearchQAByProjectId,
   textSearchQAByProjectId
-} from "../sqlite/services/qa_service.js";
+} = require('../sqlite/services/qa_service.cjs');
 
-export const qaIpc = (mainWindow) => {
+
+const qaIpc = (mainWindow) => {
 
   ipcMain.on("insert-qa", async (event, body, embeddingModel) => {
     try {
@@ -106,4 +108,8 @@ export const qaIpc = (mainWindow) => {
       }
     }
   );
+};
+
+module.exports = {
+  qaIpc
 };

@@ -1,13 +1,9 @@
-import { ipcMain, dialog, shell } from "electron";
-import { Worker } from "worker_threads";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import path from "path";
+const { ipcMain, dialog, shell } = require("electron");
+const { Worker } = require("worker_threads");
+const path = require("path");
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
-export const fileIpc = (mainWindow) => {
+const fileIpc = (mainWindow) => {
   ipcMain.on("open-folder", async (event) => {
     const result = await dialog.showOpenDialog(mainWindow, {
       properties: ["openDirectory"],
@@ -228,4 +224,8 @@ export const fileIpc = (mainWindow) => {
   ipcMain.on("search", async (event, searchPath, patternStr) => {
     console.log(searchPath, patternStr);
   });
+};
+
+module.exports = {
+  fileIpc,
 };

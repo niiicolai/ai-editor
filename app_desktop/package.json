@@ -65,6 +65,7 @@
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^36.3.2",
+    "electron-builder": "^26.0.12",
     "electron-rebuild": "^3.2.9",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
@@ -74,9 +75,14 @@
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0"
   },
+  "optionalDependencies": {
+    "sqlite-vec-windows-x64": "0.1.7-alpha.2",
+    "sqlite-vec-darwin-arm64": "0.1.7-alpha.2",
+    "sqlite-vec-linux-x64": "0.1.7-alpha.2"
+  },
   "build": {
-    "appId": "com.example.app",
-    "productName": "Example app",
+    "appId": "com.palm.editor",
+    "productName": "Palm Editor",
     "directories": {
       "output": "dist"
     },
@@ -89,8 +95,14 @@
     "linux": {
       "target": "AppImage"
     },
+    "asarUnpack": [
+      "node_modules/sqlite-vec-windows-x64/**",
+      "node_modules/sqlite-vec-darwin-arm64/**",
+      "node_modules/sqlite-vec-linux-x64/**"
+    ],
     "files": [
       "dist/**/*",
+      "electron_main/**/*",
       "main.prod.cjs",
       "preload.cjs"
     ],

@@ -38,7 +38,7 @@ function RagIndexView() {
   };
 
   const saveQuestions = () => {
-    dispatch(setAutoEvaluation({ active: rag.autoEvaluation.active, questions }));
+    dispatch(setAutoEvaluation({ questions }));
   };
 
   return (
