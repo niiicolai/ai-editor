@@ -107,15 +107,15 @@ jobs:
           cd ./email_service
           echo "${{ secrets.EMAIL_ENV_FILE }}" > .env
 
-    - name: Create Gmail credentials file
+    - name: Create gmail_credentials.json file
       run: |
           cd ./email_service
-          echo "${{ secrets.GMAIL_CREDENTIALS }}" > gmail_credentials.json
+          echo '${{ secrets.GMAIL_CREDENTIALS }}' > gmail_credentials.json
 
-    - name: Create Gmail token file
+    - name: Create gmail_token.json file
       run: |
           cd ./email_service
-          echo "${{ secrets.GMAIL_TOKEN }}" > gmail_token.json
+          echo '${{ secrets.GMAIL_TOKEN }}' > gmail_token.json
 
     - name: SSH and Remove old files
       uses: appleboy/ssh-action@master
