@@ -1,4 +1,4 @@
-import { Circle, CircleAlert, XIcon } from "lucide-react";
+import { Circle, XIcon } from "lucide-react";
 import { TabType } from "../../types/fileTabType";
 import { useFileTabs } from "../../hooks/useFileTabs";
 import { setInspectorMenu } from "../../features/tabs";
