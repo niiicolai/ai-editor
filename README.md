@@ -1,4 +1,4 @@
-# AI Code Editor
+# IDE
 
 ## Agent Service
 
