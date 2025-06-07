@@ -5,6 +5,9 @@ import { authentication } from "../middleware/authentication.js";
 import { hateoas } from "../middleware/hateoas.js";
 import { respond } from "../respond.js";
 
+const WEBSITE_URL = process.env.WEBSITE_URL;
+if (!WEBSITE_URL) console.error('WEBSITE_URL should be set in the .env file');
+
 const router = express.Router();
 export const links = {
     get: { rel: "get checkout", method: "GET", href: "/checkout/{_id}" },
@@ -365,8 +368,8 @@ router.get(
     async (req, res) => {
         try {
             const _id = req.query.session_id;
-            await CheckoutService.successCheckout(_id);
-            res.send(`<!DOCTYPE html><html><head><title>Checkout success</title></head><body><h1>Checkout Success!</h1></body></html>`);
+            const checkout = await CheckoutService.successCheckout(_id);
+            res.redirect(`${WEBSITE_URL}/checkout/${checkout._id}`);
         } catch (error) {
             if (error instanceof ClientError) {
                 res.status(error.statusCode).json({ error: error.message });
@@ -400,7 +403,7 @@ router.get(
         try {
             const _id = req.query.session_id;
             await CheckoutService.cancelCheckout(_id);
-            res.send(`<!DOCTYPE html><html><head><title>Checkout cancel</title></head><body><h1>Checkout Cancel!</h1></body></html>`);
+            res.redirect(`${WEBSITE_URL}/checkout/cancel`);
         } catch (error) {
             if (error instanceof ClientError) {
                 res.status(error.statusCode).json({ error: error.message });

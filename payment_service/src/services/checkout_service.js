@@ -18,6 +18,9 @@ if (!API_KEY) console.error("STRIPE_API_KEY not set in .env");
 const DOMAIN = process.env.DOMAIN;
 if (!DOMAIN) console.error("DOMAIN is not set in .env");
 
+const WEBSITE_URL = process.env.WEBSITE_URL;
+if (!WEBSITE_URL) console.error("WEBSITE_URL should be set in the .env file");
+
 const stripe = new Stripe(API_KEY);
 
 export default class CheckoutService {
@@ -30,7 +33,7 @@ export default class CheckoutService {
    */
   static async find(_id, userId) {
     idValidator(_id);
-    idValidator(userId, "userId")
+    idValidator(userId, "userId");
 
     const user = await UserModel.findOne({ _id: userId, deleted_at: null });
     if (!user) ClientError.notFound("user not found");
@@ -195,10 +198,11 @@ export default class CheckoutService {
 
     try {
       let session = null;
-      if (process.env.NODE_ENV === "test") session = {
-        id: new Date().toLocaleString(),
-        url: new Date().toLocaleString()
-      };
+      if (process.env.NODE_ENV === "test")
+        session = {
+          id: new Date().toLocaleString(),
+          url: new Date().toLocaleString(),
+        };
       else {
         const line_items = checkout.products.map((p) => {
           return { price: p.product.stripePriceId, quantity: p.quantity };
@@ -238,15 +242,22 @@ export default class CheckoutService {
     const user = await UserModel.findOne({ _id: checkout.user });
     if (!user) ClientError.notFound("user not found");
 
+    // Check with Stripe if the session is completed
+    const stripeSession = await stripe.checkout.sessions.retrieve(sessionId);
+    if (!stripeSession || stripeSession.payment_status !== "paid") {
+      ClientError.badRequest("checkout session is not completed or paid");
+    }
+
     try {
       await produceUserCreditModificationSaga(sessionId.toString());
       await produceSendEmailSaga({
         subject: `Your Payment Was Successful! Order: ${checkout._id.toString()}`,
         content: `Hello ${
           user.username || user.email
-        },\n\nThank you for your purchase! Your payment has been successfully processed. If you have any questions or need support, please contact us.\n\nBest regards,\nThe Team`,
+        },\n\nThank you for your purchase! Your payment has been successfully processed. Find details at ${WEBSITE_URL}/checkout/${checkout._id.toString()}.\n\nIf you have any questions or need support, please contact us.\n\nBest regards,\nThe Team`,
         to: user.email,
       });
+      return await this.find(checkout._id.toString(), user._id.toString());
     } catch (error) {
       console.error("Error completing checkout", error);
       throw new Error("Error completing checkout", error);
