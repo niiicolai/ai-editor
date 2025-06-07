@@ -35,33 +35,39 @@ def get_samples(page, limit):
 
 async def create_many(body):
     samples_to_insert = []
-    for s in body:
-        question = s.get("input_prompt")
-        answer = s.get("output_response")
-        embedded_files = s.get("input_embedded_files", [])
-        retrieved_documents = [json.dumps(e) for e in embedded_files]
+    try:
+        for s in body:
+            question = s.get("input_prompt")
+            answer = s.get("output_response")
+            embedded_files = s.get("input_embedded_files", [])
+            retrieved_documents = [json.dumps(e) for e in embedded_files]
+            print(question)
+            
+            context_precision, faithfulness, response_relevancy = await asyncio.gather(
+                cal_context_precision(question, answer, retrieved_documents),
+                cal_faithfulness(question, answer, retrieved_documents),
+                cal_response_relevancy(question, answer, retrieved_documents)
+            )
+            
+            print(context_precision)
+            sample = {
+                "input_prompt": question,
+                "input_embedded_files": embedded_files,
+                "output_response": answer,
+                "event": s.get("event"),
+                "config": s.get("config"),
+                "metrics": {
+                    "context_precision": context_precision,
+                    "response_relevancy": response_relevancy,
+                    "faithfulness": faithfulness
+                },
+                "created_at": datetime.datetime.now(),
+                "updated_at": datetime.datetime.now()
+            }
+            samples_to_insert.append(sample)
 
-        context_precision, faithfulness, response_relevancy = await asyncio.gather(
-            cal_context_precision(question, answer, retrieved_documents),
-            cal_faithfulness(question, answer, retrieved_documents),
-            cal_response_relevancy(question, answer, retrieved_documents)
-        )
-
-        sample = {
-            "input_prompt": question,
-            "input_embedded_files": embedded_files,
-            "output_response": answer,
-            "event": s.get("event"),
-            "config": s.get("config"),
-            "metrics": {
-                "context_precision": context_precision,
-                "response_relevancy": response_relevancy,
-                "faithfulness": faithfulness
-            },
-            "created_at": datetime.datetime.now(),
-            "updated_at": datetime.datetime.now()
-        }
-        samples_to_insert.append(sample)
-
-    if samples_to_insert:
-        insert_many(samples_to_insert)
+        if samples_to_insert:
+            insert_many(samples_to_insert)
+    except Exception as e:
+        print(e)
+        raise Exception(e)

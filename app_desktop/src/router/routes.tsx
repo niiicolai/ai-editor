@@ -3,6 +3,7 @@ import EditorView from '../views/EditorView';
 import ThemeIndexView from '../views/theme/ThemeIndexView';
 import ShortcutIndexView from '../views/shortcut/ShortcutIndexView';
 import ProjectIndexIndexView from '../views/projectIndex/ProjectIndexIndexView';
+import RagIndexView from '../views/rag/RagIndexView';
 
 import UserLoginView from '../views/user/UserLoginView';
 import UserCreateView from '../views/user/UserCreateView';
@@ -33,6 +34,14 @@ export const routes = [
   {
     path: "/project-index",
     element: <ProjectIndexIndexView />,
+  },
+
+  /**
+   * Rag routes
+   */
+  {
+    path: "/rag",
+    element: <RagIndexView />,
   },
 
   /**

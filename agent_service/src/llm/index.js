@@ -76,6 +76,7 @@ export const creatChatCompletion = async (
       if (response.tool_call) {
         const { name: callName, args: callArgs } = response.tool_call;
 
+
         for (const fn of functions) {
           if (fn.name === callName) {
             const { message, code, clientFn } = await fn.agent.call(

@@ -1,1 +1,37 @@
 @import "tailwindcss";
+
+.markdown p {
+    margin-bottom: 0.2em;
+}
+
+.markdown h1 {
+    margin-top: 0.6em;
+    font-size: 2em;
+}
+
+.markdown h2 {
+    margin-top: 0.4em;
+    font-size: 1.5em;
+}
+
+.markdown h3 {
+    margin-top: 0.2em;
+    font-size: 1.3em;
+}
+
+.markdown ul {
+    padding-left: 1.5em;
+    margin-bottom: 1em;
+    list-style-type: circle;
+}
+
+.markdown ol {
+    padding-left: 1.5em;
+    margin-bottom: 1em;
+    list-style-type: decimal;
+}
+
+.markdown code {
+    display: inline-block;
+    font-style: italic;
+}

@@ -5,11 +5,15 @@ import storage from 'redux-persist/lib/storage';
 const hierarchySettingsSlice = createSlice({
     name: "hierarchySettings",
     initialState: {
-        minimized: false
+        minimized: false,
+        responsiveActive: false,
     },
     reducers: {
         setHierarchyMinimized: (state: any, action: PayloadAction<boolean>) => {
-            state.hierarchy.minimized = action.payload;
+            state.minimized = action.payload;
+        },
+        setHierarchyResponsiveActive: (state: any, action: PayloadAction<boolean>) => {
+            state.responsiveActive = action.payload;
         },
     },
 });

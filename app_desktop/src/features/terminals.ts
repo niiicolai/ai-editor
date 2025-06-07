@@ -10,7 +10,7 @@ export interface Terminal {
 const terminalsSlice = createSlice({
     name: "terminals",
     initialState: {
-        terminals: [{ id: new Date().getTime().toString(), messages: [] }],
+        terminals: [{ id: new Date().getTime().toString(), cwd: '/', messages: [] }],
         inspectorMenu: null,
         selectedIndex: 0,
     } as Terminal,
