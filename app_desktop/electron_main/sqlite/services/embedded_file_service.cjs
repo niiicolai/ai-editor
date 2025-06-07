@@ -89,7 +89,7 @@ const updateEmbeddedFile = (
       : "code_t5_files";
   const stmt = db.prepare(`
     UPDATE ${table}
-    filepath = ?, filename = ?, project_id = ?, hash = ?, created_at = ?, updated_at = ?
+    SET filepath = ?, filename = ?, project_id = ?, hash = ?, created_at = ?, updated_at = ?
     WHERE rowid = ?
   `);
   stmt.run(
