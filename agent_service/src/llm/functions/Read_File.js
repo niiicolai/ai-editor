@@ -64,13 +64,13 @@ const fn = {
     name,
     agent: {
         call: async (userArgs, gptArgs) => {
-            console.log(gptArgs)
+
             return {
                 message: gptArgs.message,
                 code: "",
                 clientFn: {
                     name,
-                    args: JSON.stringify(gptArgs.args)
+                    args: gptArgs.args
                 }
             };
         }

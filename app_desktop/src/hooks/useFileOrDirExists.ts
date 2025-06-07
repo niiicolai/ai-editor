@@ -8,7 +8,7 @@ export const useFileOrDirExists = () => {
     setIsLoading(true);
     try {
       const content = await fileOrDirExists(path);
-      return content.data;
+      return content;
     } catch (error) {
       console.error("Error opening file:", error);
     } finally {
