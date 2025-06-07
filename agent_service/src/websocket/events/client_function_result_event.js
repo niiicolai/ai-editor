@@ -91,7 +91,9 @@ export default class UserInputEvent extends WebsocketEvent {
         userId,
         "running"
       );
+
       const operation = operations.total > 0 ? operations.operations[0] : null;
+      console.log(operation, "operation");
       if (!operation) {
         return;
       }
@@ -189,7 +191,7 @@ export default class UserInputEvent extends WebsocketEvent {
       reply("user_input_reply_update", updatedUserAgentSessionMessionAgent);
       let newState =
         operation.iterations.length + 1 >= operation.max_iterations ||
-        !userAgentSessionMessionAgent.clientFn
+        !agentContent.clientFn
           ? "completed"
           : "running";
       const updatedOperation = await UserAgentSessionOperationService.update(

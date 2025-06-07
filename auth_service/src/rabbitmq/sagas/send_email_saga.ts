@@ -3,10 +3,10 @@ import TransactionModel from "../../mongodb/models/transaction_model";
 import mongoose from "mongoose";
 import SagaBuilder from "../saga/SagaBuilder.js";
 
-const queueName = "send_email:email_service";
+const queueName = "send_email:auth_service";
 const producer = SagaBuilder.producer(queueName, rabbitMq)
 
-  .onProduce(async (body) => {
+  .onProduce(async (body: { subject: string; content: string; to: string; }) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -23,7 +23,7 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
         mail: {
           subject: body.subject,
           content: body.content,
-          to: body.email,
+          to: body.to,
         },
         transaction: {
           _id: transaction._id,
@@ -39,19 +39,19 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
     }
   })
 
-  .onCompensate(async (message) => {
+  .onCompensate(async (message: { transaction: { _id: string; }; error: string; }) => {
+    const transaction = await TransactionModel.findOne({
+      _id: message.transaction._id,
+      state: "pending",
+    });
+    if (!transaction) throw new Error("Transaction not found");
+
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      const transaction = await TransactionModel.findOne(
-        { _id: message.transaction._id, state: "pending" },
-        { session }
-      );
-      if (!transaction) throw new Error("Transaction not found");
-
       await TransactionModel.updateOne(
         { _id: message.transaction._id },
-        { state: "error", error: message.transaction.error },
+        { state: "error", error: message.error },
         { session }
       );
       await session.commitTransaction();
@@ -63,16 +63,15 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
     }
   })
 
-  .onSuccess(async (message) => {
+  .onSuccess(async (message: { transaction: { _id: string; };}) => {
+    const transaction = await TransactionModel.findOne(
+      { _id: message.transaction._id, state: "pending" },
+    );
+    if (!transaction) throw new Error("Transaction not found");
+
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      const transaction = await TransactionModel.findOne(
-        { _id: message.transaction._id, state: "pending" },
-        { session }
-      );
-      if (!transaction) throw new Error("Transaction not found");
-
       await TransactionModel.updateOne(
         { _id: message.transaction._id },
         { state: "completed", error: null },
@@ -90,6 +89,5 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
 
   .build();
 
-export const produceSendEmailSaga = async (body) =>
-  await producer.produce(body);
+export const produceSendEmailSaga = async (body: { subject: string; content: string; to: string; }) => await producer.produce(body);
 export default async () => producer.addListeners();

@@ -10,6 +10,7 @@ import DropdownComponent from "../utils/DropdownComponent";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useTerminals } from "../../hooks/useTerminals";
 import { useExternalBrowser } from "../../hooks/useExternalBrowser";
+import { userAgentSessionSettingsActions } from "../../features/userAgentSessionSettings";
 
 const WEBSITE_DOMAIN_URL = import.meta.env.VITE_WEBSITE_DOMAIN;
 if (!WEBSITE_DOMAIN_URL) console.error('CONFIGURATION ERROR(ViewOptionsComponent.ts): VITE_WEBSITE_DOMAIN should be set in the .env file');
@@ -18,6 +19,9 @@ function ViewOptionsComponent() {
   const hierarchySettings = useSelector((state: RootState) => state.hierarchySettings);
   const shortcuts = useSelector((state: RootState) => state.shortcuts);
   const { disabled, minimized } = useSelector((state: RootState) => state.terminalSettings);
+  const userAgentSessionSettings = useSelector(
+    (state: RootState) => state.userAgentSessionSettings
+  );
   const { closeActiveTab, newTab } = useTerminals();
   const { openExternalBrowser } = useExternalBrowser();
   const navigate = useNavigate();
@@ -28,6 +32,9 @@ function ViewOptionsComponent() {
   useHotkeys(shortcuts.new_terminal.join('+'), () => newTab(), [newTab]);
   useHotkeys(shortcuts.hide_terminal.join('+'), () => handleMinimizeTerminal(), [handleMinimizeTerminal]);
   useHotkeys(shortcuts.hide_explorer.join('+'), () => handleMinimizeExplorer(), [handleMinimizeExplorer]);
+  useHotkeys(shortcuts.hide_agent.join('+'), () => dispatch(
+    userAgentSessionSettingsActions.setMinimized(!userAgentSessionSettings.minimized)
+  ), [userAgentSessionSettings, dispatch]);
 
   return (
     <DropdownComponent
@@ -54,6 +61,12 @@ function ViewOptionsComponent() {
           >
             Shortcuts
           </button>
+          <button
+            onClick={() => navigate("/rag")}
+            className="button-main w-full text-left px-2 py-1"
+          >
+            RAG Settings
+          </button>
           <hr className="border-color" />
           <button
             onClick={() => dispatch(
@@ -68,6 +81,21 @@ function ViewOptionsComponent() {
               ? "Show Explorer"
               : "Hide Explorer"}</span>
               <span>{shortcuts.hide_explorer.join(" + ")}</span>
+          </button>
+          <hr className="border-color" />
+                 <button
+            onClick={() => dispatch(
+              userAgentSessionSettingsActions.setMinimized(
+                !userAgentSessionSettings.minimized
+              )
+            )}
+            className="button-main w-full text-left px-2 py-1 flex justify-between"
+          >
+            
+              <span>{userAgentSessionSettings.minimized
+              ? "Show Agent"
+              : "Hide Agent"}</span>
+              <span>{shortcuts.hide_agent.join(" + ")}</span>
           </button>
           <hr className="border-color" />
           <button

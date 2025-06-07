@@ -4,12 +4,14 @@ import { useWebsocket } from "../../hooks/useWebsocket";
 import { RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
 import { setSessionId, setSessionTitle } from "../../features/userAgentSession";
-import { LoaderIcon } from "lucide-react";
+import { ChevronLeft, LoaderIcon, XIcon } from "lucide-react";
+import { userAgentSessionSettingsActions } from "../../features/userAgentSessionSettings";
 
 function ChatComponent() {
     const { sessionId, sessionTitle } = useSelector((state: RootState) => state.userAgentSession);
     const { leaveSession, connectionStatus, sendMessage } = useWebsocket(sessionId || '');
     const dispatch = useDispatch();
+
     const handleToggleSessions = () => {
         dispatch(setSessionId(null));
         dispatch(setSessionTitle(null));
@@ -26,12 +28,16 @@ function ChatComponent() {
 
                     <div className="flex gap-1 items-center justify-center">
                         <button
+                            onClick={() => dispatch(userAgentSessionSettingsActions.setMinimized(true))}
+                            className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
                             onClick={() => handleToggleSessions()}
                             className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <XIcon className="w-4 h-4" />
                         </button>
                     </div>
                 </div>

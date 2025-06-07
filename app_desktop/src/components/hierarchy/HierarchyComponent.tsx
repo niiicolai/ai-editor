@@ -14,7 +14,7 @@ import { setInspectorMenu } from "../../features/hierarchy";
 
 function HierarchyComponent() {
   const dispatch = useDispatch();
-  const { minimized: isMinimized } = useSelector((state: RootState) => state.hierarchySettings);
+  const { minimized: isMinimized, responsiveActive } = useSelector((state: RootState) => state.hierarchySettings);
   const { currentFile, currentPath, directoryState, renameFileItem }  = useSelector((state: RootState) => state.hierarchy);
   const currentFolder = currentPath ? currentPath.split("\\").pop() || "" : "";
   const hasFiles = currentPath && directoryState[currentPath]?.files.length > 0;
@@ -31,9 +31,9 @@ function HierarchyComponent() {
     );
   };
 
-  if (isMinimized) {
-    return (
-      <div className="h-full flex flex-col justify-center main-bgg text-white p-1">
+  return (
+    <>
+      <div className={`h-full flex-col justify-center main-bgg text-white p-1 ${isMinimized ? "hidden lg:flex" : "hidden"}`}>
         <button
           onClick={() =>
             dispatch(hierarchySettingsActions.setHierarchyMinimized(false))
@@ -44,11 +44,8 @@ function HierarchyComponent() {
           <ChevronDown className="w-4 h-4 block lg:hidden" />
         </button>
       </div>
-    );
-  }
 
-  return (
-    <div className="h-full h-64 lg:w-64 flex flex-col justify-between main-bgg text-white">
+    <div className={`absolute left-0 right-0 bottom-0 top-0 lg:static lg:h-full lg:w-64 lg:flex lg:flex-col lg:justify-between main-bgg text-white ${isMinimized ? "lg:hidden" : ""} ${responsiveActive ? "block" : "hidden"}`}>
       <HierarchyRightClickMenuComponent />
       <HierarchyDeleteComponent />
 
@@ -65,6 +62,12 @@ function HierarchyComponent() {
                     <span>{currentFolder}</span>
                   </h2>
                 )}
+                <button
+                  onClick={() => dispatch(hierarchySettingsActions.setHierarchyMinimized(true))}
+                  className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
             <div>
@@ -110,6 +113,7 @@ function HierarchyComponent() {
         </div>
       )}
     </div>
+    </>
   );
 }
 

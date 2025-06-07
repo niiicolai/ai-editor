@@ -2,6 +2,7 @@ import { FileType } from "./editorFileType";
 
 export interface TabType {
   file: FileType;
+  contentIsChanged: boolean;
 }
 
 export interface TabMenuType {

@@ -18,6 +18,7 @@ const shortcutsSlice = createSlice({
         hide_terminal: ['ctrl', 'l'],
         close_active_terminal: ['ctrl', 'y'],
         hide_explorer: ['ctrl', 'b'],
+        hide_agent: ['ctrl', 'h'],
         redo: ['ctrl', 'shift', 'z'],
         undo: ['ctrl', 'z'],
         find: ['ctrl', 'd'],

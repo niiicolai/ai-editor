@@ -37,7 +37,7 @@ function LayoutComponent(props: LayoutComponentProps) {
                         {isAuthorized && (
                                 <Link to="/user" className="p-2 hover:underline">Profile</Link>
                         )}
-                        <Link to="/download" className="p-2 hover:underline bg-yellow-500 border-l border-r border-black text-black">Download</Link>
+                        <Link to="https://github.com/niiicolai/ai-editor/releases" className="p-2 hover:underline bg-yellow-500 border-l border-r border-black text-black" target="_blank">Download</Link>
                     </nav>
                 </div>
             </div>

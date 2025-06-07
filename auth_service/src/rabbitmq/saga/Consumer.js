@@ -15,8 +15,11 @@ export class Consumer {
         try {
             const message = await this.onConsume(msg);
             this.rabbitMq.sendMessage(`${this.queueName}_success`, message);
-        } catch {
-            this.rabbitMq.sendMessage(`${this.queueName}_compensate`, msg);
+        } catch (error) {
+            this.rabbitMq.sendMessage(`${this.queueName}_compensate`, {
+                ...msg,
+                error: error.message,
+            })
         }
     }
 }

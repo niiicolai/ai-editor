@@ -11,7 +11,7 @@ import ThemeComponent from './components/utils/ThemeComponent';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 10000,
+      staleTime: Infinity,
       retry: false,
       retryDelay: 5000,
       refetchOnMount: false,

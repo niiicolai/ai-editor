@@ -8,6 +8,7 @@ import { readFile } from "../electron/readFile";
 import { setFile } from "../features/editor";
 import { useGetLanguage } from "./useGetLanguage";
 import { setQueue } from "../features/projectIndex";
+import { hierarchySettingsActions } from "../features/hierarchySettings";
 
 export const useSelectFile = () => {
   const { queue } = useSelector((state: RootState) => state.projectIndex);
@@ -17,20 +18,25 @@ export const useSelectFile = () => {
   const dispatch = useDispatch();
 
   const handleToggleIsOpen = async (file: FileItemType) => {
-    dispatch(setDirectoryState({
-      ...directoryState,
-      [file.path]: {
-        ...directoryState[file.path],
-        isOpen: !directoryState[file.path].isOpen,
-      },
-    }));
+    dispatch(
+      setDirectoryState({
+        ...directoryState,
+        [file.path]: {
+          ...directoryState[file.path],
+          isOpen: !directoryState[file.path].isOpen,
+        },
+      })
+    );
   };
 
   const handleLoadDirectory = async (path: string) => {
     setIsLoading(true);
     try {
       const directoryFiles = await readDirectory(path);
-      const newQueue = [...queue, ...directoryFiles.filter((f) => !f.isDirectory)];
+      const newQueue = [
+        ...queue,
+        ...directoryFiles.filter((f) => !f.isDirectory),
+      ];
       const newDirectoryState = {
         ...directoryState,
         [path]: {
@@ -52,22 +58,25 @@ export const useSelectFile = () => {
     setIsLoading(true);
 
     try {
-        if (file.isDirectory) {
-            const directoryExists = directoryState[file.path];
-            if (directoryExists) await handleToggleIsOpen(file);
-            else await handleLoadDirectory(file.path);
-        } else {
-            const content = (await readFile(file.path)) || '';
-            const language = getLanguageFromFile(file.name);
-            dispatch(setCurrentFile(file));
-            dispatch(setFile({
-                id: file.path,
-                path: file.path,
-                name: file.name,
-                content,
-                language,
-            }));
-        }
+      if (file.isDirectory) {
+        const directoryExists = directoryState[file.path];
+        if (directoryExists) await handleToggleIsOpen(file);
+        else await handleLoadDirectory(file.path);
+      } else {
+        const content = (await readFile(file.path)) || "";
+        const language = getLanguageFromFile(file.name);
+        dispatch(setCurrentFile(file));
+        dispatch(
+          setFile({
+            id: file.path,
+            path: file.path,
+            name: file.name,
+            content,
+            language,
+          })
+        );
+        dispatch(hierarchySettingsActions.setHierarchyResponsiveActive(false));
+      }
     } catch (error) {
       console.error("Error selecting file:", error);
     } finally {

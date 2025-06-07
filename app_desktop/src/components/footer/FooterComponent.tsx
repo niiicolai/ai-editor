@@ -8,7 +8,7 @@ import IndexingComponent from "./IndexingComponent";
 function FooterComponent() {
 
   return (
-    <footer className="px-3 py-1 border-color border-t main-bgg">
+    <footer className="px-3 py-1 border-color border-t main-bgg w-full overflow-hidden truncate">
       <div className="flex flex-row justify-between items-center gap-3">
         <div>
           <CreditInfoComponent />
