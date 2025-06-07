@@ -1,13 +1,9 @@
-import { ipcMain, dialog, shell } from "electron";
-import { Worker } from "worker_threads";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import path from "path";
+const { ipcMain, dialog, shell } = require("electron");
+const { Worker } = require("worker_threads");
+const path = require("path");
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
-export const fileIpc = (mainWindow) => {
+const fileIpc = (mainWindow) => {
   ipcMain.on("open-folder", async (event) => {
     const result = await dialog.showOpenDialog(mainWindow, {
       properties: ["openDirectory"],
@@ -225,7 +221,33 @@ export const fileIpc = (mainWindow) => {
     }
   });
 
+  ipcMain.on("file-or-dir-exists", async (event, _path) => {
+    const worker = new Worker(
+      path.join(__dirname, "../workers/fileOrDirExistsWorker.js"),
+      {
+        workerData: { path: _path },
+      }
+    );
+
+    worker.on("message", (msg) => {
+      event.reply("on-file-or-dir-exists", msg.data);
+    });
+
+    worker.on("error", (err) => {
+      console.error("Worker error:", err);
+      event.reply("on-file-or-dir-exists", false);
+    });
+
+    worker.on("exit", (code) => {
+      if (code !== 0) console.error(`Worker stopped with exit code ${code}`);
+    });
+  });
+
   ipcMain.on("search", async (event, searchPath, patternStr) => {
     console.log(searchPath, patternStr);
   });
+};
+
+module.exports = {
+  fileIpc,
 };

@@ -1,6 +1,6 @@
-export const executeTerminalCommand = (cmd:string) => {
+export const executeTerminalCommand = (cmd:string, cwd: string) => {
     return new Promise<string>((resolve) => {
-        window.electron.terminalCmd(cmd);
+        window.electron.terminalCmd(cmd, cwd);
         window.electron.onTerminalCmd((response: string) => {
             resolve(response);
         });

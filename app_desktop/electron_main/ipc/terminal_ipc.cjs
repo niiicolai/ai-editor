@@ -1,16 +1,12 @@
-import { ipcMain, dialog } from "electron";
-import { Worker } from "worker_threads";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import path from "path";
+const { ipcMain } = require('electron');
+const { Worker } = require('worker_threads');
+const path = require('path');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
-export const terminalIpc = (mainWindow) => {
-  ipcMain.on("terminal-cmd", async (event, cmd) => {
+const terminalIpc = (mainWindow) => {
+  ipcMain.on("terminal-cmd", async (event, cmd, cwd) => {
       const worker = new Worker(path.join(__dirname, "../workers/executeTerminalCmdWorker.js"), {
-        workerData: { cmd },
+        workerData: { cmd, cwd },
       });
     
       worker.on("message", (msg) => {
@@ -27,4 +23,8 @@ export const terminalIpc = (mainWindow) => {
           console.error(`Worker stopped with exit code ${code}`);
       });
     });
+};
+
+module.exports = {
+  terminalIpc
 };

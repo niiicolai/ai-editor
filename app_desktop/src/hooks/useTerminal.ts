@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
 import { setTerminals } from "../features/terminals";
 import { executeTerminalCommand } from "../electron/executeTerminalCommand";
+import { fileOrDirExists } from "../electron/fileOrDirExists";
 
 export const useTerminal = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -31,13 +32,40 @@ export const useTerminal = () => {
     if (index == -1) return setFormError("Unable to find terminal");
 
     try {
-      const response = await executeTerminalCommand(command);
+      let response: string | null = null;
+      let cwd = t.cwd;
+
+      // Bypass cd and change directory to the terminal's cwd
+      if (command.match(/^cd\s/)) {
+        const newPath = command.replace("cd ", "").trim();
+        if (!newPath) return setFormError("You must specify a directory to change to");
+        const isAbsolute = newPath.startsWith("/") || newPath.match(/^[a-zA-Z]:/);
+        cwd = isAbsolute ? newPath : `${t.cwd}/${newPath}`;
+        // if ../ is used, resolve the path
+        cwd = cwd.replace(/\/\.\//g, "/").replace(/\/[^/]+\/\.\.\//g, "/");
+        // if .. is used, resolve the path
+        cwd = cwd.replace(/\/[^/]+\/\.\.\//g, "/");
+        // Check if the directory exists
+        if (!(await fileOrDirExists(cwd))) {
+          return setFormError(`Directory does not exist: ${cwd}`);
+        }
+        response = `Changed directory to ${cwd}`;
+      } else {
+        response = await executeTerminalCommand(command, t.cwd);
+        if (response) {
+          response = response.split("\n").filter((s:string)=>s.trim().length>0).map((s:string)=>{
+            return `${new Date().getTime().toString()}: ${s}`.trim();
+          }).join("\n");
+        }
+      }
+
       const updatedTerminal = {
         ...terminals[index],
+        cwd,
         messages: [
           ...(terminals[index].messages || []),
           `${new Date().getTime().toString()}: ${command}`,
-          `${new Date().getTime().toString()}: ${response || "No response"}`,
+          `${response || "No response"}`,
         ],
       };
       const newTerminals = [
@@ -54,12 +82,12 @@ export const useTerminal = () => {
     }
   };
 
-  const executeString = async (cmd: string) => {
+  const executeString = async (cmd: string, cwd: string) => {
     setFormError(null);
     setIsLoading(true);
 
     try {
-      await executeTerminalCommand(cmd);
+      await executeTerminalCommand(cmd, cwd);
       setMessage("");
     } catch (err) {
       setFormError(err instanceof Error ? err.message : String(err));

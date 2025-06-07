@@ -73,13 +73,6 @@ function FileOptionsComponent() {
             <span>New File</span>
             <span>{shortcuts.new_file.join(' + ')}</span>
           </button>
-          <button
-            onClick={() => console.log('not implemented')}
-            className="button-main w-full text-left px-2 py-1 flex justify-between"
-          >
-            <span>New Window</span>
-            <span>{shortcuts.new_window.join(' + ')}</span>
-          </button>
           <hr className="border-color" />
           <button
             onClick={() => openFolder.open()}
@@ -128,6 +121,12 @@ function FileOptionsComponent() {
                 className="button-main w-full text-left px-2 py-1"
               >
                 Profile
+              </button>
+              <button
+                onClick={() => navigate("/user/login")}
+                className="button-main w-full text-left px-2 py-1"
+              >
+                Sign into another account
               </button>
             </>
           )}

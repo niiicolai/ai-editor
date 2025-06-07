@@ -1,15 +1,15 @@
-import { ipcMain } from "electron";
-import { 
+const { ipcMain } = require("electron");
+const {
   insertEmbeddedFile,
-  updateEmbeddedFile, 
-  deleteEmbeddedFile, 
-  deleteAllEmbeddedFiles, 
-  paginateEmbeddedFiles, 
+  updateEmbeddedFile,
+  deleteEmbeddedFile,
+  deleteAllEmbeddedFiles,
+  paginateEmbeddedFiles,
   findEmbeddedFileByHashAndProjectId,
   findEmbeddedFileByFilepathAndProjectId
-} from "../sqlite/services/embedded_file_service.js";
+} = require("../sqlite/services/embedded_file_service.cjs");
 
-export const embeddedFileIpc = (mainWindow) => {
+const embeddedFileIpc = (mainWindow) => {
   ipcMain.on(
     "find-embedded-file-by-hash-and-project-id",
     async (event, hash, project_id, embeddingModel) => {
@@ -137,4 +137,8 @@ export const embeddedFileIpc = (mainWindow) => {
       }
     }
   );
+};
+
+module.exports = {
+  embeddedFileIpc,
 };

@@ -10,10 +10,10 @@ function FolderOptionComponent() {
   return (
     <>
         {hierarchy.currentPath && (
-            <div className="flex justify-start items-center gap-1">
+            <div className="flex justify-start items-center gap-1 overflow-hidden w-12 lg:w-auto">
               <FolderIcon className="w-3.5 h-3.5" />
               <button
-                className="text-xs button-main"
+                className="text-xs button-main truncate"
                 onClick={() => openFolder.open()}
               >
                 {hierarchy.currentPath}

@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 
 export const useGetQAs = (page: number, limit: number, project_id: string) => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+    const { embeddingModel } = useSelector((state: RootState) => state.rag);
 
     return useQuery({ 
         queryKey: ['qas', page, limit], 
@@ -22,7 +22,7 @@ export const useGetQAs = (page: number, limit: number, project_id: string) => {
 }
 
 export const useVectorSearchQA = () => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+    const { embeddingModel } = useSelector((state: RootState) => state.rag);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -43,7 +43,7 @@ export const useVectorSearchQA = () => {
 }
 
 export const useTextSearchQA = () => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+    const { embeddingModel } = useSelector((state: RootState) => state.rag);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -64,7 +64,7 @@ export const useTextSearchQA = () => {
 }
 
 export const useCreateQA = () => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+    const { embeddingModel } = useSelector((state: RootState) => state.rag);
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (body: QAType) => insertQA(body, embeddingModel),
@@ -73,7 +73,7 @@ export const useCreateQA = () => {
 }
 
 export const useUpdateQA = () => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+    const { embeddingModel } = useSelector((state: RootState) => state.rag);
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: ({ id, body }: { id: string; body: QAType }) => {
@@ -88,7 +88,7 @@ export const useUpdateQA = () => {
 }
 
 export const useDestroyQA = () => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+    const { embeddingModel } = useSelector((state: RootState) => state.rag);
     const queryClient = useQueryClient();
 
     return useMutation({
@@ -103,7 +103,7 @@ export const useDestroyQA = () => {
 }
 
 export const useDestroyAllQA = () => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+    const { embeddingModel } = useSelector((state: RootState) => state.rag);
     const queryClient = useQueryClient();
 
     return useMutation({

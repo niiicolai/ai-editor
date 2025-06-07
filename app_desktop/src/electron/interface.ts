@@ -44,11 +44,14 @@ declare global {
       moveItemToTrash: (path: string) => void;
       onMoveItemToTrash: (callback: () => void) => void;
 
+      fileOrDirExists: (path: string) => void;
+      onFileOrDirExists: (callback: (content: any) => void) => void;
+
       /**
        * Terminal methods
        */
       
-      terminalCmd: (cmd: string) => void;
+      terminalCmd: (cmd: string, cwd: string) => void;
       onTerminalCmd: (callback: (response: string) => void) => void;
 
       /**

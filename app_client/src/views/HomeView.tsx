@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom";
-import productImage from "../assets/product.png";
+import productImage from "../assets/editorRag.png";
+import editorAstralVenomImage from "../assets/editorAstralVenom.png";
+import editorCyberDriftImage from "../assets/editorCyberDrift.png";
+import editorHighContrastLightImage from "../assets/editorHighContrastLight.png";
+import editorOrangeEmberImage from "../assets/editorOrangeEmber.png";
 import LayoutComponent from "../components/LayoutComponent";
 
 function HomeView() {
@@ -17,15 +21,15 @@ function HomeView() {
                   AI-Powered Code Editor
                 </h1>
                 <p className="text-lg text-indigo-200">
-                  Experience the future of coding with real-time AI assistance,
-                  smart refactoring, and blazing-fast completions.
+                  Experience the future of coding with real-time AI assistance.
                 </p>
                 <div className="flex space-x-4 mt-6">
                   <Link
-                    to="/editor"
+                    to="https://github.com/niiicolai/ai-editor/releases"
+                    target="_blank"
                     className="px-6 py-3 text-base font-semibold rounded-lg border border-cyan-400 text-cyan-300 hover:bg-cyan-500 hover:text-white transition duration-200 backdrop-blur-md bg-white/5"
                   >
-                    Try the Editor
+                    Get the Editor
                   </Link>
                   <Link
                     to="/features"
@@ -46,11 +50,15 @@ function HomeView() {
             </div>
           </div>
 
-          <div className="py-12 flex gap-12 items-start py-24" style={{
-                background: "linear-gradient(135deg,rgb(11, 10, 12),rgb(15, 15, 20),rgb(11, 8, 17))",
-                backgroundSize: "400% 400%",
-                animation: "gradientAnimation 10s ease infinite",
-            }}>
+          <div
+            className="py-12 flex gap-12 items-start py-24"
+            style={{
+              background:
+                "linear-gradient(135deg,rgb(11, 10, 12),rgb(15, 15, 20),rgb(11, 8, 17))",
+              backgroundSize: "400% 400%",
+              animation: "gradientAnimation 10s ease infinite",
+            }}
+          >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-12">
               <div className="lg:text-center">
                 <h2 className="text-base text-cyan-500 font-semibold tracking-wide uppercase">
@@ -65,9 +73,9 @@ function HomeView() {
                 <div className="grid gap-10 md:grid-cols-2 mt-10">
                   {[
                     {
-                      title: "Intelligent Code Completion",
+                      title: "Retrieval Augmented Generation",
                       description:
-                        "Get context-aware suggestions that understand your project structure and coding patterns.",
+                        "Advanced indexing and retrieval capabilities to enhance your AI Assistant's performance.",
                       icon: (
                         <path
                           strokeLinecap="round"
@@ -78,9 +86,9 @@ function HomeView() {
                       ),
                     },
                     {
-                      title: "Real-time Refactoring",
+                      title: "Add Specific Files or Lines to Chat",
                       description:
-                        "Automatically improve your code quality with AI-powered refactoring suggestions.",
+                        "Easily include specific files or code lines in your AI conversations for context.",
                       icon: (
                         <path
                           strokeLinecap="round"
@@ -91,9 +99,9 @@ function HomeView() {
                       ),
                     },
                     {
-                      title: "Smart Debugging",
+                      title: "AI-Powered Tooling",
                       description:
-                        "Let AI help identify and fix bugs before they become problems.",
+                        "Leverage AI to automate repetitive tasks and enhance your coding workflow.",
                       icon: (
                         <path
                           strokeLinecap="round"
@@ -104,9 +112,9 @@ function HomeView() {
                       ),
                     },
                     {
-                      title: "Performance Insights",
+                      title: "Conversations with Context",
                       description:
-                        "Get real-time performance analysis and optimization suggestions.",
+                        "Get context-aware responses from your AI Assistant, making interactions more relevant and efficient.",
                       icon: (
                         <path
                           strokeLinecap="round"
@@ -143,6 +151,44 @@ function HomeView() {
             </div>
           </div>
 
+          <div className="bg-gray-900 py-16 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 className="text-3xl font-extrabold text-white text-center">
+                Choose Your Theme
+              </h2>
+              <p className="mt-4 text-lg text-gray-400 text-center">
+                Customize your coding experience with our beautiful themes.
+              </p>
+              <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {[
+                  { src: editorAstralVenomImage, alt: "Astral Venom" },
+                  { src: editorCyberDriftImage, alt: "Cyber Drift" },
+                  {
+                    src: editorHighContrastLightImage,
+                    alt: "High Contrast Light",
+                  },
+                  { src: editorOrangeEmberImage, alt: "Orange Ember" },
+                ].map((theme, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-lg shadow-lg overflow-hidden"
+                  >
+                    <img
+                      src={theme.src}
+                      alt={theme.alt}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {theme.alt}
+                      </h3>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div className="bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e]">
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
               <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
@@ -156,7 +202,8 @@ function HomeView() {
               <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
                 <div className="inline-flex rounded-md shadow">
                   <Link
-                    to="/editor"
+                    to="https://github.com/niiicolai/ai-editor/releases"
+                    target="_blank"
                     className="inline-flex items-center justify-center px-5 py-3 border border-cyan-500 text-base font-medium rounded-md text-cyan-500 bg-transparent hover:border-cyan-700"
                   >
                     Download Editor

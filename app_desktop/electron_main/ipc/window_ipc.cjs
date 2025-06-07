@@ -1,6 +1,6 @@
-import { ipcMain, BrowserWindow } from "electron";
+const { ipcMain, BrowserWindow } = require('electron');
 
-export const windowIpc = (mainWindowSize, mainWindow) => {
+const windowIpc = (mainWindowSize, mainWindow) => {
 
   ipcMain.on("minimize-window", async (event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
@@ -25,4 +25,8 @@ export const windowIpc = (mainWindowSize, mainWindow) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     if (window) window.close();
   });
+};
+
+module.exports = {
+  windowIpc
 };

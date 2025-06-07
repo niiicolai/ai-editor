@@ -1,4 +1,4 @@
-export const createDB = (db) => {
+const createDB = (db) => {
   db.prepare(
     `
     CREATE TABLE IF NOT EXISTS all_minilm_l6_v2_files (
@@ -37,7 +37,7 @@ export const createDB = (db) => {
       created_at TEXT,
       updated_at TEXT
     );
-    `//code_t5_file_id FLOAT NULL,
+    `
   ).run();
 
   db.prepare(
@@ -50,6 +50,10 @@ export const createDB = (db) => {
       created_at TEXT,
       updated_at TEXT
     );
-    `//all_minilm_l6_v2_file_id INTEGER NULL,
+    `
   ).run();
+};
+
+module.exports = {
+  createDB
 };

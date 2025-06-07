@@ -1,6 +1,6 @@
-import { db } from '../index.js'
+const { db } = require('../index.cjs');
 
-export const findEmbeddedFileByHashAndProjectId = (
+const findEmbeddedFileByHashAndProjectId = (
     hash,
     project_id,
     embeddingModel = "all-MiniLM-L6-v2"
@@ -20,7 +20,7 @@ export const findEmbeddedFileByHashAndProjectId = (
     return result;
 };
 
-export const findEmbeddedFileByFilepathAndProjectId = (
+const findEmbeddedFileByFilepathAndProjectId = (
     filepath,
     project_id,
     embeddingModel = "all-MiniLM-L6-v2"
@@ -40,7 +40,7 @@ export const findEmbeddedFileByFilepathAndProjectId = (
     return result;
 };
 
-export const insertEmbeddedFile = (
+const insertEmbeddedFile = (
   body,
   embeddingModel = "all-MiniLM-L6-v2"
 ) => {
@@ -78,7 +78,7 @@ export const insertEmbeddedFile = (
   return info.lastInsertRowid;
 };
 
-export const updateEmbeddedFile = (
+const updateEmbeddedFile = (
   id,
   body,
   embeddingModel = "all-MiniLM-L6-v2"
@@ -103,7 +103,7 @@ export const updateEmbeddedFile = (
   );
 };
 
-export const deleteEmbeddedFile = (id, embeddingModel = "all-MiniLM-L6-v2") => {
+const deleteEmbeddedFile = (id, embeddingModel = "all-MiniLM-L6-v2") => {
   const table =
     embeddingModel === "all-MiniLM-L6-v2"
       ? "all_minilm_l6_v2_files"
@@ -112,7 +112,7 @@ export const deleteEmbeddedFile = (id, embeddingModel = "all-MiniLM-L6-v2") => {
   stmt.run(id);
 };
 
-export const deleteAllEmbeddedFiles = (
+const deleteAllEmbeddedFiles = (
   project_id,
   embeddingModel = "all-MiniLM-L6-v2"
 ) => {
@@ -127,7 +127,7 @@ export const deleteAllEmbeddedFiles = (
   stmt.run(project_id);
 };
 
-export const paginateEmbeddedFiles = (
+const paginateEmbeddedFiles = (
   page,
   limit,
   project_id,
@@ -200,4 +200,14 @@ export const paginateEmbeddedFiles = (
     pages,
     total,
   };
+};
+
+module.exports = {
+  findEmbeddedFileByHashAndProjectId,
+  findEmbeddedFileByFilepathAndProjectId,
+  insertEmbeddedFile,
+  updateEmbeddedFile,
+  deleteEmbeddedFile,
+  deleteAllEmbeddedFiles,
+  paginateEmbeddedFiles
 };

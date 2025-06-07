@@ -1,6 +1,6 @@
-import { ipcMain, shell } from "electron";
+const { ipcMain, shell } = require("electron");
 
-export const browserIpc = (mainWindow) => {
+const browserIpc = (mainWindow) => {
   ipcMain.on("open-external-browser", async (event, url) => {
     try {
       shell.openExternal(url);
@@ -9,3 +9,8 @@ export const browserIpc = (mainWindow) => {
     }
   });
 };
+
+module.exports = {
+  browserIpc
+};
+
