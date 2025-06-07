@@ -90,7 +90,7 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
     try {
       await TransactionModel.updateOne(
         { _id: message.transaction._id },
-        { state: "error", error: message.transaction.error },
+        { state: "error", error: message.error },
         { session }
       );
       await session.commitTransaction();

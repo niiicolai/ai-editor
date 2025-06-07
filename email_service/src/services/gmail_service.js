@@ -5,7 +5,7 @@ import { authenticate } from "@google-cloud/local-auth";
 import { google } from "googleapis";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { stringValidator } from "../validators/string_validator";
+import { stringValidator } from "../validators/string_validator.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -55,7 +55,7 @@ export class GmailService {
       keyfilePath: CREDENTIALS_PATH,
     });
     if (client.credentials) {
-      await saveCredentials(client);
+      await this.saveCredentials(client);
     }
     return client;
   }

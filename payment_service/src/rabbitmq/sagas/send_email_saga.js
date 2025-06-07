@@ -3,7 +3,7 @@ import TransactionModel from "../../mongodb/models/transaction_model.js";
 import mongoose from "mongoose";
 import SagaBuilder from "../saga/SagaBuilder.js";
 
-const queueName = "send_email:email_service";
+const queueName = "send_email:payment_service";
 const producer = SagaBuilder.producer(queueName, rabbitMq)
 
   .onProduce(async (body) => {
@@ -23,7 +23,7 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
         mail: {
           subject: body.subject,
           content: body.content,
-          to: body.email,
+          to: body.to,
         },
         transaction: {
           _id: transaction._id,
@@ -40,51 +40,38 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
   })
 
   .onCompensate(async (message) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    try {
-      const transaction = await TransactionModel.findOne(
-        { _id: message.transaction._id, state: "pending" },
-        { session }
-      );
-      if (!transaction) throw new Error("Transaction not found");
+    const transaction = await TransactionModel.findOne({
+      _id: message.transaction._id,
+      state: "pending",
+    });
+    if (!transaction) throw new Error("Transaction not found");
 
+    try {
       await TransactionModel.updateOne(
         { _id: message.transaction._id },
-        { state: "error", error: message.transaction.error },
-        { session }
+        { state: "error", error: message.error },
       );
-      await session.commitTransaction();
     } catch (error) {
-      await session.abortTransaction();
+      console.error("Error updating transaction state", error);
       throw error;
-    } finally {
-      await session.endSession();
     }
   })
 
   .onSuccess(async (message) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    try {
-      const transaction = await TransactionModel.findOne(
-        { _id: message.transaction._id, state: "pending" },
-        { session }
-      );
-      if (!transaction) throw new Error("Transaction not found");
+    const transaction = await TransactionModel.findOne({
+      _id: message.transaction._id,
+      state: "pending",
+    });
+    if (!transaction) throw new Error("Transaction not found");
 
+    try {
       await TransactionModel.updateOne(
         { _id: message.transaction._id },
         { state: "completed", error: null },
-        { session }
       );
-
-      await session.commitTransaction();
     } catch (error) {
-      await session.abortTransaction();
+      console.error("Error updating transaction state", error);
       throw error;
-    } finally {
-      await session.endSession();
     }
   })
 

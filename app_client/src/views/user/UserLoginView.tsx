@@ -110,6 +110,13 @@ function UserLoginView() {
         </form>
 
         <Link
+          to="/user/password-reset"
+          className="font-medium text-cyan-700 hover:text-cyan-600 text-center w-full mx-auto block transition duration-200"
+        >
+          Forgot your password?
+        </Link>
+
+        <Link
           to="/"
           className="font-medium text-cyan-700 hover:text-cyan-600 text-center w-full mx-auto block mt-4 transition duration-200"
         >

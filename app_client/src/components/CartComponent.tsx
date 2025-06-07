@@ -1,5 +1,4 @@
 import { useGetOrCreateCheckout, useUpdateCheckout, useStartCheckout } from "../hooks/useCheckout";
-import { Link } from "react-router-dom";
 import { CheckoutProductType } from "../types/checkoutType";
 import { useState } from "react";
 
@@ -124,7 +123,7 @@ function CartComponent() {
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg overflow-hidden z-10">
+                <div className="absolute left-0 mt-2 w-72 bg-white rounded-md shadow-lg overflow-hidden z-10">
                     {cartError && (
                         <div className="p-4 bg-red-50 border-l-4 border-red-400">
                             <p className="text-sm text-red-700">{cartError}</p>
@@ -133,12 +132,6 @@ function CartComponent() {
                     {itemCount === 0 ? (
                         <div className="p-4 text-center">
                             <p className="text-sm text-gray-500">Your cart is empty</p>
-                            <Link
-                                to="/products"
-                                className="mt-2 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-                            >
-                                Browse Products
-                            </Link>
                         </div>
                     ) : (
                         <>
