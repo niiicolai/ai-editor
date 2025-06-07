@@ -3,12 +3,12 @@ import { app, BrowserWindow } from "electron";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import path from "path";
-import { browserIpc } from "./electron_main/ipc/browser_ipc.js";
-import { embeddedFileIpc } from "./electron_main/ipc/embedded_file_ipc.js";
-import { fileIpc } from "./electron_main/ipc/file_ipc.js";
-import { qaIpc } from "./electron_main/ipc/qa_ipc.js";
-import { terminalIpc } from "./electron_main/ipc/terminal_ipc.js";
-import { windowIpc } from "./electron_main/ipc/window_ipc.js";
+import { browserIpc } from "./electron_main/ipc/browser_ipc.cjs";
+import { embeddedFileIpc } from "./electron_main/ipc/embedded_file_ipc.cjs";
+import { fileIpc } from "./electron_main/ipc/file_ipc.cjs";
+import { qaIpc } from "./electron_main/ipc/qa_ipc.cjs";
+import { terminalIpc } from "./electron_main/ipc/terminal_ipc.cjs";
+import { windowIpc } from "./electron_main/ipc/window_ipc.cjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

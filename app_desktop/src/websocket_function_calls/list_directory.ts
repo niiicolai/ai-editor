@@ -4,7 +4,7 @@ export default () => {
   const files = useFiles();
 
   const execute = async (_id: string, clientFn: any, sendMessage: (msg: string) => void) => {
-    const parsedArgs = JSON.parse(JSON.parse(clientFn?.args));
+    const parsedArgs = JSON.parse(clientFn?.args);
     const path = parsedArgs.path;
 
     const resultContent = (await files.readDirectory(path)) as any;

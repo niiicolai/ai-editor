@@ -11,6 +11,9 @@ import { idValidator } from "../validators/id_validator";
 import { stringValidator } from "../validators/string_validator";
 import { fieldsValidator } from "../validators/fields_validator";
 
+const WEBSITE_URL = process.env.WEBSITE_URL;
+if (!WEBSITE_URL) console.error('WEBSITE_URL should be set in the .env file');
+
 const allowedFields = ["expired_at", "created_at", "updated_at"];
 
 interface UserPasswordResetResponse {
@@ -74,9 +77,9 @@ export default class UserPasswordResetService {
       await userPasswordReset.save();
 
       await produceSendEmailSaga({
-        email: user.email,
+        to: user.email,
         subject: "Password reset request",
-        content: `Hi,\n\nClick on the following link to reset password: ${userPasswordReset._id}`,
+        content: `Hi,\n\nClick on the following link to reset password: ${WEBSITE_URL}/user/password-reset/${userPasswordReset._id}`,
       });
 
       return await this.find(userPasswordReset._id.toString(), fields);
@@ -144,7 +147,7 @@ export default class UserPasswordResetService {
       await userPwdReset?.save({ session });
 
       await produceSendEmailSaga({
-        email: user?.email,
+        to: user?.email,
         subject: "Password reset complete",
         content: `Hi,\n\nYour password has been changed.`,
       });

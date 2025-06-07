@@ -30,7 +30,7 @@ function LanguageOptionsComponent() {
         className="w-24 bottom-5"
         buttonText={file.language}
         slot={
-          <>
+          <div className="flex flex-col gap-1">
             <button
               onClick={() => handleSetLang("auto")}
               className="button-main w-full text-xs text-left px-2 py-1"
@@ -46,7 +46,7 @@ function LanguageOptionsComponent() {
                 {lang}
               </button>
             ))}
-          </>
+          </div>
         }
       />
     </div>
