@@ -9,10 +9,15 @@ import { useWriteFile } from "../../hooks/useFiles";
 import { useSaveAs } from "../../hooks/useSaveAs";
 import { useFocusFiles } from "../../hooks/useFocusFiles";
 import themesJson from "../../assets/themes.json";
+import { setTabs } from "../../features/tabs";
 
 function EditorCodeComponent() {
   const { name: themeName } = useSelector((state: RootState) => state.theme);
   const { file, tabSize, nextEditorCommand } = useSelector((state: RootState) => state.editor);
+  const { minimized: terminalIsMinimized, disabled: terminalIsDisabled } = useSelector((state: RootState) => state.terminalSettings);
+  const { minimized: hierarchyIsMinimized } = useSelector((state: RootState) => state.hierarchySettings);
+  const { minimized: agentIsMinimized } = useSelector((state: RootState) => state.userAgentSessionSettings);
+  const { tabs } = useSelector((state: RootState) => state.tabs);
   const theme = themesJson.find((t) => t.name === themeName)?.editor;
 
   //const shortcuts = useSelector((state: RootState) => state.shortcuts);
@@ -72,6 +77,17 @@ function EditorCodeComponent() {
 
   const handleEditorChange = (value?: string) => {
     if (value !== undefined) {
+      const updatedTabs = tabs.map((tab) => {
+        if (tab.file.path === file.path) {
+          return {
+            ...tab,
+            content: value,
+            contentIsChanged: true,
+          };
+        }
+        return tab;
+      });
+      dispatch(setTabs(updatedTabs));
       dispatch(setFile({ ...file, content: value }));
     }
   };
@@ -177,7 +193,25 @@ function EditorCodeComponent() {
     }
   }, [file]);
 
-  
+  const handleResize = () => {      
+      if (editorRef.current) {
+        editorRef.current.layout({
+              width: 100, 
+              height: 100,
+          });
+      }
+    };
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    handleResize();
+  }, [terminalIsMinimized, terminalIsDisabled, hierarchyIsMinimized, agentIsMinimized]);
 
   return (
     <div className="flex-1">

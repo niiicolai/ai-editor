@@ -6,10 +6,14 @@ import UserEditView from '../views/user/UserEditView';
 import UserShowView from '../views/user/UserShowView';
 import UserDestroyView from '../views/user/UserDestroyView';
 
+import UserPasswordResetCreateView from '../views/user_password_reset/UserPasswordResetCreateView';
+import UserPasswordResetUpdateView from '../views/user_password_reset/UserPasswordResetUpdateView';
+
 import ProductIndexView from '../views/product/ProductIndexView';
 
 import CheckoutIndexView from '../views/checkout/CheckoutIndexView';
 import CheckoutShowView from '../views/checkout/CheckoutShowView';
+import CheckoutCancelView from '../views/checkout/CheckoutCancelView';
 
 import DocsIndexView from '../views/docs/DocsIndexView';
 
@@ -128,6 +132,18 @@ export const routes = [
   },
 
   /**
+   * User password reset routes
+   */
+  {
+    path: "/user/password-reset",
+    element: <UserPasswordResetCreateView />,
+  },
+  {
+    path: "/user/password-reset/:_id",
+    element: <UserPasswordResetUpdateView />,
+  },
+
+  /**
    * Product routes
    */
   {
@@ -146,5 +162,8 @@ export const routes = [
     path: "/checkout/:_id",
     element: <CheckoutShowView />,
   },
-
+  {
+    path: "/checkout/cancel",
+    element: <CheckoutCancelView />,
+  },
 ];

@@ -1,4 +1,4 @@
-import { Check, ChevronUp, Code, LoaderIcon, Plus, XIcon } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Code, LoaderIcon, Plus, XIcon } from "lucide-react";
 import { useTerminal } from "../../hooks/useTerminal";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
@@ -76,6 +76,12 @@ function TerminalComponent() {
           >
             <Plus className="w-4 h-4" />
           </button>
+          <button
+            onClick={() => dispatch(setTerminalMinimized(true))}
+            className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ChevronDown className="w-4 h-4" />
+          </button>
         </div>
       </div>
       {selectedIndex > -1 && (
@@ -88,11 +94,15 @@ function TerminalComponent() {
               {terminals[selectedIndex].messages.map((m: string, i: number) => (
                 <pre key={i}>{m}</pre>
               ))}
+              <pre>~ {terminals[selectedIndex].cwd} $</pre>
               <div ref={messagesEndRef} />
             </div>
           </Scrollbar>
           <div>
-            {formError && <>{formError}</>}
+            {formError && 
+            <div className="main-color px-1 text-sm">
+              {formError}
+              </div>}
 
             <form onSubmit={handleExecute} className="flex p-1 h-8">
               <input

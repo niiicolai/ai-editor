@@ -1,15 +1,18 @@
 import { useGetUserAgentSessions } from "../../hooks/useUserAgentSession";
 import { RootState } from "../../store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { usePagination } from "../../hooks/usePagination";
 
 import SessionItemComponent from "./SessionItemComponent";
 import SessionCreateButtonComponent from "./SessionCreateButtonComponent";
+import { userAgentSessionSettingsActions } from "../../features/userAgentSessionSettings";
+import { ChevronLeft } from "lucide-react";
 
 function SessionsComponent() {
     const { page, nextPage, prevPage, limit } = usePagination(10);
     const { data, isLoading, error } = useGetUserAgentSessions(page, limit);
     const { sessionId } = useSelector((state: RootState) => state.userAgentSession);
+    const dispatch = useDispatch();
 
     if (isLoading) {
         return (
@@ -36,6 +39,12 @@ function SessionsComponent() {
             <div className="p-1 border-b border-color h-8 flex items-center justify-between w-full">
                 <div className="flex items-center justify-end w-full">
                     <div className="flex gap-1">
+                        <button
+                            onClick={() => dispatch(userAgentSessionSettingsActions.setMinimized(true))}
+                            className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </button>
                         <SessionCreateButtonComponent />
                     </div>
                 </div>

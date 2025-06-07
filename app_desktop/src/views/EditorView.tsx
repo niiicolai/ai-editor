@@ -8,52 +8,80 @@ import EditorCodeComponent from "../components/editor/EditorCodeComponent";
 import EditorTabsComponent from "../components/editor/EditorTabsComponent";
 import SearchComponent from "../components/search/SearchComponent";
 import { RootState } from "../store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useIsAuthorized } from "../hooks/useUser";
 import { Link } from "react-router-dom";
-import { Lock } from "lucide-react";
+import { ChevronRight, Lock } from "lucide-react";
+import { userAgentSessionSettingsActions } from "../features/userAgentSessionSettings";
 
 function EditorView() {
   const { data: isAuthorized } = useIsAuthorized();
   const { sessionId } = useSelector(
     (state: RootState) => state.userAgentSession
   );
+  const { responsiveActive, minimized } = useSelector(
+    (state: RootState) => state.userAgentSessionSettings
+  );
+  const dispatch = useDispatch();
 
   return (
     <div className="flex flex-col justify-between h-screen">
       <HeaderComponent />
       <SearchComponent />
 
-      <div className="flex-1 flex flex-col lg:flex-row">
-        <div
-          className={`h-full relative main-bgg text-white ${
-            isAuthorized ? "lg:w-96" : ""
-          }`}
-        >
+      <div className="flex-1 flex flex-col lg:flex-row relative">
+        {minimized && (
           <div
-            className={`h-full flex-1 flex flex-col ${
-              isAuthorized ? "lg:w-96" : ""
+            className={`h-full flex-col justify-center main-bgg text-white border-r border-color p-1 ${
+              minimized ? "hidden lg:flex" : "hidden"
             }`}
           >
-            {isAuthorized && sessionId && <ChatComponent />}
-            {isAuthorized && !sessionId && <SessionsComponent />}
-            {!isAuthorized && (
-              <div
-                className={`h-full flex items-center justify-end border-r border-color`}
-              >
-                <Link
-                  title="Login"
-                  to="/user/login"
-                  className="button-main p-1 text-sm rounded-md"
-                >
-                  <Lock className="w-4 h-4" />
-                </Link>
-              </div>
-            )}
+            <button
+              onClick={() =>
+                dispatch(userAgentSessionSettingsActions.setMinimized(false))
+              }
+              className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronRight className="w-4 h-4 hidden lg:block" />
+            </button>
           </div>
-        </div>
+        )}
+        <div
+            className={`hidden absolute left-0 right-0 bottom-0 top-0 lg:static lg:h-full main-bgg text-white lg:block ${minimized ? "lg:hidden" : ""} ${
+              isAuthorized ? "w-full lg:w-96" : ""
+            }`}
+            style={responsiveActive ? { display: "block", zIndex: 99 } : {}}
+          >
+            <div
+              className={`h-full flex-1 flex flex-col ${
+                isAuthorized ? "lg:w-96" : ""
+              }`}
+            >
+              {isAuthorized && sessionId && <ChatComponent />}
+              {isAuthorized && !sessionId && <SessionsComponent />}
+              {!isAuthorized && (
+                <div
+                  className={`h-full flex flex-col lg:flex-row items-center justify-center gap-3 lg:gap-auto lg:justify-end border-r border-color`}
+                >
+                  <p className="lg:hidden text-sm text-white text-center">
+                    Please login to access the AI Assistant
+                    <br /> by clicking the lock icon.
+                  </p>
 
-        <div className="flex-1 flex">
+                  <Link
+                    title="Login"
+                    to="/user/login"
+                    className="button-main p-1 text-sm rounded-md"
+                  >
+                    <Lock className="w-4 h-4" />
+                  </Link>
+                </div>
+              )}
+            </div>
+        </div>
+       
+
+        <div className="flex-1 flex h-full">
           <div className="h-full w-full flex-1 flex flex-col border-r border-color main-bgg">
             <EditorTabsComponent />
             <EditorCodeComponent />

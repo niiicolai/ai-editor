@@ -21,8 +21,8 @@ def sample_controller(app):
         try:
             if page < 1:
                 raise HTTPException(status_code=400, detail="Page must be at least 1")
-            if limit > 100:
-                raise HTTPException(status_code=400, detail="Limit cannot exceed 100")
+            if limit > 120:
+                raise HTTPException(status_code=400, detail="Limit cannot exceed 120")
 
             return get_samples(page=page, limit=limit)
         except Exception as e:

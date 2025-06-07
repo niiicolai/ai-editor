@@ -20,7 +20,7 @@ function TabSizeOptionsComponent() {
         className="w-24 bottom-5"
         buttonText={`Tab size: ${tabSize}`}
         slot={
-          <>
+          <div className="flex flex-col gap-1">
             {tabSizes.map((size: number) => (
               <button
                 key={size}
@@ -30,7 +30,7 @@ function TabSizeOptionsComponent() {
                 {size.toString()}
               </button>
             ))}
-          </>
+          </div>
         }
       />
     </div>
