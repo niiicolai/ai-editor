@@ -76,7 +76,7 @@ export default class Gemini20FlashLite extends Model {
     if (response.functionCalls && response.functionCalls.length > 0) {
       const functionCall = response.functionCalls[0];
       const callName = functionCall.name;
-      const callArgs = JSON.stringify(functionCall.args) || "{'args':''}";
+      const callArgs = functionCall.args;
       return {
         usage,
         tool_call: { name: callName, args: callArgs },

@@ -5,14 +5,35 @@ import { readDirectory } from "../electron/readDirectory";
 import { readFile } from "../electron/readFile";
 import { writeFile } from "../electron/writeFile";
 import { writeDir } from "../electron/writeDir";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store";
+import { setTabs } from "../features/tabs";
 
 export const useWriteFile = () => {
+  const { tabs } = useSelector((state: RootState) => state.tabs);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
+  const dispatch = useDispatch();
+
   const mutateAsync = async (path: string, content: string) => {
     setIsPending(true);
     try {
       await writeFile(path, content);
+
+      const updatedTabs = tabs.map((tab) => {
+        if (tab.file.path === path) {
+          return {
+            ...tab,
+            contentIsChanged: false,
+            file: {
+              ...tab.file,
+              content,
+            },
+          };
+        }
+        return tab;
+      });
+      dispatch(setTabs(updatedTabs));
     } catch (error: unknown) {
       if (error instanceof Error) setError(error.message);
       else setError("Something went wrong");

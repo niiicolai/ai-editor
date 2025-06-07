@@ -17,6 +17,11 @@ jobs:
         with:
           node-version: 18
 
+      - name: Create .env file
+        run: | 
+          cd ./app_desktop
+          echo "${{ secrets.APP_DESKTOP_ENV_FILE }}" > .env 
+
       - name: Install dependencies
         run: |
           cd ./app_desktop
@@ -45,6 +50,11 @@ jobs:
         with:
           node-version: 18
 
+      - name: Create .env file
+        run: | 
+          cd ./app_desktop
+          echo "${{ secrets.APP_DESKTOP_ENV_FILE }}" > .env 
+
       - name: Install dependencies
         run: |
           cd ./app_desktop
@@ -72,6 +82,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+
+      - name: Create .env file
+        run: | 
+          cd ./app_desktop
+          echo "${{ secrets.APP_DESKTOP_ENV_FILE }}" > .env 
 
       - name: Install dependencies
         run: |

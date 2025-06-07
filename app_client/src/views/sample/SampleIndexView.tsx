@@ -7,7 +7,7 @@ import RequireRoleComponent from "../../components/RequireRoleComponent";
 import LineChartComponent from "../../components/LineChartComponent";
 
 export default function SampleIndexView() {
-  const { page, limit, nextPage, prevPage, setLimit } = usePagination(8);
+  const { page, limit, nextPage, prevPage, setLimit } = usePagination(120);
   const { data, isLoading, error } = useGetSamples(page, limit);
 
   const downloadCSV = () => {

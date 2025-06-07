@@ -9,3 +9,4 @@ __pycache__
 venv
 .palm_project_index
 certs
+editor_db.db

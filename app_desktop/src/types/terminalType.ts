@@ -1,5 +1,6 @@
 export interface TerminalType {
   id: string;
+  cwd: string;
   messages: string[];
 }
 

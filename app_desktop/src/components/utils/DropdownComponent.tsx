@@ -37,7 +37,7 @@ export default function DropdownComponent({
         {buttonText}
       </button>
       {isOpen && (
-        <div id={`drop-down-slot-${id}`} className={`fixed main-bgg text-sm main-color text-white shadow-md rounded-md border border-color z-50 ${className}`}>
+        <div id={`drop-down-slot-${id}`} className={`fixed main-bgg text-sm main-color text-white shadow-md rounded-md border border-color z-150 ${className}`}>
           {slot}
         </div>
       )}

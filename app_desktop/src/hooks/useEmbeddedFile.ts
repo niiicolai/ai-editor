@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 
 export const useGetEmbeddedFiles = (page: number, limit: number, project_id: string) => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+    const { embeddingModel } = useSelector((state: RootState) => state.rag);
 
     return useQuery({ 
         queryKey: ['embedded_files', page, limit], 
@@ -19,7 +19,7 @@ export const useGetEmbeddedFiles = (page: number, limit: number, project_id: str
 }
 
 export const useCreateEmbeddedFile = () => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+    const { embeddingModel } = useSelector((state: RootState) => state.rag);
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (body: EmbeddedFileType) => insertEmbeddedFile(body, embeddingModel),
@@ -28,7 +28,7 @@ export const useCreateEmbeddedFile = () => {
 }
 
 export const useUpdateEmbeddedFile = () => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+    const { embeddingModel } = useSelector((state: RootState) => state.rag);
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: ({ id, body }: { id: string; body: EmbeddedFileType }) => {
@@ -43,7 +43,7 @@ export const useUpdateEmbeddedFile = () => {
 }
 
 export const useDestroyEmbeddedFile = () => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+    const { embeddingModel } = useSelector((state: RootState) => state.rag);
     const queryClient = useQueryClient();
 
     return useMutation({
@@ -58,7 +58,7 @@ export const useDestroyEmbeddedFile = () => {
 }
 
 export const useDestroyEmbeddedFiles = () => {
-    const { embeddingModel } = useSelector((state: RootState) => state.userAgentSession);
+    const { embeddingModel } = useSelector((state: RootState) => state.rag);
     const queryClient = useQueryClient();
 
     return useMutation({
