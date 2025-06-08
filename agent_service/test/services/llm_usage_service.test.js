@@ -15,8 +15,8 @@ beforeAll(async () => {
   await UserModel.deleteMany();
   await UserModel.create({
     _id: userId,
-    username: "test55",
-    email: "test@55test.com",
+    username: "testcvxxcv55",
+    email: "test@55texcvxvcvcxst.com",
   });
   await AvailableLllmModel.create({
     _id: llmId,
