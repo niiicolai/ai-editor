@@ -105,20 +105,36 @@ export default class LlmUsageService {
      * @return {Promise<object>} - Created llm usage object
      */
     static async create(body, userId, fields = null) {
-        const { prompt_tokens, completion_tokens, total_tokens } = body;
+        const { prompt_tokens, completion_tokens, total_tokens, event, llm: llmId } = body;
 
         objectValidator(body, "body");
-        stringValidator(body.llm, "llm");
-        stringValidator(body.event, "event")
-        numberValidator(prompt_tokens, "prompt_tokens");
-        numberValidator(completion_tokens, "completion_tokens");
-        numberValidator(total_tokens, "total_tokens");
+        stringValidator(event, "body.event", {
+            min: { enabled: true, value: 1 },
+            max: { enabled: true, value: 100 },
+            regex: null
+        })
+        numberValidator(prompt_tokens, "body.prompt_tokens", {
+            min: { enabled: true, value: 0 },
+            max: { enabled: true, value: 100000 },
+            regex: null
+        });
+        numberValidator(completion_tokens, "body.completion_tokens", {
+            min: { enabled: true, value: 0 },
+            max: { enabled: true, value: 100000 },
+            regex: null
+        });
+        numberValidator(total_tokens, "body.total_tokens", {
+            min: { enabled: true, value: 0 },
+            max: { enabled: true, value: 200000 },
+            regex: null
+        });
+        idValidator(llmId, "body.llm");
         idValidator(userId, "userId");
 
         const user = await UserModel.findOne({ _id: userId });
         if (!user) ClientError.notFound("user not found");
 
-        const llm = await AvailableLlmModel.findOne({ _id: body.llm });
+        const llm = await AvailableLlmModel.findOne({ _id: llmId });
         if (!llm) ClientError.notFound("LLM not found");
         
         /**
@@ -146,10 +162,10 @@ export default class LlmUsageService {
         
         try {
             const llmUsage = new LlmUsageModel({
-                llm: body.llm,
+                llm: llm._id,
                 user_agent_session_messages: body.messages,
                 context_user_agent_session_messages: body.context_messages,
-                event: body.event,
+                event,
                 total_cost_in_dollars: totalCostInDollars,
                 credit_to_dollars_at_purchase: costPerCreditInDollars,
                 cost_per_input_token_at_purchase: costPerInputToken,
@@ -157,9 +173,9 @@ export default class LlmUsageService {
                 fee_per_input_token_at_purchase: feePerInputToken,
                 fee_per_output_token_at_purchase: feePerOutputToken,
                 cost_per_cached_input_token_at_purchase: costPerCachedInputToken,
-                prompt_tokens: body.prompt_tokens,
-                completion_tokens: body.completion_tokens,
-                total_tokens: body.total_tokens,
+                prompt_tokens,
+                completion_tokens,
+                total_tokens,
                 user: user._id,
                 credit_cost,
             });
