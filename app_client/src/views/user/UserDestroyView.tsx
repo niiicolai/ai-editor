@@ -76,7 +76,7 @@ function UserDestroyView() {
             </div>
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               <div className="rounded-xl shadow-sm bg-gray-50/80 p-6 space-y-4">
-                <div>
+                <div data-testid="username-destroy-input">
                   <label
                     htmlFor="username"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -97,7 +97,7 @@ function UserDestroyView() {
                 </div>
               </div>
               {(error || formError) && (
-                <div className="text-red-500 text-sm text-center mt-2">
+                <div className="text-red-500 text-sm text-center mt-2" data-testid="destroy-error">
                   {formError || "An error occurred while deleting your account"}
                 </div>
               )}
@@ -111,6 +111,7 @@ function UserDestroyView() {
                 <button
                   type="submit"
                   disabled={isPending}
+                  data-testid="destroy-submit-button"
                   className={`group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white shadow-lg transition duration-200 ${
                     isPending
                       ? "bg-red-400 cursor-not-allowed"

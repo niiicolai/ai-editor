@@ -47,7 +47,7 @@ function UserEditView() {
             </div>
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               <div className="rounded-xl shadow-sm bg-gray-50/80 p-6 space-y-4">
-                <div>
+                <div data-testid="username-edit-input">
                   <label
                     htmlFor="username"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -58,13 +58,12 @@ function UserEditView() {
                     id="username"
                     name="username"
                     type="text"
-                    value={data?.username}
-                    required
+                    defaultValue={data?.username}
                     className="appearance-none rounded-lg block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-700 focus:border-cyan-700 sm:text-sm transition"
                     placeholder="Username"
                   />
                 </div>
-                <div>
+                <div data-testid="email-edit-input">
                   <label
                     htmlFor="email"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -75,13 +74,12 @@ function UserEditView() {
                     id="email"
                     name="email"
                     type="email"
-                    value={data?.email}
-                    required
+                    defaultValue={data?.email}
                     className="appearance-none rounded-lg block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-700 focus:border-cyan-700 sm:text-sm transition"
                     placeholder="Email address"
                   />
                 </div>
-                <div>
+                <div data-testid="password-edit-input">
                   <label
                     htmlFor="password"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -99,7 +97,7 @@ function UserEditView() {
               </div>
 
               {(error || getUserError || formError) && (
-                <div className="text-red-500 text-sm text-center mt-2">
+                <div className="text-red-500 text-sm text-center mt-2" data-testid="edit-error">
                   {(getUserError as unknown as string) ||
                     formError ||
                     "An error occurred while updating your profile"}
@@ -114,6 +112,7 @@ function UserEditView() {
                   Cancel
                 </Link>
                 <button
+                data-testid="edit-submit-button"
                   type="submit"
                   disabled={isPending}
                   className={`group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white shadow-lg transition duration-200 ${
