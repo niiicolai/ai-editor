@@ -124,6 +124,34 @@ jobs:
           echo "agent service server did not become ready in time!"
           exit 1
 
+      - name: Create docs service .env file
+        run: |
+          cd ./docs_service
+          echo "${{ secrets.DOCS_TEST_ENV_FILE }}" > .env   
+        
+      - name: Install docs service dependencies
+        run: |
+          cd ./docs_service
+          npm install
+
+      - name: Start docs service in the background
+        run: |
+          cd ./docs_service
+          npm start &
+          
+      - name: Wait for docs service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3004 > /dev/null; then
+              echo "Frontend server is ready!"
+              exit 0
+            fi
+            echo "Waiting for docs service server to be ready..."
+            sleep 2
+          done
+          echo "docs service server did not become ready in time!"
+          exit 1
+
       - name: Create payment service .env file
         run: |
           cd ./payment_service
