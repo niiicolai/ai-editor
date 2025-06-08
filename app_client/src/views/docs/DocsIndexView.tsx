@@ -73,87 +73,95 @@ function DocsIndexView() {
     <LayoutComponent
       pageName="docs"
       slot={
-        <div className="bg-white lg:flex gap-3 p-6">
-          <div className="w-full lg:w-64 border border-slate-800 rounded-md">
-            {orderedPages?.data.map((orderedCollection: DocOrderedPageType) => (
-              <div className="p-3" key={orderedCollection.category_name}>
-                <h3 className="font-bold text-lg">
-                  {orderedCollection.category_name}
-                </h3>
-                <ul>
-                  {orderedCollection?.pages.map((page: DocPageType) => (
-                    <li>
-                      <button
-                        onClick={() => setActivePage(page)}
-                        className={`hover:underline cursor-pointer ${
-                          activePage?._id === page._id
-                            ? "font-bold text-blue-500 underline"
-                            : ""
-                        }`}
-                      >
-                        {page.name}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <div className="flex-1 p-6 flex flex-col justify-between">
-            {activePage && (
-              <div>
-                <h1 className="font-bold border-b text-3xl pb-3 text-blue-500 mb-3">
-                  {activePage?.name}
-                </h1>
-                <div className="flex gap-3 text-xs mb-3">
-                  <span>
-                    Created {new Date(activePage?.created_at).toLocaleString()}
-                  </span>
-                  <span>
-                    Last Modified{" "}
-                    {new Date(activePage?.updated_at).toLocaleString()}
-                  </span>
-                </div>
-
-                <div className="markdown">
-                  <Markdown>{activePage?.content}</Markdown>
-                </div>
-              </div>
-            )}
-            {!activePage && (
-              <div>
-                <h1 className="font-bold border-b text-3xl pb-3 text-blue-500">
-                  Select a page
-                </h1>
-              </div>
-            )}
-
-            <div className="flex gap-1 mt-6">
-              {prevPage && (
-                <button
-                  onClick={() => handlePrevPage()}
-                  className="flex flex-col items-start justify-start border px-12 py-3 rounded-md bg-slate-900 hover:bg-slate-600 text-slate-100 cursor-pointer"
-                >
-                  <span className="text-md text-gray-500">Previous Page</span>
-                  <span className="font-bold text-lg">
-                    {prevPage.category.name}: {prevPage.name}
-                  </span>
-                </button>
-              )}
-              {nextPage && (
-                <button
-                  onClick={() => handleNextPage()}
-                  className="flex flex-col items-start justify-start border px-12 py-3 rounded-md bg-slate-900 hover:bg-slate-600 text-slate-100 cursor-pointer"
-                >
-                  <span className="text-md text-gray-500">Next Page</span>
-                  <span className="font-bold text-lg">
-                    {nextPage.category.name}: {nextPage.name}
-                  </span>
-                </button>
+        <>
+          <h4 className="text-xs uppercase font-bold mt-6 ml-6" data-testid="docs-title">
+            Documentation
+          </h4>
+          <div className="bg-white lg:flex gap-3 p-6">
+            <div className="w-full lg:w-64 border border-slate-800 rounded-md">
+              {orderedPages?.data.map(
+                (orderedCollection: DocOrderedPageType) => (
+                  <div className="p-3" key={orderedCollection.category_name}>
+                    <h3 className="font-bold text-lg">
+                      {orderedCollection.category_name}
+                    </h3>
+                    <ul>
+                      {orderedCollection?.pages.map((page: DocPageType) => (
+                        <li>
+                          <button
+                            onClick={() => setActivePage(page)}
+                            className={`hover:underline cursor-pointer ${
+                              activePage?._id === page._id
+                                ? "font-bold text-blue-500 underline"
+                                : ""
+                            }`}
+                          >
+                            {page.name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )
               )}
             </div>
+            <div className="flex-1 p-6 flex flex-col justify-between">
+              {activePage && (
+                <div>
+                  <h1 className="font-bold border-b text-3xl pb-3 text-blue-500 mb-3">
+                    {activePage?.name}
+                  </h1>
+                  <div className="flex gap-3 text-xs mb-3">
+                    <span>
+                      Created{" "}
+                      {new Date(activePage?.created_at).toLocaleString()}
+                    </span>
+                    <span>
+                      Last Modified{" "}
+                      {new Date(activePage?.updated_at).toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="markdown">
+                    <Markdown>{activePage?.content}</Markdown>
+                  </div>
+                </div>
+              )}
+              {!activePage && (
+                <div>
+                  <h1 className="font-bold border-b text-3xl pb-3 text-blue-500">
+                    Select a page
+                  </h1>
+                </div>
+              )}
+
+              <div className="flex gap-1 mt-6">
+                {prevPage && (
+                  <button
+                    onClick={() => handlePrevPage()}
+                    className="flex flex-col items-start justify-start border px-12 py-3 rounded-md bg-slate-900 hover:bg-slate-600 text-slate-100 cursor-pointer"
+                  >
+                    <span className="text-md text-gray-500">Previous Page</span>
+                    <span className="font-bold text-lg">
+                      {prevPage.category.name}: {prevPage.name}
+                    </span>
+                  </button>
+                )}
+                {nextPage && (
+                  <button
+                    onClick={() => handleNextPage()}
+                    className="flex flex-col items-start justify-start border px-12 py-3 rounded-md bg-slate-900 hover:bg-slate-600 text-slate-100 cursor-pointer"
+                  >
+                    <span className="text-md text-gray-500">Next Page</span>
+                    <span className="font-bold text-lg">
+                      {nextPage.category.name}: {nextPage.name}
+                    </span>
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
+        </>
       }
     />
   );

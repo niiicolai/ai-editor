@@ -14,7 +14,7 @@ export default function NotFoundView() {
             }}
         >
             <img src={editor404} alt="404 Not Found" className="max-w-xs w-full mb-4" />
-            <h1 className="text-2xl font-bold text-gray-800">Oops! Page Not Found</h1>
+            <h1 className="text-2xl font-bold text-gray-800" data-testid="error-title">Oops! Page Not Found</h1>
             <p className="text-base text-gray-600 mb-6">
                 The page you're looking for doesn't exist or has been moved.
             </p>

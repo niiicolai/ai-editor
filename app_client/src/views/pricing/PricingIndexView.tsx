@@ -40,7 +40,7 @@ function PricingIndexView() {
           <h2 className="text-base text-cyan-400 font-semibold tracking-wide uppercase">
             Pay-as-you-go Credits
           </h2>
-          <p className="mt-2 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+          <p className="mt-2 text-4xl font-extrabold tracking-tight text-white sm:text-5xl" data-testid="pricing-title">
             Buy Credits & Use the AI Assistant
           </p>
           <p className="mt-4 text-lg text-gray-300 max-w-2xl mx-auto">

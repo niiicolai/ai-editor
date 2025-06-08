@@ -8,16 +8,13 @@ const queueName = "delete_user:auth_service";
 const producer = SagaBuilder.producer(queueName, rabbitMq)
 
   .onProduce(async (body) => {
+    const user = await UserModel.findOne({ _id: body._id, deleted_at: null });
+    if (!user) throw new Error("User not found");
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const user = await UserModel.findOne(
-        { _id: body._id, deleted_at: null },
-        { session }
-      );
-      if (!user) throw new Error("User not found");
-
       user.deleted_at = new Date();
 
       const transaction = new TransactionModel({
@@ -93,7 +90,9 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
       );
       if (!user) throw new Error("User not found");
 
-      user.incomplete_transactions.pull({ transaction: message.transaction._id });
+      user.incomplete_transactions.pull({
+        transaction: message.transaction._id,
+      });
       await user.save({ session });
 
       await TransactionModel.updateOne(
@@ -113,5 +112,6 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
 
   .build();
 
-export const produceDeleteUserSaga = async (body) => await producer.produce(body);
+export const produceDeleteUserSaga = async (body) =>
+  await producer.produce(body);
 export default async () => producer.addListeners();
