@@ -83,10 +83,26 @@ export default class UserService {
    * @returns {Promise<UserCreateResponse>}
    */
   static async create({ username, password, email, role }: UserCreateBody, fields: Array<string> = []): Promise<UserCreateResponse> {
-    stringValidator(username, "username");
-    stringValidator(password, "password");
-    stringValidator(email, "email");
-    stringValidator(role, "role");
+    stringValidator(username, "username", {
+      min: { enabled: true, value: 3 },
+      max: { enabled: true, value: 50 },
+      regex: null,
+    });
+    stringValidator(password, "password", {
+      min: { enabled: true, value: 8 },
+      max: { enabled: true, value: 100 },
+      regex: null,
+    });
+    stringValidator(email, "email", {
+      min: { enabled: true, value: 5 },
+      max: { enabled: true, value: 200 },
+      regex: { enabled: true, value: /^[^@]+@[^@]+\.[^@]+$/ }
+    });
+    stringValidator(role, "role", {
+      min: { enabled: false, value: 0 },
+      max: { enabled: false, value: 0 },
+      regex: { enabled: true, value: /member|admin/ }
+    });
 
     const usernameExists = await User.exists({ username });
     if (usernameExists) ClientError.badRequest("username already exists");

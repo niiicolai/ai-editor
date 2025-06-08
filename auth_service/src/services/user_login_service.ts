@@ -25,8 +25,16 @@ export default class UserLoginService {
    * @returns {Promise<UserLoginResponse>}
    */
   static async login({ email, password }: UserLoginBody): Promise<UserLoginResponse> {
-    stringValidator(email, "email");
-    stringValidator(password, "password");
+    stringValidator(email, "email", {
+      min: { enabled: true, value: 3 },
+      max: { enabled: true, value: 50 },
+      regex: { enabled: true, value: /^[^@]+@[^@]+\.[^@]+$/ }
+    });
+    stringValidator(password, "password", {
+      min: { enabled: true, value: 8 },
+      max: { enabled: true, value: 100 },
+      regex: null,
+    });
 
     const user = await User.findOne({ email });
     if (!user) ClientError.notFound("user not found");

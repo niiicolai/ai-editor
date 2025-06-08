@@ -9,7 +9,7 @@ export default class SessionConnectEvent extends WebsocketEvent {
     async execute(connection, reply, data) {
         const user = await JwtService.verify(data.token);
         if (!user) {
-            reply('error', { content: "Invalid authentication token" });
+            reply('error', { content: "Invalid authentication token", code: 401 });
             return;
         }
 

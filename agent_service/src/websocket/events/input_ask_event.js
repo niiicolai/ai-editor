@@ -3,6 +3,7 @@ import { ChatHandler } from "../../llm/chat_handler.js";
 import UserService from "../../services/user_service.js";
 import RankingService from "../../services/ranking_service.js";
 import Decimal from "decimal.js";
+import ClientError from "../../errors/client_error.js";
 
 export default class InputAskEvent extends WebsocketEvent {
   constructor() {
@@ -20,16 +21,16 @@ export default class InputAskEvent extends WebsocketEvent {
       const userId = connection.userData?.user?._id;
       const sessionId = connection.userData?.sessionId;
 
-      if (!userId) throw new Error("UserId not found");
-      if (!sessionId) throw new Error("SessionId not found");
-      if (!content) throw new Error("no content provided");
+      if (!userId) ClientError.badRequest("UserId not found");
+      if (!sessionId) ClientError.badRequest("SessionId not found");
+      if (!content) ClientError.badRequest("no content provided");
 
       const user = await UserService.find(userId);
-      if (!user) throw new Error("user not found");
+      if (!user) ClientError.notFound("user not found");
 
       const user_credit = new Decimal(user.credit);
       if (user_credit.isZero() || user_credit.isNegative()) {
-        throw new Error("insufficient credits");
+        ClientError.badRequest("insufficient credits");
       }
 
       if (embeddedFiles) {
@@ -88,7 +89,11 @@ export default class InputAskEvent extends WebsocketEvent {
 
     } catch (error) {
       console.log(error);
-      reply("error", { content: "Something went wrong" });
+      if (error instanceof ClientError) {
+        reply("error", { content: error.message, code: error.code });
+      } else {
+        reply("error", { content: "Internal server error" });
+      }
     }
   }
 }
