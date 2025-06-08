@@ -15,8 +15,8 @@ beforeAll(async () => {
   await UserModel.deleteMany();
   await UserModel.create({
     _id: userId,
-    username: "test55",
-    email: "test@55test.com",
+    username: "test552",
+    email: "test@552test.com",
   });
   await UserAgentSessionModel.create({
     _id: sessionId,
