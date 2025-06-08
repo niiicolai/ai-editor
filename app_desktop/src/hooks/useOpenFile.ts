@@ -21,7 +21,7 @@ export const useOpenFile = () => {
         const name = splittedPath[splittedPath.length - 1];
         const language = getLanguageFromFile(path);
 
-        dispatch(setFile({ id: path, name, path, content, language }));
+        dispatch(setFile({ id: path, name, path, content, language, isSaved: true }));
         dispatch(setCurrentFile({ name, path, isDirectory: false }));
       }
     } catch (error) {

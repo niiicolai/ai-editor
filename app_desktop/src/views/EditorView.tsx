@@ -25,7 +25,7 @@ function EditorView() {
   const dispatch = useDispatch();
 
   return (
-    <div className="flex flex-col justify-between h-screen">
+    <div className="flex flex-col justify-between h-screen" data-testid="editor-wrapper">
       <HeaderComponent />
       <SearchComponent />
 
@@ -47,6 +47,7 @@ function EditorView() {
           </div>
         )}
         <div
+            data-testid="editor-agent-wrapper"
             className={`hidden absolute left-0 right-0 bottom-0 top-0 lg:static lg:h-full main-bgg text-white lg:block ${minimized ? "lg:hidden" : ""} ${
               isAuthorized ? "w-full lg:w-96" : ""
             }`}
@@ -61,6 +62,7 @@ function EditorView() {
               {isAuthorized && !sessionId && <SessionsComponent />}
               {!isAuthorized && (
                 <div
+                  data-testid="editor-chat-unauthorized"
                   className={`h-full flex flex-col lg:flex-row items-center justify-center gap-3 lg:gap-auto lg:justify-end border-r border-color`}
                 >
                   <p className="lg:hidden text-sm text-white text-center">

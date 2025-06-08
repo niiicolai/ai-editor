@@ -34,14 +34,14 @@ function SessionsComponent() {
     }
 
     return (
-        <div className="main-bgg text-white bottom-0 border-r border-color bg-gray-50 flex flex-col flex-1">
+        <div className="main-bgg text-white bottom-0 border-r border-color bg-gray-50 flex flex-col flex-1" data-testid="editor-user-sessions">
 
             <div className="p-1 border-b border-color h-8 flex items-center justify-between w-full">
                 <div className="flex items-center justify-end w-full">
                     <div className="flex gap-1">
                         <button
                             onClick={() => dispatch(userAgentSessionSettingsActions.setMinimized(true))}
-                            className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed hidden lg:inline-flex"
                         >
                             <ChevronLeft className="w-4 h-4" />
                         </button>

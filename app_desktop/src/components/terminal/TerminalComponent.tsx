@@ -1,4 +1,12 @@
-import { Check, ChevronDown, ChevronUp, Code, LoaderIcon, Plus, XIcon } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Code,
+  LoaderIcon,
+  Plus,
+  XIcon,
+} from "lucide-react";
 import { useTerminal } from "../../hooks/useTerminal";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
@@ -11,20 +19,22 @@ import Scrollbar from "react-scrollbars-custom";
 function TerminalComponent() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { terminals, isActiveTab, newTab, removeTab, viewTab } = useTerminals();
-  const { minimized, disabled } = useSelector((state: RootState) => state.terminalSettings);
+  const { minimized, disabled } = useSelector(
+    (state: RootState) => state.terminalSettings
+  );
   const { selectedIndex } = useSelector((state: RootState) => state.terminals);
   const { execute, isLoading, formError, message, setMessage } = useTerminal();
   const dispatch = useDispatch();
   const selected = selectedIndex > -1 ? terminals[selectedIndex] : null;
 
-  const handleExecute = (e:any) => {
-    execute(e, terminals[selectedIndex])
-  }
+  const handleExecute = (e: any) => {
+    execute(e, terminals[selectedIndex]);
+  };
 
   // Scroll to bottom when new messages arrive
-    useEffect(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [selected?.messages]);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [selected?.messages]);
 
   if (disabled) {
     return <></>;
@@ -32,7 +42,10 @@ function TerminalComponent() {
 
   if (minimized) {
     return (
-      <div className="border-t border-color flex flex-col justify-between">
+      <div
+        className="border-t border-color flex flex-col justify-between"
+        data-testid="editor-terminal-minimized"
+      >
         <div className="p-1 flex justify-between h-8">
           <div className="flex items-center justify-center ml-1 highlight-color">
             <Code className="w-4 h-4" />
@@ -49,21 +62,34 @@ function TerminalComponent() {
   }
 
   return (
-    <div className="h-64 border-t border-color flex flex-col justify-between">
+    <div
+      className="h-64 border-t border-color flex flex-col justify-between"
+      data-testid="editor-terminal-wrapper"
+    >
       <div className="border-b border-color flex justify-between h-8">
-        <div className="flex items-center justify-left highlight-color">
-          {terminals.map((t: TerminalType, i:number) => (
-            <div key={t.id} className={`tab border-r flex ${
-                isActiveTab(t) ? 'tab-active' : ''
-              }`}>
-              <button 
-              onClick={() => viewTab(t)}
-              className={`overflow-hidden truncate cursor-pointer text-sm px-3 py-1 view-tab-button`}>
+        <div
+          className="flex items-center justify-left highlight-color"
+          data-testid={`editor-terminal-tabs`}
+        >
+          {terminals.map((t: TerminalType, i: number) => (
+            <div
+              key={t.id}
+              className={`tab border-r flex ${
+                isActiveTab(t) ? "tab-active" : ""
+              }`}
+            >
+              <button
+                data-testid={`editor-terminal-tab-${t.id}`}
+                onClick={() => viewTab(t)}
+                className={`overflow-hidden truncate cursor-pointer text-sm px-3 py-1 view-tab-button`}
+              >
                 T: {i.toString()}
               </button>
-              <button 
-              onClick={() => removeTab(t)}
-              className={`overflow-hidden truncate cursor-pointer text-sm px-3 py-1 close-tab-button`}>
+              <button
+                data-testid={`editor-terminal-remove-button`}
+                onClick={() => removeTab(t)}
+                className={`overflow-hidden truncate cursor-pointer text-sm px-3 py-1 close-tab-button`}
+              >
                 <XIcon className="w-4 h-4" />
               </button>
             </div>
@@ -71,12 +97,14 @@ function TerminalComponent() {
         </div>
         <div className="flex gap-1">
           <button
+            data-testid={`editor-terminal-new-tab-button`}
             onClick={() => newTab()}
             className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="w-4 h-4" />
           </button>
           <button
+            data-testid={`editor-terminal-hide-terminal-button`}
             onClick={() => dispatch(setTerminalMinimized(true))}
             className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -99,10 +127,9 @@ function TerminalComponent() {
             </div>
           </Scrollbar>
           <div>
-            {formError && 
-            <div className="main-color px-1 text-sm">
-              {formError}
-              </div>}
+            {formError && (
+              <div className="main-color px-1 text-sm">{formError}</div>
+            )}
 
             <form onSubmit={handleExecute} className="flex p-1 h-8">
               <input

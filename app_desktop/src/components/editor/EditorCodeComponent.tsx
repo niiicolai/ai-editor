@@ -74,14 +74,16 @@ function EditorCodeComponent() {
     };
   };
   
-
   const handleEditorChange = (value?: string) => {
     if (value !== undefined) {
       const updatedTabs = tabs.map((tab) => {
-        if (tab.file.path === file.path) {
+        if (tab.file.path === file.path && tab.file.content !== value) {
           return {
             ...tab,
-            content: value,
+            file: {
+              ...tab.file,
+              content: value,
+            },
             contentIsChanged: true,
           };
         }
@@ -186,12 +188,13 @@ function EditorCodeComponent() {
         const model = editor.getModel();
         if (model) {
           monaco.editor.setModelLanguage(model, file.language.toLowerCase());
+          model.setValue(file.content);
 
           updateEditorCommands();
         }
       }
     }
-  }, [file]);
+  }, [file.id]);
 
   const handleResize = () => {      
       if (editorRef.current) {
@@ -216,6 +219,7 @@ function EditorCodeComponent() {
   return (
     <div className="flex-1">
       <Editor
+        data-testid="editor-code-area"
         defaultLanguage={file.language.toLowerCase()}
         value={file.content}
         path={file.path}
