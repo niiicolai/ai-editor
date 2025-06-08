@@ -40,70 +40,58 @@ function DocsIndexView() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <LayoutComponent
-        pageName="docs"
-        slot={
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          </div>
-        }
-      />
-    );
-  }
-
-  if (error) {
-    return (
-      <LayoutComponent
-        pageName="docs"
-        slot={
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="text-red-500 text-center">
-              <p className="text-lg">Error loading docs</p>
-              <p className="text-sm mt-2">Please try again later</p>
-            </div>
-          </div>
-        }
-      />
-    );
-  }
-
   return (
     <LayoutComponent
       pageName="docs"
       slot={
         <>
-          <h4 className="text-xs uppercase font-bold mt-6 ml-6" data-testid="docs-title">
+          <h4
+            className="text-xs uppercase font-bold mt-6 ml-6"
+            data-testid="docs-title"
+          >
             Documentation
           </h4>
           <div className="bg-white lg:flex gap-3 p-6">
             <div className="w-full lg:w-64 border border-slate-800 rounded-md">
-              {orderedPages?.data.map(
-                (orderedCollection: DocOrderedPageType) => (
-                  <div className="p-3" key={orderedCollection.category_name}>
-                    <h3 className="font-bold text-lg">
-                      {orderedCollection.category_name}
-                    </h3>
-                    <ul>
-                      {orderedCollection?.pages.map((page: DocPageType) => (
-                        <li>
-                          <button
-                            onClick={() => setActivePage(page)}
-                            className={`hover:underline cursor-pointer ${
-                              activePage?._id === page._id
-                                ? "font-bold text-blue-500 underline"
-                                : ""
-                            }`}
-                          >
-                            {page.name}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )
+              {isLoading && (
+                <div className="min-h-screen flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                </div>
               )}
+              {!isLoading && error && (
+                <div className="min-h-screen flex items-center justify-center">
+                  <div className="text-red-500 text-center">
+                    <p className="text-lg">Error loading docs</p>
+                    <p className="text-sm mt-2">Please try again later</p>
+                  </div>
+                </div>
+              )}
+              {!isLoading &&
+                orderedPages?.data.map(
+                  (orderedCollection: DocOrderedPageType) => (
+                    <div className="p-3" key={orderedCollection.category_name}>
+                      <h3 className="font-bold text-lg">
+                        {orderedCollection.category_name}
+                      </h3>
+                      <ul>
+                        {orderedCollection?.pages.map((page: DocPageType) => (
+                          <li>
+                            <button
+                              onClick={() => setActivePage(page)}
+                              className={`hover:underline cursor-pointer ${
+                                activePage?._id === page._id
+                                  ? "font-bold text-blue-500 underline"
+                                  : ""
+                              }`}
+                            >
+                              {page.name}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )
+                )}
             </div>
             <div className="flex-1 p-6 flex flex-col justify-between">
               {activePage && (
