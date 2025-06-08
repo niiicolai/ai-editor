@@ -30,7 +30,11 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
       });
 
       if (body.username && body.username !== user.username) {
-        stringValidator(body.username, "username");
+        stringValidator(body.username, "username", {
+          min: { enabled: true, value: 3 },
+          max: { enabled: true, value: 50 },
+          regex: null,
+        });
 
         const usernameExists = await UserModel.exists({
           username: body.username,
@@ -41,7 +45,11 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
       }
 
       if (body.email && body.email !== user.email) {
-        stringValidator(body.email, "email");
+        stringValidator(body.email, "email", {
+          min: { enabled: true, value: 5 },
+          max: { enabled: true, value: 200 },
+          regex: { enabled: true, value: /^[^@]+@[^@]+\.[^@]+$/ }
+        });
 
         const emailExists = await UserModel.exists({ email: body.email });
         if (emailExists) ClientError.badRequest("email already exists");
@@ -50,7 +58,11 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
       }
 
       if (body.password) {
-        stringValidator(body.password, "password");
+        stringValidator(body.password, "password", {
+          min: { enabled: true, value: 8 },
+          max: { enabled: true, value: 100 },
+          regex: null,
+        });
         const password = await PwdService.hashPassword(body.password);
         const login = user.logins.find((login) => login.type === "password");
         if (!login) user.logins.push({ type: 'password', password })
