@@ -60,7 +60,11 @@ export default class UserPasswordResetService {
     },
     fields: Array<string> = []
   ): Promise<UserPasswordResetResponse> {
-    stringValidator(email, "email");
+    stringValidator(email, "email", {
+      min: { enabled: true, value: 5 },
+      max: { enabled: true, value: 200 },
+      regex: { enabled: true, value: /^[^@]+@[^@]+\.[^@]+$/ }
+    });
     
     const user = await User.findOne({ email });
     if (!user) ClientError.notFound("user not found");
@@ -106,7 +110,11 @@ export default class UserPasswordResetService {
     fields: Array<string> = []
   ): Promise<UserPasswordResetResponse> {
     idValidator(_id);
-    stringValidator(password, "password");
+    stringValidator(password, "password", {
+      min: { enabled: true, value: 8 },
+      max: { enabled: true, value: 100 },
+      regex: null,
+    });
 
     const userPwdReset = await UserPasswordReset.findOne({
       _id,

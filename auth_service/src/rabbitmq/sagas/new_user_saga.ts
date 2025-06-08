@@ -8,7 +8,7 @@ import SagaBuilder from "../saga/SagaBuilder.js";
 const queueName = "new_user:auth_service";
 const producer = SagaBuilder.producer(queueName, rabbitMq)
 
-  .onProduce(async (body) => {
+  .onProduce(async (body: { username: string; email: string; role: string; password: string; }) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -52,7 +52,7 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
     }
   })
 
-  .onCompensate(async (message) => {
+  .onCompensate(async (message: { transaction: { _id: string; }; error: string; }) => {
     const transaction = await TransactionModel.findOne(
       { _id: message.transaction._id, state: "pending" }
     );
@@ -63,7 +63,7 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
     try {
       await TransactionModel.updateOne(
         { _id: message.transaction._id },
-        { state: "error", error: message.transaction.error },
+        { state: "error", error: message.error },
         { session }
       );
       await session.commitTransaction();
@@ -75,7 +75,7 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
     }
   })
 
-  .onSuccess(async (message) => {
+  .onSuccess(async (message: { transaction: { _id: string; }; user: { _id: string; };}) => {
     const transaction = await TransactionModel.findOne(
       { _id: message.transaction._id, state: "pending" },
     );
