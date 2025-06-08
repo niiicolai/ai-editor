@@ -134,10 +134,46 @@ export default class UserAgentSessionMessageService {
    */
   static async create(body, userId, fields = null) {
     objectValidator(body, "body");
-    stringValidator(body.role, "role");
-    stringValidator(body?.context?.content, "context.content");
-    idValidator(body.userAgentSessionId, "userAgentSessionId");
+    stringValidator(body.role, "body.role", {
+      min: { enabled: false, value: 0 },
+      max: { enabled: false, value: 0 },
+      regex: { enabled: true, value: /user|assistant|system/ },
+    });
+    stringValidator(body?.context?.content, "body.context.content", {
+      min: { enabled: true, value: 1 },
+      max: { enabled: true, value: 10000 },
+      regex: null,
+    });
+    idValidator(body.userAgentSessionId, "body.userAgentSessionId");
     idValidator(userId, "userId");
+    if (body?.context?.code) {
+      stringValidator(body?.context?.code, "body.context.code", {
+        min: { enabled: true, value: 1 },
+        max: { enabled: true, value: 10000 },
+        regex: null,
+      });
+    }
+    if (body?.state) {
+      stringValidator(body?.state, "body.state", {
+        min: { enabled: false, value: 0 },
+        max: { enabled: false, value: 0 },
+        regex: { enabled: true, value: /pending|processing|completed|failed/ },
+      });
+    }
+    if (body.context?.clientFn) {
+      if (body.context?.clientFn.name)
+        stringValidator(body.context.clientFn.name, "body.context.clientFn.name", {
+          min: { enabled: true, value: 1 },
+          max: { enabled: true, value: 100 },
+          regex: null,
+        });
+      if (body.context?.clientFn.args)
+        stringValidator(body.context.clientFn.args, "body.context.clientFn.args", {
+          min: { enabled: true, value: 1 },
+          max: { enabled: true, value: 500 },
+          regex: null,
+        });
+    }
 
     const user = await User.findOne({ _id: userId });
     if (!user) ClientError.notFound("user not found");
@@ -149,9 +185,6 @@ export default class UserAgentSessionMessageService {
     if (!userAgentSession) ClientError.notFound("user agent session not found");
 
     try {
-      /**
-       * Create message
-       */
       const userAgentSessionMessage = new UserAgentSessionMessage({
         content: body?.context?.content,
         clientFn: body?.context?.clientFn,
@@ -188,6 +221,44 @@ export default class UserAgentSessionMessageService {
     objectValidator(body, "body");
     idValidator(_id, "_id");
     idValidator(userId, "userId");
+    if (body.content) {
+        stringValidator(body.content, "body.content", {
+          min: { enabled: true, value: 1 },
+          max: { enabled: true, value: 10000 },
+          regex: null,
+        });
+      }
+      if (body.clientFn) {
+        if (body.clientFn.name)
+          stringValidator(body.clientFn.name, "body.clientFn.name", {
+            min: { enabled: true, value: 1 },
+            max: { enabled: true, value: 100 },
+            regex: null,
+          });
+        if (body.clientFn.args)
+          stringValidator(body.clientFn.args, "body.clientFn.args", {
+            min: { enabled: true, value: 1 },
+            max: { enabled: true, value: 500 },
+            regex: null,
+          });
+      }
+      if (body.code) {
+        stringValidator(body.code, "body.code", {
+          min: { enabled: true, value: 1 },
+          max: { enabled: true, value: 10000 },
+          regex: null,
+        });
+      }
+      if (body.state) {
+        stringValidator(body.state, "body.state", {
+          min: { enabled: false, value: 0 },
+          max: { enabled: false, value: 0 },
+          regex: {
+            enabled: true,
+            value: /pending|processing|completed|failed/,
+          },
+        });
+      }
 
     const userAgentSessionMessage = await UserAgentSessionMessage.findOne({
       _id,
@@ -201,6 +272,7 @@ export default class UserAgentSessionMessageService {
       if (body.clientFn) userAgentSessionMessage.clientFn = body.clientFn;
       if (body.code) userAgentSessionMessage.code = body.code;
       if (body.state) userAgentSessionMessage.state = body.state;
+
       await userAgentSessionMessage.save();
 
       return await this.find(

@@ -37,7 +37,14 @@ export default class LlmService {
     if (!llm) ClientError.notFound("LLM not found");
 
     try {
-      const response = await openai.chat.completions.create({
+      // This is to avoiding spamming the LLM in test if someone forgets to mock the request.
+      const response =
+        process.NODE_ENV === "test"
+          ? { content: { 
+                choices: [{ message: "test message"}], 
+                usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 } 
+            }}
+          : await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: body.messages,
         max_tokens: 10000,

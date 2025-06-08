@@ -60,6 +60,14 @@ test.each([
       e: "state is required",
     },
   ],
+  [
+    {
+      state: "wrong_test",
+      page: 1,
+      limit: 1,
+      e: "state wrong_test does not match the required pattern",
+    },
+  ],
 ])("TransactionService.findAll invalid partitions", async ({ page, limit, state, e }) => {
   await expect(TransactionService.findAll(page, limit, state)).rejects.toThrowError(e);
 });
