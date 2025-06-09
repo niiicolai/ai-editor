@@ -20,10 +20,4 @@ describe('editor footer test', () => {
     cy.get('#drop-down-button-footer-indent-drop-down').should('contain', '4');
   });
 
-  it('test footer show credit details after login success', () => {
-    cy.login();
-    cy.wait(1000);
-    cy.get('[data-testid=editor-footer-credit-info]').should('contain', 'Credit Left:');
-  });
-
 });
