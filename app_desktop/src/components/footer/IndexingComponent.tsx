@@ -11,7 +11,7 @@ export default function IndexingComponent() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (projectIndex.queue.length > 0) {
+    if (projectIndex.queue.length) {
       embedding.synchronize();
     }
   }, [projectIndex.queue]);
@@ -20,8 +20,8 @@ export default function IndexingComponent() {
     <>
       {projectIndex.meta && (
         <div className="flex justify-start items-center gap-1">
-          {projectIndex.isLoading ? (
-            <Loader2Icon className="w-3.5 h-3.5 animate-spin" />
+          {embedding.isLoading ? (
+            <Loader2Icon className="w-3 h-3 animate-spin" />
           ) : (
             <Clipboard className="w-3.5 h-3.5" />
           )}

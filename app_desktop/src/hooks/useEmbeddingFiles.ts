@@ -9,7 +9,7 @@ import { setMeta, setQueue } from "../features/projectIndex";
 import { insertEmbeddedFile } from "../electron/insertEmbeddedFile";
 import { updateEmbeddedFile } from "../electron/updateEmbeddedFile";
 import { insertQA } from "../electron/insertQA";
-import { deleteAllQA } from "../electron/deleteAllQA";
+import { deleteAllQAByFileId } from "../electron/deleteAllQAByFileId";
 import { findEmbeddedFileByFilepathAndProjectId } from "../electron/findEmbeddedFileByFilepathAndProjectId";
 import { parseCustomCode } from "../rag/chunking/custom_code/parser";
 import { parseLanguageModelAugmentation } from "../rag/chunking/language_model_augmentation/parser"
@@ -62,6 +62,8 @@ export const useEmbeddingFiles = () => {
       }
 
       for (const file of queue) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+
         const { name, path } = file;
         if (ignoreFile?.includes(name) || ignoreFile?.includes(path)) {
           console.log("skip file specified in ignore file");
@@ -78,6 +80,7 @@ export const useEmbeddingFiles = () => {
           project_id,
           embeddingModel
         );
+        console.log(existingFile)
         if (existingFile?.file && existingFile?.file?.hash === hash) {
           console.log("skip unchanged existing file");
           continue;
@@ -100,7 +103,7 @@ export const useEmbeddingFiles = () => {
         if (existingFile?.file) {
           console.log('updating file', data)
           await updateEmbeddedFile(existingFile?.file?.rowid, data, embeddingModel);
-          await deleteAllQA(existingFile?.file?.rowid, embeddingModel);
+          await deleteAllQAByFileId(existingFile?.file?.rowid, embeddingModel);
         } else {
           console.log('inserting file', data)
           const result = await insertEmbeddedFile(data, embeddingModel);

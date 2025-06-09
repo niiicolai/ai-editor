@@ -7,12 +7,10 @@ import { FileItemType } from "../types/directoryInfoType";
 import { readFile } from "../electron/readFile";
 import { setFile } from "../features/editor";
 import { useGetLanguage } from "./useGetLanguage";
-import { setQueue } from "../features/projectIndex";
 import { hierarchySettingsActions } from "../features/hierarchySettings";
 import { TabType } from "../types/fileTabType";
 
 export const useSelectFile = () => {
-  const { queue } = useSelector((state: RootState) => state.projectIndex);
   const { directoryState } = useSelector((state: RootState) => state.hierarchy);
   const { tabs } = useSelector((state: RootState) => state.tabs);
   const { getLanguageFromFile } = useGetLanguage();
@@ -35,10 +33,6 @@ export const useSelectFile = () => {
     setIsLoading(true);
     try {
       const directoryFiles = await readDirectory(path);
-      const newQueue = [
-        ...queue,
-        ...directoryFiles.filter((f) => !f.isDirectory),
-      ];
       const newDirectoryState = {
         ...directoryState,
         [path]: {
@@ -48,7 +42,6 @@ export const useSelectFile = () => {
       };
 
       dispatch(setDirectoryState(newDirectoryState));
-      dispatch(setQueue(newQueue));
     } catch (error) {
       console.error("Error reading directory:", error);
     } finally {

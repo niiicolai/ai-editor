@@ -34,19 +34,23 @@ function EditorCodeComponent() {
   ) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-  
-    // Configure TS options
-    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-      jsx: monaco.languages.typescript.JsxEmit.React,
-      target: monaco.languages.typescript.ScriptTarget.ESNext,
-      allowJs: true,
-      checkJs: true,
-      allowNonTsExtensions: true,
-      module: monaco.languages.typescript.ModuleKind.ESNext,
-      moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-      typeRoots: ["node_modules/@types"],
-      reactNamespace: "React",
-    });    
+
+    monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+  noSemanticValidation: true,
+  noSyntaxValidation: true,
+});
+
+monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+  checkJs: false, // Disable type checking in JS files
+  allowJs: true,
+  jsx: monaco.languages.typescript.JsxEmit.React,
+  target: monaco.languages.typescript.ScriptTarget.ESNext,
+  allowNonTsExtensions: true,
+  module: monaco.languages.typescript.ModuleKind.ESNext,
+  moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+  typeRoots: ["node_modules/@types"],
+  reactNamespace: "React",
+});
   
     // Handle Ctrl + Click
     editor.onMouseDown((event) => {
@@ -154,7 +158,7 @@ function EditorCodeComponent() {
     //const keys = shortcuts.save;
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
       const currentFile = { ...file }; // Get the latest file state
-      if (!currentFile.id) saveAs.saveAs(currentFile.name, currentFile.content);
+      if (!currentFile.isSaved) saveAs.saveAs(currentFile.name, currentFile.content);
       else writeFile.mutateAsync(currentFile.path, currentFile.content);
     });
 
@@ -179,6 +183,19 @@ function EditorCodeComponent() {
       dispatch(setNextEditorCommand(null));
     }
   }, [nextEditorCommand]);
+
+  useEffect(() => {
+    if (file) {
+      const editor = editorRef.current;
+      const monaco = monacoRef.current;
+      if (editor && monaco) {
+        const model = editor.getModel();
+        if (model) {
+          updateEditorCommands();
+        }
+      }
+    }
+  }, [file]);
 
   useEffect(() => {
     if (file) {

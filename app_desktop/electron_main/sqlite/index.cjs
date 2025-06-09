@@ -4,7 +4,8 @@ const os = require("os");
 const Database = require("better-sqlite3");
 const vec = require("sqlite-vec");
 const path = require("path");
-const isDev = !app.isPackaged;
+const isDev = !app?.isPackaged;
+
 const db = new Database("editor_db.db");
 
 if (isDev) {
