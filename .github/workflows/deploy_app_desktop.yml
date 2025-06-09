@@ -406,7 +406,7 @@ jobs:
       - name: Publish macOS release
         run: |
           cd ./app_desktop
-          npm exec electron-builder -- --mac --publish always
+          npm exec electron-builder -- --mac --x64 --publish always
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 

@@ -87,8 +87,7 @@
       "output": "dist"
     },
     "mac": {
-      "target": "dmg",
-      "arch": [ "x64" ]
+      "target": "dmg"
     },
     "win": {
       "target": "nsis"
