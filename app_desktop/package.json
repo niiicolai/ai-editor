@@ -76,7 +76,7 @@
     "vite": "^6.2.0"
   },
   "optionalDependencies": {
-    "sqlite-vec-darwin-arm64": "0.1.7-alpha.2",
+    "sqlite-vec-darwin-x64": "0.1.7-alpha.2",
     "sqlite-vec-linux-x64": "0.1.7-alpha.2",
     "sqlite-vec-windows-x64": "0.1.7-alpha.2"
   },
@@ -87,7 +87,8 @@
       "output": "dist"
     },
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "arch": [ "x64" ]
     },
     "win": {
       "target": "nsis"
@@ -97,7 +98,7 @@
     },
     "asarUnpack": [
       "node_modules/sqlite-vec-windows-x64/**",
-      "node_modules/sqlite-vec-darwin-arm64/**",
+      "node_modules/sqlite-vec-darwin-x64/**",
       "node_modules/sqlite-vec-linux-x64/**"
     ],
     "files": [
