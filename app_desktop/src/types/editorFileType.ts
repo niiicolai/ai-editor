@@ -5,4 +5,5 @@ export interface FileType {
     content: string;
     language: string;
     path: string;
+    isSaved: boolean;
   }

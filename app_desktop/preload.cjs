@@ -111,6 +111,9 @@ contextBridge.exposeInMainWorld('electron', {
     deleteAllQA: (project_id, embeddingModel) => ipcRenderer.send('delete-all-qa', project_id, embeddingModel),
     onDeleteAllQA: (callback) => ipcRenderer.on('on-delete-all-qa', (event, content) => callback(content)),
 
+    deleteAllQAByFileId: (file_id, embeddingModel) => ipcRenderer.send('delete-all-qa-by-file-id', file_id, embeddingModel),
+    onDeleteAllQAByFileId: (callback) => ipcRenderer.on('on-delete-all-qa-by-file-id', (event, content) => callback(content)),
+
     vectorSearchQA: (project_id, queryEmbedding, embeddingModel) => ipcRenderer.send('vector-search-qa', project_id, queryEmbedding, embeddingModel),
     onVectorSearchQA: (callback) => ipcRenderer.on('on-vector-search-qa', (event, content) => callback(content)),
 

@@ -29,6 +29,7 @@ function ResponsiveOptionsComponent() {
   return (
     <>
       <button
+        data-testid="editor-header-res-show-agent"
         title="Assistant"
         onClick={() => toggleAgentResponsive()}
         className={`lg:hidden inline-flex items-center p-1 border border-transparent rounded-full shadow-sm button-main disabled:opacity-50 disabled:cursor-not-allowed ${
@@ -38,6 +39,7 @@ function ResponsiveOptionsComponent() {
         <Computer className="h-3 w-3" />
       </button>
       <button
+        data-testid="editor-header-res-show-explorer"
         title="Explorer"
         onClick={() => toggleHierarchyResponsive()}
         className={`lg:hidden inline-flex items-center p-1 border border-transparent rounded-full shadow-sm button-main disabled:opacity-50 disabled:cursor-not-allowed ${

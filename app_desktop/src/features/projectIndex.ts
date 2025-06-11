@@ -12,7 +12,6 @@ const projectIndexSlice = createSlice({
     meta: null,
     queue: [] as FileItemType[],
     items: {} as ProjectIndexItemType,
-    isLoading: false,
   } as ProjectIndexType,
   reducers: {
     setMeta: (
@@ -20,9 +19,6 @@ const projectIndexSlice = createSlice({
       action: PayloadAction<ProjectIndexMetaType | null>
     ) => {
       state.meta = action.payload;
-    },
-    setIsLoading: (state: any, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
     },
     setItems: (state: any, action: PayloadAction<ProjectIndexItemType>) => {
       state.items = action.payload;
@@ -39,7 +35,6 @@ const projectIndexSlice = createSlice({
 export const { 
     setMeta, 
     setItems, 
-    setIsLoading, 
     addToQueue, 
     setQueue,
 } = projectIndexSlice.actions;

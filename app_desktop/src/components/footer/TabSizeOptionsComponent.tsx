@@ -24,6 +24,7 @@ function TabSizeOptionsComponent() {
             {tabSizes.map((size: number) => (
               <button
                 key={size}
+                data-testid={`editor-footer-tab-select-button-${size}`}
                 onClick={() => handleSetTabSize(size)}
                 className="button-main w-full text-left px-2 py-1 text-xs"
               >

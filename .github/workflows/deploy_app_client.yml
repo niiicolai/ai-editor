@@ -23,6 +23,11 @@ jobs:
         run: | 
           cd ./app_client
           npm install
+      
+      - name: Build client
+        run: | 
+          cd ./app_client
+          npm run build
 
       - name: Remove .env file
         run: |
@@ -115,7 +120,7 @@ jobs:
         run: |
           for i in {1..30}; do
             if curl -s http://localhost:3001 > /dev/null; then
-              echo "Frontend server is ready!"
+              echo "agent service is ready!"
               exit 0
             fi
             echo "Waiting for agent service server to be ready..."
@@ -143,7 +148,7 @@ jobs:
         run: |
           for i in {1..30}; do
             if curl -s http://localhost:3004 > /dev/null; then
-              echo "Frontend server is ready!"
+              echo "docs service is ready!"
               exit 0
             fi
             echo "Waiting for docs service server to be ready..."
@@ -171,7 +176,7 @@ jobs:
         run: |
           for i in {1..30}; do
             if curl -s http://localhost:3006 > /dev/null; then
-              echo "Frontend server is ready!"
+              echo "email service is ready!"
               exit 0
             fi
             echo "Waiting for email service server to be ready..."
@@ -202,7 +207,7 @@ jobs:
         run: |
           for i in {1..30}; do
             if curl -s http://localhost:3005 > /dev/null; then
-              echo "Frontend server is ready!"
+              echo "rag evaluation service is ready!"
               exit 0
             fi
             echo "Waiting for rag evaluation service server to be ready..."
@@ -230,7 +235,7 @@ jobs:
         run: |
           for i in {1..30}; do
             if curl -s http://localhost:3002 > /dev/null; then
-              echo "Frontend server is ready!"
+              echo "payment service is ready!"
               exit 0
             fi
             echo "Waiting for payment service server to be ready..."
@@ -260,7 +265,7 @@ jobs:
         run: |
           for i in {1..30}; do
             if curl -s http://localhost:3000 > /dev/null; then
-              echo "Frontend server is ready!"
+              echo "auth service is ready!"
               exit 0
             fi
             echo "Waiting for auth service server to be ready..."

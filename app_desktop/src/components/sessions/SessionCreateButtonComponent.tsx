@@ -27,6 +27,7 @@ function SessionCreateButtonComponent() {
   return (
     <>
       <button
+        data-testid="editor-user-sessions-create-button"
         onClick={handleCreate}
         disabled={isPending}
         className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm button-main disabled:opacity-50 disabled:cursor-not-allowed"

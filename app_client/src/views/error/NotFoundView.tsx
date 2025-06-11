@@ -19,6 +19,7 @@ export default function NotFoundView() {
                 The page you're looking for doesn't exist or has been moved.
             </p>
             <button
+                data-testid="error-back-link"
                 className="px-6 py-3 text-black bg-yellow-500 border border-black rounded hover:bg-yellow-600 cursor-pointer"
                 onClick={() => navigate("/")}
             >
