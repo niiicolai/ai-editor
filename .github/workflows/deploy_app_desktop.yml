@@ -378,7 +378,7 @@ jobs:
     needs: 
       - build
       - test
-    runs-on: macos-11
+    runs-on: macos-latest
     steps:
       - name: Clone repo
         uses: actions/checkout@v3
@@ -398,17 +398,18 @@ jobs:
           cd ./app_desktop
           npm install
 
-      - name: Build Electron app (macOS)
+      - name: Build Electron app (macOS) under Rosetta (x86_64)
         run: |
           cd ./app_desktop
-          npm run build
+          arch -x86_64 npm run build
 
-      - name: Publish macOS release
+      - name: Publish macOS release under Rosetta (x86_64)
         run: |
           cd ./app_desktop
-          npm exec electron-builder -- --mac --x64 --publish always
+          arch -x86_64 npm exec electron-builder -- --mac --x64 --publish always
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
 
   release-windows:
     needs: 
