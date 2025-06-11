@@ -10,10 +10,9 @@ import LayoutComponent from "../components/LayoutComponent";
 function HomeView() {
   return (
     <LayoutComponent
-      data-testid="home-wrapper"
       pageName="home"
       slot={
-        <div className="bg-gradient-to-br from-black via-[#302b63] to-[#24243e] min-h-screen text-white">
+        <div className="bg-gradient-to-br from-black via-[#302b63] to-[#24243e] min-h-screen text-white" data-testid="home-wrapper">
           <div className="relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900/30 via-transparent to-transparent blur-3xl z-0"></div>
             <div className="relative z-10 max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between px-6 py-20">
