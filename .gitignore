@@ -10,3 +10,4 @@ venv
 .palm_project_index
 certs
 editor_db.db
+.DS_Store
