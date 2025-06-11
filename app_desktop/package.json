@@ -97,7 +97,7 @@
       "target": "AppImage"
     },
     "asarUnpack": [
-      "node_modules/sqlite-vec-windows-x64/**",      
+      "node_modules/sqlite-vec-windows-x64/**",
       "node_modules/sqlite-vec-linux-x64/**",
       "vec-darwin-x64/**"
     ],
