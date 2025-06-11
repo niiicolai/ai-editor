@@ -52,7 +52,7 @@ function SessionsComponent() {
 
             <div className="flex-1 overflow-y-auto">
                 {data?.sessions?.map((session) => (
-                    <SessionItemComponent session={session} sessionId={sessionId} key={session._id} />
+                    <SessionItemComponent session={session} key={session._id} />
                 ))}
             </div>
 

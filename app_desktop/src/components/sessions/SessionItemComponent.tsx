@@ -6,11 +6,9 @@ import { UserAgentSessionType } from "../../types/userAgentSessionType";
 import { XIcon, LoaderIcon } from "lucide-react";
 
 function SessionItemComponent({
-  session,
-  sessionId
+  session
 }: {
   session: UserAgentSessionType;
-  sessionId: string | null;
 }) {
   const { mutateAsync, isPending, error } = useDestroyUserAgentSession();
   const [formError, setFormError] = useState<string | null>(null);
