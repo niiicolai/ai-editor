@@ -43,7 +43,7 @@ Cypress.Commands.add("login", () => {
   cy.fixture("config").then(({ baseURL }) => {
     cy.fixture("user").then(({ email, password }) => {
       // Load the login page.
-      cy.visit(`${baseURL}/user/login`);
+      cy.visit(`${baseURL}/#/user/login`);
 
       // Fill in the email information.
       cy.get("[data-testid=email-login-input] input").type(email);
@@ -67,12 +67,12 @@ Cypress.Commands.add("login", () => {
 
 Cypress.Commands.add("goto", (path) => {
   cy.fixture("config").then(({ baseURL }) => {
-    cy.visit(`${baseURL}${path}`);
+    cy.visit(`${baseURL}/#${path}`);
   });
 });
 
 Cypress.Commands.add("urlShould", (path) => {
   cy.fixture("config").then(({ baseURL }) => {
-    cy.url().should("eq", `${baseURL}${path}`);
+    cy.url().should("eq", `${baseURL}/#${path}`);
   });
 });
