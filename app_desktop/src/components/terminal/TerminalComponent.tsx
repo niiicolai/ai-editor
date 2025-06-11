@@ -118,7 +118,7 @@ function TerminalComponent() {
             style={{ height: 250 }}
             className="w-full border-b border-color h-full text-sm text-white"
           >
-            <div className="p-1 text-white">
+            <div className="p-1 main-color">
               {terminals[selectedIndex].messages.map((m: string, i: number) => (
                 <pre key={i}>{m}</pre>
               ))}

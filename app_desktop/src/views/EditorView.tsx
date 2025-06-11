@@ -65,7 +65,7 @@ function EditorView() {
                   data-testid="editor-chat-unauthorized"
                   className={`h-full flex flex-col lg:flex-row items-center justify-center gap-3 lg:gap-auto lg:justify-end border-r border-color`}
                 >
-                  <p className="lg:hidden text-sm text-white text-center">
+                  <p className="lg:hidden text-sm main-color text-center">
                     Please login to access the AI Assistant
                     <br /> by clicking the lock icon.
                   </p>

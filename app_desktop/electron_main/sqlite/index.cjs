@@ -6,7 +6,9 @@ const vec = require("sqlite-vec");
 const path = require("path");
 const isDev = !app?.isPackaged;
 
-const db = new Database("editor_db.db");
+const userDataPath = app.getPath('userData');
+const dbPath = path.join(userDataPath, 'editor_db.db');
+const db = new Database(dbPath);
 
 if (isDev) {
   vec.load(db);
@@ -28,7 +30,7 @@ if (isDev) {
   db.loadExtension(
     path.join(
       app.getAppPath().replace("app.asar", "app.asar.unpacked"),
-      "node_modules/sqlite-vec-macos-x64/vec0.dylib"
+      "node_modules/sqlite-vec-darwin-x64/vec0.dylib"
     )
   );
 } else {
