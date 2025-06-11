@@ -54,12 +54,14 @@ function HierarchyComponent() {
             <div className="px-2 py-1.5 border-b border-color h-8">
               <div className="flex items-center justify-between">
                 {currentFolder && (
-                  <h2 className="text-sm font-medium highlight-color text-left flex gap-2 items-center">
+                  <div className="text-sm font-medium highlight-color text-left flex gap-2 items-center">
                     <ChevronRight
                       className={`w-4 h-4 mt-1 transition-transform rotate-90`}
                     />{" "}
-                    <span>{currentFolder}</span>
-                  </h2>
+                    <span className="max-w-36 overflow-hidden truncate">
+                      {currentFolder}
+                    </span>
+                  </div>
                 )}
                 <button
                   onClick={() => dispatch(hierarchySettingsActions.setHierarchyMinimized(true))}
