@@ -10,6 +10,7 @@ import LayoutComponent from "../components/LayoutComponent";
 function HomeView() {
   return (
     <LayoutComponent
+      data-testid="home-wrapper"
       pageName="home"
       slot={
         <div className="bg-gradient-to-br from-black via-[#302b63] to-[#24243e] min-h-screen text-white">
