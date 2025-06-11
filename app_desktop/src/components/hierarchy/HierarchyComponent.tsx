@@ -16,7 +16,9 @@ function HierarchyComponent() {
   const dispatch = useDispatch();
   const { minimized: isMinimized, responsiveActive } = useSelector((state: RootState) => state.hierarchySettings);
   const { currentFile, currentPath, directoryState, renameFileItem }  = useSelector((state: RootState) => state.hierarchy);
-  const currentFolder = currentPath ? currentPath.split("\\").pop() || "" : "";
+  const currentFolder = currentPath
+    ? currentPath.split(/[/\\]/).pop() || ""
+    : "";
   const hasFiles = currentPath && directoryState[currentPath]?.files.length > 0;
 
   const handleContextMenu = (event: any) => {
