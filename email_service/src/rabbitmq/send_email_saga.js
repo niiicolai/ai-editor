@@ -7,32 +7,27 @@ export const createSendEmailSaga = (queueName) => {
   const consumer = SagaBuilder.consumer(queueName, rabbitMq)
 
     .onConsume(async (message) => {
-      const { mail, transaction } = message;
-
-      const existingTransaction = await TransactionModel.findOne({
-        _id: transaction._id,
-      });
-      if (existingTransaction) throw new Error("Transaction already processed");
+      const { _id, type } = message.transaction;
+      const { content, subject, to } = message.mail;
+      const exists = await TransactionModel.exists({ _id }); 
+      if (exists) throw new Error("Transaction already processed");
 
       try {
-        await GmailService.sendMail(mail.content, mail.subject, mail.to);
-
-        const newTransaction = new TransactionModel({
-          _id: transaction._id,
-          type: transaction.type,
-          state: "complete",
+        const transaction = new TransactionModel({
+          _id,
+          type,
+          state: "completed",
           parameters: JSON.stringify({ message }),
         });
-        await newTransaction.save();
 
-        return {
-          transaction: newTransaction,
-        };
+        await GmailService.sendMail(content, subject,to);
+        await transaction.save();
+
+        return message;
       } catch (error) {
-        throw new Error(`Error sending email: ${error.message}`);
+        throw error;
       }
     })
-
     .build();
 
   return { consumer, addListeners: () => consumer.addListeners() };

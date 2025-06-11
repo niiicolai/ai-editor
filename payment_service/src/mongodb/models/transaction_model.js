@@ -7,7 +7,8 @@ const transactionModelSchema = new mongoose.Schema({
     },
     state: {
         type: String,
-        required: true
+        required: true,
+        enum: ['completed', 'error', 'pending']
     },
     error: {
         type: String,

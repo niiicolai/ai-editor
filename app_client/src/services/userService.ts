@@ -53,7 +53,7 @@ export default class UserService {
         return json.data as UserType;
     }
 
-    static async login(email: string, password: string): Promise<void> {
+    static async login(email: string, password: string): Promise<void> {        
         const response = await fetch(`${AUTH_API_URL}/api/v1/user/login`, {
             method: "POST",
             headers: {
@@ -130,5 +130,7 @@ export default class UserService {
         if (!response.ok) {
             throw new Error(await response.text());
         }
+
+        TokenService.removeToken();
     }
 }

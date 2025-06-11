@@ -26,7 +26,8 @@ function UserDestroyView() {
       await mutateAsync();
       navigate("/");
     } catch (err) {
-      setFormError(err as string);
+      const message = JSON.parse((err as any)?.message).error;
+      setFormError(message as string);
     }
   };
 
