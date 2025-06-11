@@ -20,9 +20,49 @@ test.each([
   [
     {
       body: {
-        username: "test",
+        username: "admin",
+        password: "P@11word",
+        email: "a@a.a",
+        role: "member",
+      },
+    },
+  ],
+  [
+    {
+      body: {
+        username: "user12",
+        password: "Dk3f$fdllm",
+        email: "test@test.dk",
+        role: "member",
+      },
+    },
+  ],
+  [
+    {
+      body: {
+        username: "!brugeR3",
+        password: "etheltgenerisDbru2ern!vnsomhar100tegnpræcistetheltgeneriskbrugernavnsomhar100tegnpræcist321123321232",
+        email: "etheltgenerisDbru2ern!vnsomhar100tegnpræcistetheltgeneriskbrugernavnsomhar100tegn@præcist321123321232etheltgenerisDbru2ern!vnsomhar100tegn.præcistetheltgeneriskbrugernavnsomhar100tegnpræcist3211233212",
+        role: "member",
+      },
+    },
+  ],
+  [
+    {
+      body: {
+        username: "aaa",
         password: "Te1!stTest",
-        email: "test@test.com",
+        email: "aaa@test.com",
+        role: "member",
+      },
+    },
+  ],
+  [
+    {
+      body: {
+        username: "etheltgeneriskbrugernavnsomhar50tegnpræcist1233212",
+        password: "Te1!stTest",
+        email: "etheltgeneriskbrugernavnsomhar50tegnpræcist1233212@test.com",
         role: "member",
       },
     },
@@ -54,12 +94,122 @@ test.each([
   [
     {
       body: {
+        username: "a",
+        password: "Te1!stTest",
+        email: "test@test.com",
+        role: "member",
+      },
+      e: "username a out of bounds. Min username is 3",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "aa",
+        password: "Te1!stTest",
+        email: "test@test.com",
+        role: "member",
+      },
+      e: "username aa out of bounds. Min username is 3",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "etheltgeneriskbrugernavnsomhar50tegnpræcist12332122",
+        password: "Te1!stTest",
+        email: "test@test.com",
+        role: "member",
+      },
+      e: "username etheltgeneriskbrugernavnsomhar50tegnpræcist12332122 out of bounds. Max username is 50",
+    },
+  ],
+  [
+    {
+      body: {
         username: "test",
         password: "",
         email: "test@test.com",
         role: "member",
       },
       e: "password is required",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "test",
+        password: "a",
+        email: "test@test.com",
+        role: "member",
+      },
+      e: "password a out of bounds. Min password is 8",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "test",
+        password: "Aa",
+        email: "test@test.com",
+        role: "member",
+      },
+      e: "password Aa out of bounds. Min password is 8",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "test",
+        password: "Aa1",
+        email: "test@test.com",
+        role: "member",
+      },
+      e: "password Aa1 out of bounds. Min password is 8",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "test",
+        password: "Aa1@",
+        email: "test@test.com",
+        role: "member",
+      },
+      e: "password Aa1@ out of bounds. Min password is 8",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "test",
+        password: "aaaaaaaa",
+        email: "test@test.com",
+        role: "member",
+      },
+      e: "Password must contain at least one digit",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "test",
+        password: "P@11wor",
+        email: "test@test.com",
+        role: "member",
+      },
+      e: "password P@11wor out of bounds. Min password is 8",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "test",
+        password: "etheltgenerisDbru2ern!vnsomhar100tegnpræcistetheltgeneriskbrugernavnsomhar100tegnpræcist3211233212322",
+        email: "test@test.com",
+        role: "member",
+      },
+      e: "password etheltgenerisDbru2ern!vnsomhar100tegnpræcistetheltgeneriskbrugernavnsomhar100tegnpræcist3211233212322 out of bounds. Max password is 100",
     },
   ],
   [
@@ -78,10 +228,54 @@ test.each([
       body: {
         username: "test",
         password: "Te1!stTest",
-        email: "test@test.com",
-        role: "",
+        email: "a@a.",
+        role: "member",
       },
-      e: "role is required",
+      e: "email a@a. out of bounds. Min email is 5",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "test",
+        password: "Te1!stTest",
+        email: "etheltgenerisDbru2ern!vnsomhar100tegnpræcistetheltgeneriskbrugernavnsomhar100tegn@præcist321123321232etheltgenerisDbru2ern!vnsomhar100tegn.præcistetheltgeneriskbrugernavnsomhar100tegnpræcist3211233212322",
+        role: "member",
+      },
+      e: "email etheltgenerisDbru2ern!vnsomhar100tegnpræcistetheltgeneriskbrugernavnsomhar100tegn@præcist321123321232etheltgenerisDbru2ern!vnsomhar100tegn.præcistetheltgeneriskbrugernavnsomhar100tegnpræcist3211233212322 out of bounds. Max email is 200",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "te2st",
+        password: "Te1!stTest",
+        email: "aaaaaaaaaaaa",
+        role: "member",
+      },
+      e: "email aaaaaaaaaaaa does not match the required pattern",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "te2st",
+        password: "Te1!stTest",
+        email: "a@aaa",
+        role: "member",
+      },
+      e: "email a@aaa does not match the required pattern",
+    },
+  ],
+  [
+    {
+      body: {
+        username: "te2st",
+        password: "Te1!stTest",
+        email: "aa.aa",
+        role: "member",
+      },
+      e: "email aa.aa does not match the required pattern",
     },
   ],
   [
@@ -90,9 +284,9 @@ test.each([
         username: "test",
         password: "Te1!stTest",
         email: "test@test.com",
-        role: "member",
+        role: "",
       },
-      e: "username already exists",
+      e: "role is required",
     },
   ],
 ])("UserService.create invalid partitions", async ({ body, e }) => {

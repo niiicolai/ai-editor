@@ -29,11 +29,12 @@ function ChatComponent() {
                     <div className="flex gap-1 items-center justify-center">
                         <button
                             onClick={() => dispatch(userAgentSessionSettingsActions.setMinimized(true))}
-                            className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed hidden lg:inline-flex"
                         >
                             <ChevronLeft className="w-4 h-4" />
                         </button>
                         <button
+                            data-testid="editor-user-sessions-close-button"
                             onClick={() => handleToggleSessions()}
                             className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
                         >

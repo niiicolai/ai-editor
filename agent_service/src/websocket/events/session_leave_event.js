@@ -7,7 +7,7 @@ export default class SessionLeaveEvent extends WebsocketEvent {
 
     async execute(connection, reply, data) {
         if (!connection.userData?.user) {
-            reply('error', { content: "User not found" });
+            reply('error', { content: "User not found", code: 404 });
             return;
         }
         connection.userData = { user: connection.userData.user, sessionId: null };

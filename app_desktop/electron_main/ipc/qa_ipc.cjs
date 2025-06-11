@@ -5,6 +5,7 @@ const {
   updateQA,
   deleteQA,
   deleteAllQAByProjectId,
+  deleteAllQAByFileId,
   paginateQAByProjectId,
   vectorSearchQAByProjectId,
   textSearchQAByProjectId
@@ -62,6 +63,19 @@ const qaIpc = (mainWindow) => {
     } catch (error) {
       console.error("Error deleting all QA:", error);
       event.reply("on-delete-all-qa", {
+        success: false,
+        error: error.message,
+      });
+    }
+  });
+
+  ipcMain.on("delete-all-qa-by-file-id", async (event, file_id, embeddingModel) => {
+    try {
+      deleteAllQAByFileId(file_id, embeddingModel);
+      event.reply("on-delete-all-qa-by-file-id", { success: true });
+    } catch (error) {
+      console.error("Error deleting all QA:", error);
+      event.reply("on-delete-all-qa-by-file-id", {
         success: false,
         error: error.message,
       });

@@ -37,7 +37,16 @@ export const useMoveItemToTrash = () => {
 
       // Update the file in the editor state
       if (editor.file.path === path) {
-        dispatch(setFile({ id: "", name: "temp_file", path: "", content: "", language: "" }));
+        const f = `temp-file-${new Date().getTime()}`;
+        const dummyFile = {
+          id: f,
+          name: f,
+          content: "",
+          language: "javascript",
+          path: "temp/"+f,
+          isSaved: false,
+        };
+        dispatch(setFile(dummyFile));
         dispatch(setCurrentFile(null));
       }
 

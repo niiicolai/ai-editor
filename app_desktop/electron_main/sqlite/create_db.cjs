@@ -31,6 +31,7 @@ const createDB = (db) => {
     `
     CREATE VIRTUAL TABLE IF NOT EXISTS code_t5_file_question_answer USING vec0(
       rowid INTEGER PRIMARY KEY AUTOINCREMENT,
+      file_id TEXT,
       project_id TEXT,
       embedding FLOAT[256],
       qa TEXT,
@@ -44,6 +45,7 @@ const createDB = (db) => {
     `
     CREATE VIRTUAL TABLE IF NOT EXISTS all_minilm_l6_v2_file_question_answer USING vec0(
       rowid INTEGER PRIMARY KEY AUTOINCREMENT,
+      file_id TEXT,
       project_id TEXT,
       embedding FLOAT[384],
       qa TEXT,

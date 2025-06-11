@@ -3,10 +3,345 @@ name: Deploy App Desktop
 on:
   push:
     tags:
-      - 'editor-v*.*.*'
+      - "editor-v*.*.*"
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Create .env file
+        run: |
+          cd ./app_desktop
+          echo "${{ secrets.APP_DESKTOP_ENV_FILE }}" > .env
+
+      - name: Install dependencies
+        run: |
+          cd ./app_desktop
+          npm install
+
+      - name: Remove .env file
+        run: |
+          cd ./app_desktop
+          rm .env
+          
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      MONGO_HOST: 127.0.0.1
+      RABBITMQ_HOST: 127.0.0.1
+    services:
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --health-cmd "rabbitmqctl status"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # https://engineering.synatic.com/a-simple-way-to-run-a-mongodb-replica-set-in-github-actions
+      - name: Start mongo
+        id: start-mongo
+        run: docker run --rm -d -p 27017:27017 --name mongo  mongo:4.4.9 --replSet test --bind_ip_all
+      - name: Initialize MongoDB Replica Set
+        run: |
+          sleep 5 # Give mongo a chance to start up
+          docker run --rm mongo:6.0 mongosh --host 172.17.0.1 --eval 'rs.initiate({_id: "test", members: [{_id: 0, host: "172.17.0.1:27017"}]})'
+
+      - name: Install mongosh
+        run: |
+          wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+          echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+          sudo apt-get update
+          sudo apt-get install -y mongodb-mongosh
+
+      - name: Create .env file
+        run: |
+          cd ./app_desktop
+          echo "${{ secrets.APP_DESKTOP_TEST_ENV_FILE }}" > .env
+
+      - name: Install dependencies
+        run: |
+          cd ./app_desktop
+          npm install
+
+      - name: Start frontend server in the background
+        run: |
+          cd ./app_desktop
+          npm run dev &
+
+      - name: Wait for frontend server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:5174 > /dev/null; then
+              echo "Frontend server is ready!"
+              exit 0
+            fi
+            echo "Waiting for frontend server to be ready..."
+            sleep 2
+          done
+          echo "Frontend server did not become ready in time!"
+          exit 1
+
+      - name: Create agent service .env file
+        run: |
+          cd ./agent_service
+          echo "${{ secrets.AGENT_TEST_ENV_FILE }}" > .env
+
+      - name: Install agent service dependencies
+        run: |
+          cd ./agent_service
+          npm install
+
+      - name: Start agent service in the background
+        run: |
+          cd ./agent_service
+          npm start &
+
+      - name: Wait for agent service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3001 > /dev/null; then
+              echo "agent service is ready!"
+              exit 0
+            fi
+            echo "Waiting for agent service server to be ready..."
+            sleep 2
+          done
+          echo "agent service server did not become ready in time!"
+          exit 1
+
+      - name: Create docs service .env file
+        run: |
+          cd ./docs_service
+          echo "${{ secrets.DOCS_TEST_ENV_FILE }}" > .env
+
+      - name: Install docs service dependencies
+        run: |
+          cd ./docs_service
+          npm install
+
+      - name: Start docs service in the background
+        run: |
+          cd ./docs_service
+          npm start &
+
+      - name: Wait for docs service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3004 > /dev/null; then
+              echo "docs service is ready!"
+              exit 0
+            fi
+            echo "Waiting for docs service server to be ready..."
+            sleep 2
+          done
+          echo "docs service server did not become ready in time!"
+          exit 1
+
+      - name: Create email service .env file
+        run: |
+          cd ./email_service
+          echo "${{ secrets.EMAIL_TEST_ENV_FILE }}" > .env
+
+      - name: Install email service dependencies
+        run: |
+          cd ./email_service
+          npm install
+
+      - name: Start email service in the background
+        run: |
+          cd ./email_service
+          npm start &
+
+      - name: Wait for email service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3006 > /dev/null; then
+              echo "email service is ready!"
+              exit 0
+            fi
+            echo "Waiting for email service server to be ready..."
+            sleep 2
+          done
+          echo "email service server did not become ready in time!"
+          exit 1
+
+      - name: Create rag evaluation service .env file
+        run: |
+          cd ./rag_evaluation_service
+          echo "${{ secrets.RAG_EVALUATION_TEST_ENV_FILE }}" > .env
+
+      - name: Install rag evaluation service dependencies
+        run: |
+          cd ./rag_evaluation_service
+          python -m pip install --upgrade pip
+          pip install wheel
+          pip install "fastapi[standard]"
+          pip install -r requirements.txt
+
+      - name: Start rag evaluation service in the background
+        run: |
+          cd ./rag_evaluation_service
+          python main.py &
+
+      - name: Wait for rag evaluation service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3005 > /dev/null; then
+              echo "rag evaluation service is ready!"
+              exit 0
+            fi
+            echo "Waiting for rag evaluation service server to be ready..."
+            sleep 2
+          done
+          echo "rag evaluation service server did not become ready in time!"
+          exit 1
+      
+      - name: Create embedding service .env file
+        run: |
+          cd ./embedding_service
+          echo "${{ secrets.EMBEDDING_TEST_ENV_FILE }}" > .env
+
+      - name: Install embedding service dependencies
+        run: |
+          cd ./embedding_service
+          python -m pip install --upgrade pip
+          pip install wheel
+          pip install "fastapi[standard]"
+          pip install -r requirements.txt
+
+      - name: Start embedding service in the background
+        run: |
+          cd ./embedding_service
+          python main.py &
+
+      - name: Wait for embedding service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3005 > /dev/null; then
+              echo "embedding service is ready!"
+              exit 0
+            fi
+            echo "Waiting for embedding service server to be ready..."
+            sleep 2
+          done
+          echo "embedding service server did not become ready in time!"
+          exit 1
+
+      - name: Create payment service .env file
+        run: |
+          cd ./payment_service
+          echo "${{ secrets.PAYMENT_TEST_ENV_FILE }}" > .env
+
+      - name: Install payment service dependencies
+        run: |
+          cd ./payment_service
+          npm install
+
+      - name: Start payment service in the background
+        run: |
+          cd ./payment_service
+          npm start &
+
+      - name: Wait for payment service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3002 > /dev/null; then
+              echo "payment service is ready!"
+              exit 0
+            fi
+            echo "Waiting for payment service server to be ready..."
+            sleep 2
+          done
+          echo "payment service server did not become ready in time!"
+          exit 1
+
+      - name: Create auth service .env file
+        run: |
+          cd ./auth_service
+          echo "${{ secrets.AUTH_TEST_ENV_FILE }}" > .env
+
+      - name: Install auth service dependencies
+        run: |
+          cd ./auth_service
+          npm install
+          npm run mongo:migrate
+
+      - name: Start auth service in the background
+        run: |
+          cd ./auth_service
+          sh ./wait_for_dependencies.sh
+          npm start &
+
+      - name: Wait for auth service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3000 > /dev/null; then
+              echo "auth service is ready!"
+              exit 0
+            fi
+            echo "Waiting for auth service server to be ready..."
+            sleep 2
+          done
+          echo "auth service server did not become ready in time!"
+          exit 1
+
+      - name: Run E2E tests
+        run: |
+          cd ./app_desktop
+          npx cypress run
+
+      - name: Remove agent .env file
+        run: |
+          cd ./agent_service
+          rm .env
+      - name: Remove payment .env file
+        run: |
+          cd ./payment_service
+          rm .env
+      - name: Remove auth .env file
+        run: |
+          cd ./auth_service
+          rm .env
+      - name: Remove docs .env file
+        run: |
+          cd ./docs_service
+          rm .env
+      - name: Remove email .env file
+        run: |
+          cd ./email_service
+          rm .env
+      - name: Remove rag evaluation .env file
+        run: |
+          cd ./rag_evaluation_service
+          rm .env
+      - name: Remove embedding .env file
+        run: |
+          cd ./embedding_service
+          rm .env
+      - name: Remove frontend .env file
+        run: |
+          cd ./app_desktop
+          rm .env
+ 
   release-linux:
+    needs: 
+      - build
+      - test
     runs-on: ubuntu-latest
     steps:
       - name: Clone repo
@@ -15,12 +350,12 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Create .env file
-        run: | 
+        run: |
           cd ./app_desktop
-          echo "${{ secrets.APP_DESKTOP_ENV_FILE }}" > .env 
+          echo "${{ secrets.APP_DESKTOP_ENV_FILE }}" > .env
 
       - name: Install dependencies
         run: |
@@ -40,6 +375,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   release-macos:
+    needs: 
+      - build
+      - test
     runs-on: macos-latest
     steps:
       - name: Clone repo
@@ -48,12 +386,12 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Create .env file
-        run: | 
+        run: |
           cd ./app_desktop
-          echo "${{ secrets.APP_DESKTOP_ENV_FILE }}" > .env 
+          echo "${{ secrets.APP_DESKTOP_ENV_FILE }}" > .env
 
       - name: Install dependencies
         run: |
@@ -68,11 +406,14 @@ jobs:
       - name: Publish macOS release
         run: |
           cd ./app_desktop
-          npm exec electron-builder -- --mac --publish always
+          npm exec electron-builder -- --mac --x64 --publish always
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   release-windows:
+    needs: 
+      - build
+      - test
     runs-on: windows-latest
     steps:
       - name: Clone repo
@@ -81,12 +422,12 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Create .env file
-        run: | 
+        run: |
           cd ./app_desktop
-          echo "${{ secrets.APP_DESKTOP_ENV_FILE }}" > .env 
+          echo "${{ secrets.APP_DESKTOP_ENV_FILE }}" > .env
 
       - name: Install dependencies
         run: |

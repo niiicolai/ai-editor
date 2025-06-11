@@ -63,11 +63,31 @@ export default class ProductService {
      */
     static async create(body) {
         objectValidator(body, "body")
-        stringValidator(body.title, "body.title")
-        stringValidator(body.description, "body.description")
-        stringValidator(body.category, "body.category")
-        numberValidator(body.noOfCredits, "body.noOfCredits")
-        numberValidator(body.price, "body.price")
+        stringValidator(body.title, "body.title", {
+            min: { enabled: true, value: 2 },
+            max: { enabled: true, value: 100 },
+            regex: null
+        })
+        stringValidator(body.description, "body.description", {
+            min: { enabled: true, value: 1 },
+            max: { enabled: true, value: 1000 },
+            regex: null
+        })
+        stringValidator(body.category, "body.category", {
+            min: { enabled: true, value: 1 },
+            max: { enabled: true, value: 100 },
+            regex: null
+        })
+        numberValidator(body.noOfCredits, "body.noOfCredits", {
+            min: { enabled: true, value: 1 },
+            max: { enabled: true, value: 100000 },
+            regex: null
+        })
+        numberValidator(body.price, "body.price", {
+            min: { enabled: true, value: 1 },
+            max: { enabled: true, value: 100000 },
+            regex: null
+        })
         stringValidator(body.stripePriceId, "body.stripePriceId")
 
         const titleExist = await ProductModel.findOne({ title: body.title, deleted_at: null });
@@ -100,12 +120,56 @@ export default class ProductService {
         const product = await ProductModel.findOne({ _id, deleted_at: null });
         if (!product) ClientError.notFound("product not found");
 
-        if (body.title) product.title = body.title;
-        if (body.description) product.description = body.description;
-        if (body.category) product.category = body.category;
-        if (body.noOfCredits) product.noOfCredits = body.noOfCredits;
-        if (body.price) product.price = body.price;
-        if (body.stripePriceId) product.stripePriceId = body.stripePriceId;
+        if (body.title) {
+            stringValidator(body.title, "body.title", {
+                min: { enabled: true, value: 2 },
+                max: { enabled: true, value: 100 },
+                regex: null
+            })
+
+            product.title = body.title;
+        }
+        if (body.description) {
+            stringValidator(body.description, "body.description", {
+                min: { enabled: true, value: 1 },
+                max: { enabled: true, value: 1000 },
+                regex: null
+            })
+
+            product.description = body.description;
+        }
+        if (body.category) {
+            stringValidator(body.category, "body.category", {
+                min: { enabled: true, value: 1 },
+                max: { enabled: true, value: 100 },
+                regex: null
+            })
+            
+            product.category = body.category;
+        }
+        if (body.noOfCredits) {
+            numberValidator(body.noOfCredits, "body.noOfCredits", {
+                min: { enabled: true, value: 1 },
+                max: { enabled: true, value: 100000 },
+                regex: null
+            })
+
+            product.noOfCredits = body.noOfCredits;
+        }
+        if (body.price) {
+            numberValidator(body.price, "body.price", {
+                min: { enabled: true, value: 1 },
+                max: { enabled: true, value: 100000 },
+                regex: null
+            })
+
+            product.price = body.price;
+        }
+        if (body.stripePriceId) {
+            stringValidator(body.stripePriceId, "body.stripePriceId")
+            
+            product.stripePriceId = body.stripePriceId;
+        }
 
         await product.save();
 

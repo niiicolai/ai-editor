@@ -8,8 +8,10 @@ import { writeDir } from "../electron/writeDir";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
 import { setTabs } from "../features/tabs";
+import { setFile } from "../features/editor";
 
 export const useWriteFile = () => {
+  const { file } = useSelector((state: RootState) => state.editor);
   const { tabs } = useSelector((state: RootState) => state.tabs);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
@@ -34,6 +36,7 @@ export const useWriteFile = () => {
         return tab;
       });
       dispatch(setTabs(updatedTabs));
+      dispatch(setFile({ ...file, content: content }))
     } catch (error: unknown) {
       if (error instanceof Error) setError(error.message);
       else setError("Something went wrong");

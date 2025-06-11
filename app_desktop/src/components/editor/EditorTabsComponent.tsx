@@ -28,7 +28,7 @@ function EditorTabsComponent() {
       <EditorTabsRightClickMenuComponent />
       
       <Scrollbar className="overflow-hidden w-full h-full hide-y-scrollbar">
-        <div className="flex justify-start h-full hide-y-scrollbar">
+        <div className="flex justify-start h-full hide-y-scrollbar" data-testid={`editor-file-tabs`}>
           {tabs &&
             tabs.map((t: TabType) => (
               <div
@@ -42,6 +42,7 @@ function EditorTabsComponent() {
                 <button
                   title={t.file.path}
                   onClick={() => viewTab(t)}
+                  data-testid={`editor-file-tab-edit`}
                   className="px-4 py-1 cursor-pointer view-tab-button overflow-hidden truncate flex items-center gap-2"
                 >
                   {t.contentIsChanged && (
@@ -51,6 +52,7 @@ function EditorTabsComponent() {
                 </button>
                 <div className="px-3 py-1 flex justify-center">
                   <button
+                    data-testid={`editor-file-tab-close`}
                     onClick={() => removeTab(t)}
                     className="cursor-pointer rounded-md close-tab-button"
                   >
