@@ -18,6 +18,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "package": "npm run build && electron-builder",
+    "package:mac-darwin-x64": "npm run build && npm exec electron-builder -- --mac --x64",
     "postinstall": "electron-rebuild -v 35.1.2",
     "cy:run": "npx cypress run",
     "cy:open": "npx cypress open"
@@ -96,16 +97,17 @@
       "target": "AppImage"
     },
     "asarUnpack": [
-      "node_modules/sqlite-vec-windows-x64/**",
-      "node_modules/sqlite-vec-darwin-x64/**",
-      "vec/**"
+      "node_modules/sqlite-vec-windows-x64/**",      
+      "node_modules/sqlite-vec-linux-x64/**",
+      "vec-darwin-x64/**"
     ],
     "files": [
       "dist/**/*",
       "electron_main/**/*",
       "main.prod.cjs",
       "preload.cjs",
-      ".env"
+      ".env",
+      "vec-darwin-x64/**"
     ],
     "publish": [
       {

@@ -30,7 +30,7 @@ if (isDev) {
   db.loadExtension(
     path.join(
       app.getAppPath().replace("app.asar", "app.asar.unpacked"),
-      "vec/vec0"
+      "vec-darwin-x64/vec0"
     )
   );
 } else {
