@@ -5,7 +5,6 @@ import ClientError from "../errors/client_error.js";
 import Stripe from "stripe";
 
 import { produceUserCreditModificationSaga } from "../rabbitmq/sagas/user_credit_modification_saga.js";
-import { produceSendEmailSaga } from "../rabbitmq/sagas/send_email_saga.js";
 
 import { idValidator } from "../validators/id_validator.js";
 import { stringValidator } from "../validators/string_validator.js";
@@ -250,13 +249,6 @@ export default class CheckoutService {
 
     try {
       await produceUserCreditModificationSaga(sessionId.toString());
-      await produceSendEmailSaga({
-        subject: `Your Payment Was Successful! Order: ${checkout._id.toString()}`,
-        content: `Hello ${
-          user.username || user.email
-        },\n\nThank you for your purchase! Your payment has been successfully processed. Find details at ${WEBSITE_URL}/checkout/${checkout._id.toString()}.\n\nIf you have any questions or need support, please contact us.\n\nBest regards,\nThe Team`,
-        to: user.email,
-      });
       return await this.find(checkout._id.toString(), user._id.toString());
     } catch (error) {
       console.error("Error completing checkout", error);

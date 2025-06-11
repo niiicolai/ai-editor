@@ -30,7 +30,7 @@ if (isDev) {
   db.loadExtension(
     path.join(
       app.getAppPath().replace("app.asar", "app.asar.unpacked"),
-      "node_modules/sqlite-vec-darwin-x64/vec0.dylib"
+      "vec-darwin-x64/vec0"
     )
   );
 } else {
