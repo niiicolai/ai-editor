@@ -1,6 +1,5 @@
 import { useGetUserAgentSessions } from "../../hooks/useUserAgentSession";
-import { RootState } from "../../store";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { usePagination } from "../../hooks/usePagination";
 
 import SessionItemComponent from "./SessionItemComponent";
@@ -11,7 +10,6 @@ import { ChevronLeft } from "lucide-react";
 function SessionsComponent() {
     const { page, nextPage, prevPage, limit } = usePagination(10);
     const { data, isLoading, error } = useGetUserAgentSessions(page, limit);
-    const { sessionId } = useSelector((state: RootState) => state.userAgentSession);
     const dispatch = useDispatch();
 
     if (isLoading) {
