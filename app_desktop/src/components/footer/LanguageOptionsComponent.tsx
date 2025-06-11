@@ -40,6 +40,7 @@ function LanguageOptionsComponent() {
             {languages.map((lang: string) => (
               <button
                 key={lang}
+                data-testid={`editor-footer-lang-select-button-${lang}`}
                 onClick={() => handleSetLang(lang)}
                 className="button-main w-full text-xs text-left px-2 py-1"
               >

@@ -3,70 +3,89 @@ import UserModel from "../../mongodb/models/user_model.js";
 import TransactionModel from "../../mongodb/models/transaction_model.js";
 import mongoose from "mongoose";
 
+
+import SagaBuilder from "../saga/SagaBuilder.js";
+
 const queueNameIn = "update_user:auth_service";
 const queueNameOut = "update_user:agent_service";
 
-export default async () => {
-  rabbitMq.addListener(`${queueNameIn}`, async (message) => {
-    const { user: userData, transaction: transactionData } = message;
+const consumer = SagaBuilder
+  .chain(queueNameIn, queueNameOut, rabbitMq)
+  .onConsume(async (message) => {
+    const { _id, type } = message.transaction;
+    const { _id: userId, username, email  } = message.user;
+    const exists = await TransactionModel.exists({ _id }); 
+    if (exists) throw new Error("Transaction already processed");
 
-    const transactionExist = await TransactionModel.findOne({ _id: transactionData._id });
-    if (transactionExist) return console.log("Transaction already processed");
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) throw new Error("User not found");
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const transaction = new TransactionModel({
+        _id,
+        type,
+        state: "pending",
+        parameters: JSON.stringify({ message }),
+      });
+
+      user.username = username;
+      user.email = email;
+      user.incomplete_transactions.push({ transaction: transaction._id });
+
+      await transaction.save({ session });
+      await user.save({ session });
+      await session.commitTransaction();
+
+      return message;
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      await session.endSession();
+    }
+  })
+  .onCompensate(async (message) => {
+    const { error, transaction } = message;
+    const { _id } = transaction;
+    const exists = await TransactionModel.exists({ _id, state: "pending" }); 
+    if (!exists) throw new Error(`Transaction not found: ${message.transaction._id}`);
+    await TransactionModel.updateOne({ _id }, { state: "error", error });
+    return message;
+  })
+  .onSuccess(async (message) => {
+    const { _id } = message.transaction;
+    const { _id: userId } = message.user;
+    const exists = await TransactionModel.exists({ _id, state: "pending" }); 
+    if (!exists) throw new Error(`Transaction not found: ${_id}`);
+
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) throw new Error("User not found");
 
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      const user = await UserModel.findOne({ _id: userData._id });
-      if (!user) throw new Error("User not found");
-
-      const transaction = new TransactionModel({
-        _id: transactionData._id,
-        type: transactionData.type,
-        state: "complete",
-        parameters: JSON.stringify({ message }),
+      await TransactionModel.updateOne(
+        { _id },
+        { state: "completed", error: null },
+        { session }
+      );
+      user.incomplete_transactions.pull({
+        transaction: _id,
       });
-      await transaction.save({ session });
-
-      user.username = userData.username;
-      user.email = userData.email;
       await user.save({ session });
-
-      rabbitMq.sendMessage(`${queueNameOut}_success`, {
-        user: {
-          _id: user._id,
-          username: user.username,
-          email: user.email,
-        },
-        transaction: {
-          _id: transaction._id,
-          state: transaction.state,
-          type: transaction.type,
-        },
-      });
-
       await session.commitTransaction();
+
+      return message;
     } catch (error) {
-      console.error(error);
       await session.abortTransaction();
-      await TransactionModel.create({
-        _id: transactionData._id,
-        type: transactionData.type,
-        state: "error",
-        error: error.message,
-        parameters: JSON.stringify({ message }),
-      });
-      rabbitMq.sendMessage(`${queueNameOut}_error`, {
-        user: {
-          _id: userData._id,
-        },
-        transaction: {
-          _id: transactionData._id,
-          state: "error",
-          error: error.message
-        },
-      });
+      throw error;
     } finally {
       await session.endSession();
     }
-  });
-};
+  })
+  .build();
+  
+export default async () => consumer.addListeners();

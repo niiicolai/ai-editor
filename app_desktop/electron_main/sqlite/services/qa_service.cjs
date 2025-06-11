@@ -14,17 +14,16 @@ const insertQA = (
   embeddingModel = "all-MiniLM-L6-v2"
 ) => {
   const table = getTable(embeddingModel);
-  const foreignKey = getForeignKey(embeddingModel);
-
   const stmt = db.prepare(`
         INSERT INTO ${table} (
-            embedding, qa, project_id, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?)
+            embedding, qa, file_id, project_id, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?)
     `);
+
   const info = stmt.run(
     JSON.stringify(body.embedding),
     body.qa,
-    //parseInt(body.file_id),
+    body.file_id.toString(),
     body.project_id,
     body.created_at,
     body.updated_at
@@ -38,17 +37,15 @@ const updateQA = (
   embeddingModel = "all-MiniLM-L6-v2"
 ) => {
   const table = getTable(embeddingModel);
-  const foreignKey = getForeignKey(embeddingModel);
-
   const stmt = db.prepare(`
     UPDATE ${table}
-    SET embedding = ?, qa = ?, project_id = ?, created_at = ?, updated_at = ?
+    SET embedding = ?, qa = ?, file_id = ?, project_id = ?, created_at = ?, updated_at = ?
     WHERE rowid = ?
   `);
   stmt.run(
     JSON.stringify(body.embedding),
     body.qa,
-    //parseInt(body.file_id),
+    body.file_id.toString(),
     body.project_id,
     body.created_at,
     body.updated_at,
@@ -74,13 +71,24 @@ const deleteAllQAByProjectId = (
   stmt.run(project_id);
 };
 
+const deleteAllQAByFileId = (
+  file_id,
+  embeddingModel = "all-MiniLM-L6-v2"
+) => {
+  const table = getTable(embeddingModel);
+  const stmt = db.prepare(`
+        DELETE FROM ${table}
+        WHERE file_id = ?
+    `);
+  stmt.run(file_id);
+};
+
 const vectorSearchQAByProjectId = (
   queryEmbedding,
   project_id,
   embeddingModel = "all-MiniLM-L6-v2"
 ) => {
   const table = getTable(embeddingModel);
-  const foreignKey = getForeignKey(embeddingModel);
   
   const stmt = db.prepare(`
         SELECT rowid, qa, created_at, updated_at, distance
@@ -100,13 +108,8 @@ const textSearchQAByProjectId = (
   embeddingModel = "all-MiniLM-L6-v2"
 ) => {
   const table = getTable(embeddingModel);
-  const foreignKey = getForeignKey(embeddingModel);
 
-  // Initialize params before using it
   const params = { project_id };
-
-  // Split the query into keywords and build a dynamic WHERE clause
-  // Remove punctuation like question marks, exclamation points, etc.
   const cleanedQuery = query.replace(/[?!.,;:()\[\]{}'"`~@#$%^&*_+=<>\\/|-]/g, '');
   const keywords = cleanedQuery
     .split(/\s+/)
@@ -115,11 +118,9 @@ const textSearchQAByProjectId = (
       params[`kw${idx}`] = `%${kw}%`;
       return `qa LIKE @kw${idx}`;
     });
-
   const whereClause = keywords.length
     ? `project_id = @project_id AND (${keywords.join(' OR ')})`
     : `project_id = @project_id`;
-
   const sql = `
         SELECT rowid, qa, created_at, updated_at
         FROM ${table}
@@ -127,8 +128,6 @@ const textSearchQAByProjectId = (
         ORDER BY created_at DESC
         LIMIT 2
     `;
-
-  // params mapping already added above
 
   const stmt = db.prepare(sql);
   const result = stmt.all(params);
@@ -143,7 +142,6 @@ const paginateQAByProjectId = (
 ) => {
   const offset = (page - 1) * limit;
   const table = getTable(embeddingModel);
-  const foreignKey = getForeignKey(embeddingModel);
 
   const totalStmt = db.prepare(`
         SELECT COUNT(*) as total
@@ -177,6 +175,7 @@ module.exports = {
   updateQA,
   deleteQA,
   deleteAllQAByProjectId,
+  deleteAllQAByFileId,
   paginateQAByProjectId,
   vectorSearchQAByProjectId,
   textSearchQAByProjectId

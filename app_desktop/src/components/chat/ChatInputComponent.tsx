@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Check, FileIcon, Folder, Loader } from "lucide-react";
+import { Check, FileIcon, Folder, Loader, Search } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { FocusFileItemType } from "../../types/directoryInfoType";
@@ -70,7 +70,7 @@ function ChatInputComponent({
     }, [llms])
 
     return (
-        <div className="main-bgg border-r border-color p-1">
+        <div className="main-bgg border-r border-color p-1 main-color">
             {formError && (
                 <div>{formError}</div>
             )}
@@ -117,7 +117,9 @@ function ChatInputComponent({
                     type="submit"
                     className="button-main rounded-md border border-color  px-2 py-1 cursor-pointer focus:outline-none"
                 >
-                    <Check className="h-4 w-4" />
+                    {ragSearch.isLoading
+                    ? <span className="flex flex-col items-center justify-center w-4 h-4 highlight-color"><Search className="w-2 h-2 animate-ping" /></span>
+                    : <Check className="h-4 w-4" />}
                 </button>
                 {selectedAction === 'rag_test' && (
                     <button

@@ -30,7 +30,7 @@ function CreditInfoComponent() {
   return (
     <div>
       <div className="flex items-center gap-1 justify-start highlight-color">
-        <span className="text-xs font-semibold inline-block">
+        <span className="text-xs font-semibold inline-block" data-testid="editor-footer-credit-info">
           Credit Left:
         </span>
         <span className="text-xs font-semibold inline-block">

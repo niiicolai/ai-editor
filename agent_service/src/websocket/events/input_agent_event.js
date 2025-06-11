@@ -8,6 +8,7 @@ import AvailableLlmService from "../../services/available_llm_service.js";
 import LlmUsageService from "../../services/llm_usage_service.js";
 import UserService from "../../services/user_service.js";
 import Decimal from "decimal.js";
+import ClientError from "../../errors/client_error.js";
 
 export default class InputAgentEvent extends WebsocketEvent {
   constructor() {
@@ -21,42 +22,25 @@ export default class InputAgentEvent extends WebsocketEvent {
       const directoryInfo = data.directoryInfo ?? null;
       const embeddedFiles = data.embeddedFiles ?? null;
       const model = data.selected_llm ?? "gpt-4o-mini";
+      const content = data.content;
 
       const userId = connection.userData?.user?._id;
-      if (!userId) {
-        reply("error", { content: "User not found" });
-        return;
-      }
-
       const sessionId = connection.userData?.sessionId;
-      if (!sessionId) {
-        reply("error", { content: "SessionId not found" });
-        return;
-      }
 
-      const content = data.content;
-      if (!content) {
-        reply("error", { content: "no content provided" });
-        return;
-      }
-
-      const llm = await AvailableLlmService.findByName(model);
-      if (!llm) {
-        reply("error", { content: "LLM model not found" });
-        return;
-      }
+      if (!userId) ClientError.badRequest("UserId not found");
+      if (!sessionId) ClientError.badRequest("SessionId not found");
+      if (!content) ClientError.badRequest("no content provided");
 
       const user = await UserService.find(userId);
-      if (!user) {
-        reply("error", { content: "user not found" });
-        return;
-      }
+      if (!user) ClientError.notFound("user not found");
 
       const user_credit = new Decimal(user.credit);
       if (user_credit.isZero() || user_credit.isNegative()) {
-        reply("error", { content: "insufficient credits" });
-        return;
+        ClientError.badRequest("insufficient credits");
       }
+
+      const llm = await AvailableLlmService.findByName(model);
+      if (!llm) ClientError.notFound("LLM model not found");
 
       const page = 1;
       const limit = 10;
@@ -219,7 +203,11 @@ export default class InputAgentEvent extends WebsocketEvent {
       }
     } catch (error) {
       console.log(error);
-      reply("error", { content: "Something went wrong" });
+      if (error instanceof ClientError) {
+        reply("error", { content: error.message, code: error.code });
+      } else {
+        reply("error", { content: "Internal server error" });
+      }
     }
   }
 }

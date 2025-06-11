@@ -7,12 +7,16 @@ export const userSchema = new mongoose.Schema({
     username: {
         type: String,
         unique: true,
-        required: true
+        required: true,
+        minLength: 3,
+        maxLength: 50
     },
     email: {
         type: String,
         unique: true,
-        required: true
+        required: true,
+        minLength: 5,
+        maxLength: 200
     },
     role: {
         type: String,

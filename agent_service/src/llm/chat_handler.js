@@ -1,9 +1,8 @@
 import UserAgentSessionService from "../services/user_agent_session_service.js";
 import UserAgentSessionMessageService from "../services/user_agent_session_message_service.js";
-import UserAgentSessionOperationService from "../services/user_agent_session_operation_service.js";
 import LlmUsageService from "../services/llm_usage_service.js";
 import AvailableLlmService from "../services/available_llm_service.js";
-
+import ClientError from "../errors/client_error.js";
 import { produceNewSampleSaga } from "../rabbitmq/sagas/new_sample_saga.js";
 import { creatChatCompletion } from "./index.js";
 import { MessageBuilder } from "./messageBuilder.js";
@@ -143,7 +142,7 @@ export class ChatHandler {
         "Call createInstruction() before creating and sending the agent message"
       );
     const llm = await AvailableLlmService.findByName(this.model);
-    if (!llm) throw new Error("LLM model not found");
+    if (!llm) ClientError.notFound("LLM model not found");
 
     const instructions = [
       ...this.lastMessages.map((m) => m.message),

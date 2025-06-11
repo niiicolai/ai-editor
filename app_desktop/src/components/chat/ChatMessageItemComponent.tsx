@@ -1,6 +1,6 @@
 import SyntaxHighlighter from "react-syntax-highlighter";
 import Markdown from "react-markdown";
-import { ChevronRight, Loader, User } from "lucide-react";
+import { ChevronRight, FileWarning, Loader, User } from "lucide-react";
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { UserAgentSessionMessageType } from "../../types/userAgentSessionMessageType";
 import { useState } from "react";
@@ -50,22 +50,35 @@ function ChatMessageItemComponent({
         >
           <div className="flex items-start space-x-2">
             <div className="flex-shrink-0">
-              {message.role === "user" ? (
+              {message.role === "user" && (
                 <div className="h-8 w-8 rounded-full chat-msg-user-bubble border-1 flex items-center justify-center">
                   <span className="text-white font-medium">
                     <User className="w-4 h-4 chat-msg-user-bubble" />
                   </span>
                 </div>
-              ) : (
+              )}
+              {message.role === "assistant" && (
                 <div className="h-8 w-8 rounded-full chat-msg-assistant-bubble border-1 flex items-center justify-center">
-                  <span className="text-gray-600 font-medium">
+                  <span className="font-medium">
                     <img src={editorAvatarImage} className="w-6" />
+                  </span>
+                </div>
+              )}
+              {message.role === "error" && (
+                <div className="h-8 w-8 rounded-full chat-msg-assistant-bubble border-1 flex items-center justify-center">
+                  <span className="font-medium">
+                    <FileWarning className="w-4 h-4" />
                   </span>
                 </div>
               )}
             </div>
             <div className="flex-1">
               <div className="text-xs whitespace-pre-wrap break-words w-full overflow-hidden [&_p]:mb-0.1 [&_p]:w-64 [&_ol]:mb-0.1 [&_ol]:w-64 [&_ul]:mb-0.1 [&_ul]:w-64 [&_li]:mb-0.1 [&_li]:p-0.1 [&_li]:w-64 [&_pre]:w-64 [&_pre]:rounded-md [&_pre]:mb-0.1 [&_pre]:p-1 [&_pre]:border [&_pre]:overflow-x-auto [&_code]:w-64 [&_code]:overflow-x-auto">
+                {message.role === "error" && (
+                  <div className="font-bold">
+                    Error:
+                  </div>
+                )}
                 <Markdown>{message.content}</Markdown>
               </div>
               <p

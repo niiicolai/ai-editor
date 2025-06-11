@@ -7,6 +7,7 @@ import AvailableLlmService from "../../services/available_llm_service.js";
 import LlmUsageService from "../../services/llm_usage_service.js";
 import UserService from "../../services/user_service.js";
 import Decimal from "decimal.js";
+import ClientError from "../../errors/client_error.js";
 
 export default class UserInputEvent extends WebsocketEvent {
   constructor() {
@@ -20,47 +21,27 @@ export default class UserInputEvent extends WebsocketEvent {
       const directoryInfo = data.directoryInfo ?? null;
       const embeddedFiles = data.embeddedFiles ?? null;
       const model = data.selected_llm ?? "gpt-4o-mini";
-
+      
       const userId = connection.userData?.user?._id;
-      if (!userId) {
-        reply("error", { content: "User not found" });
-        return;
-      }
-
       const sessionId = connection.userData?.sessionId;
-      if (!sessionId) {
-        reply("error", { content: "SessionId not found" });
-        return;
-      }
 
       const content = data.content;
-      if (!content) {
-        reply("error", { content: "no content provided" });
-        return;
-      }
+      const messageId = data._id;
+
+      if (!userId) ClientError.badRequest("UserId not found");
+      if (!sessionId) ClientError.badRequest("SessionId not found");
+      if (!content) ClientError.badRequest("no content provided");
+      if (!messageId) ClientError.badRequest("no messageId provided");
 
       const llm = await AvailableLlmService.findByName(model);
-      if (!llm) {
-        reply("error", { content: "LLM model not found" });
-        return;
-      }
+      if (!llm) ClientError.notFound("LLM model not found");
 
       const user = await UserService.find(userId);
-      if (!user) {
-        reply("error", { content: "user not found" });
-        return;
-      }
+      if (!user) ClientError.notFound("user not found");
 
       const user_credit = new Decimal(user.credit);
       if (user_credit.isZero() || user_credit.isNegative()) {
-        reply("error", { content: "insufficient credits" });
-        return;
-      }
-
-      const messageId = data._id;
-      if (!messageId) {
-        reply("error", { content: "MessageId not found" });
-        return;
+        ClientError.badRequest("insufficient credits");
       }
 
       const message = await UserAgentSessionMessageService.find(
@@ -220,9 +201,7 @@ export default class UserInputEvent extends WebsocketEvent {
           prompt_tokens: usage.prompt_tokens,
           completion_tokens: usage.completion_tokens,
           total_tokens: usage.total_tokens,
-          messages: [
-            userAgentSessionMessionAgent._id,
-          ],
+          messages: [userAgentSessionMessionAgent._id],
           context_messages: lastMessages.map((m) => m._id),
           event: "function_result",
         },
@@ -230,7 +209,11 @@ export default class UserInputEvent extends WebsocketEvent {
       );
     } catch (error) {
       console.log(error);
-      reply("error", { content: "Something went wrong" });
+      if (error instanceof ClientError) {
+        reply("error", { content: error.message, code: error.code });
+      } else {
+        reply("error", { content: "Internal server error" });
+      }
     }
   }
 }

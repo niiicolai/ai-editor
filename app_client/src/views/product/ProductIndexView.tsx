@@ -50,34 +50,11 @@ function ProductIndexView() {
     }
   };
 
-  if (isLoading || isLoadingCheckout) {
-    return (
-      <RestrictedComponent slot={
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-        </div>
-      } />
-    );
-  }
-
-  if (productsError || checkoutError) {
-    return (
-      <RestrictedComponent slot={
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-red-500 text-center">
-            <p className="text-lg">Error loading products</p>
-            <p className="text-sm mt-2">Please try again later</p>
-          </div>
-        </div>
-      } />
-    );
-  }
-
   return (
     <RestrictedComponent slot={
       <div className="bg-gray-50">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          {/* Error Message */}
+
           {cartError && (
             <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
               <div className="flex">
@@ -93,9 +70,23 @@ function ProductIndexView() {
             </div>
           )}
 
-          {/* Cart Component */}
           <div className="mb-12 flex justify-between">
-            <CartComponent />
+            {isLoadingCheckout && (
+              <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+              </div>
+            )}
+            {!isLoadingCheckout && checkoutError && (
+              <div className="min-h-screen flex items-center justify-center">
+                <div className="text-red-500 text-center">
+                  <p className="text-lg">Error loading cart</p>
+                  <p className="text-sm mt-2">Please try again later</p>
+                </div>
+              </div>
+            )}
+            {!isLoadingCheckout && checkout && (
+              <CartComponent />
+            )}
 
             <Link
               to="/user"
@@ -107,7 +98,7 @@ function ProductIndexView() {
 
           {/* Header */}
           <div className="text-center">
-            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl" data-testid="product-title">
               Choose Your Credit Package
             </h2>
             <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
@@ -117,7 +108,20 @@ function ProductIndexView() {
 
           {/* Products Grid */}
           <div className="mt-12 space-y-4 sm:mt-16 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-6 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-3">
-            {products?.products?.map((product: ProductType) => (
+            {isLoading && (
+              <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+              </div>
+            )}
+            {!isLoading && productsError && (
+              <div className="min-h-screen flex items-center justify-center">
+                <div className="text-red-500 text-center">
+                  <p className="text-lg">Error loading products</p>
+                  <p className="text-sm mt-2">Please try again later</p>
+                </div>
+              </div>
+            )}
+            {!isLoading && products?.products?.map((product: ProductType) => (
               <div key={product._id} className="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200">
                 <div className="p-6">
                   <h2 className="text-lg leading-6 font-medium text-gray-900">{product.title}</h2>

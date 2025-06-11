@@ -32,7 +32,11 @@ export default class TransactionService {
    */
   static async findAll(page: number = 1, limit: number = 10, state: string) {
     paginatorValidator(page, limit);
-    stringValidator(state, "state");
+    stringValidator(state, "state", {
+      min: { enabled: false, value: 0 },
+      max: { enabled: false, value: 0 },
+      regex: { enabled: true, value: /pending|completed|error/ }
+    });
 
     const query = { state };
     const transactions = await TransactionModel.find(query)

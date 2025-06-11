@@ -48,7 +48,7 @@ function UserLoginView() {
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px main-color">
-            <div>
+            <div data-testid="email-login-input">
               <label htmlFor="email" className="sr-only">
                 Email address
               </label>
@@ -61,7 +61,7 @@ function UserLoginView() {
                 placeholder="Email address"
               />
             </div>
-            <div>
+            <div data-testid="password-login-input">
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
@@ -77,7 +77,7 @@ function UserLoginView() {
           </div>
 
           {(error || formError) && (
-            <div className="text-red-500 text-sm text-center">
+            <div className="text-red-500 text-sm text-center" data-testid="login-error">
               {formError || "An error occurred during login"}
             </div>
           )}
@@ -86,6 +86,7 @@ function UserLoginView() {
             <button
               type="submit"
               disabled={isPending}
+              data-testid="login-button"
               className={`group button-main relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
                 isPending
                   ? "cursor-not-allowed"

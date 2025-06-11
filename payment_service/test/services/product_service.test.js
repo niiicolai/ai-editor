@@ -92,3 +92,227 @@ test.each([
 ])("ProductService.find invalid partitions", async ({ _id, e }) => {
   await expect(ProductService.find(_id)).rejects.toThrowError(e);
 });
+
+test.each([
+  [
+    {
+      body: {
+        title: "aa",
+        description: "description",
+        category: "category",
+        noOfCredits: 123,
+        price: 123,
+        stripePriceId: "123"
+      },
+    },
+  ],
+  [
+    {
+      body: {
+        title: "aaa",
+        description: "description",
+        category: "category",
+        noOfCredits: 123,
+        price: 123,
+        stripePriceId: "1234"
+      },
+    },
+  ],
+  [
+    {
+      body: {
+        title: "etheltgenerisDbru2ern!vnsomhar100tegnpræcistetheltgeneriskbrugernavnsomhar100tegnpræcist321123321232",
+        description: "description",
+        category: "category",
+        noOfCredits: 123,
+        price: 123,
+        stripePriceId: "12345"
+      },
+    },
+  ],
+])("ProductService.create valid partitions", async ({ body, e }) => {
+  const product = await ProductService.create(body);
+
+  expect(product._id).toBeDefined();
+  expect(product.title).toBe(body.title);
+  expect(product.description).toBe(body.description);
+  expect(product.category).toBe(body.category);
+  expect(product.noOfCredits).toBe(body.noOfCredits);
+  expect(product.price).toBe(body.price);
+});
+
+
+test.each([
+  [
+    {
+      body: {
+        title: "",
+        description: "description",
+        category: "category",
+        noOfCredits: 123,
+        price: 123,
+        stripePriceId: "123"
+      },
+      e: "body.title is required",
+    },
+  ],
+  [
+    {
+      body: {
+        title: "a",
+        description: "description",
+        category: "category",
+        noOfCredits: 123,
+        price: 123,
+        stripePriceId: "123"
+      },
+      e: "body.title a out of bounds. Min body.title is 2",
+    },
+  ],
+  [
+    {
+      body: {
+        title: "1",
+        description: "description",
+        category: "category",
+        noOfCredits: 123,
+        price: 123,
+        stripePriceId: "123"
+      },
+      e: "body.title 1 out of bounds. Min body.title is 2",
+    },
+  ],
+  [
+    {
+      body: {
+        title: "etheltgenerisDbru2ern!vnsomhar100tegnpræcistetheltgeneriskbrugernavnsomhar100tegnpræcist3211233212322",
+        description: "description",
+        category: "category",
+        noOfCredits: 123,
+        price: 123,
+        stripePriceId: "123"
+      },
+      e: "body.title etheltgenerisDbru2ern!vnsomhar100tegnpræcistetheltgeneriskbrugernavnsomhar100tegnpræcist3211233212322 out of bounds. Max body.title is 100",
+    },
+  ],
+  [
+    {
+      body: {
+        title: "title",
+        description: "",
+        category: "category",
+        noOfCredits: 123,
+        price: 123,
+        stripePriceId: "123"
+      },
+      e: "body.description is required",
+    },
+  ],
+  [
+    {
+      body: {
+        title: "title",
+        description: "description",
+        category: "",
+        noOfCredits: 123,
+        price: 123,
+        stripePriceId: "123"
+      },
+      e: "body.category is required",
+    },
+  ],
+  [
+    {
+      body: {
+        title: "title",
+        description: "description",
+        category: "category",
+        noOfCredits: null,
+        price: 123,
+        stripePriceId: "123"
+      },
+      e: "body.noOfCredits must be a number",
+    },
+  ],
+  [
+    {
+      body: {
+        title: "title",
+        description: "description",
+        category: "category",
+        noOfCredits: 0,
+        price: 123,
+        stripePriceId: "123"
+      },
+      e: "body.noOfCredits 0 out of bounds. Min body.noOfCredits is 1",
+    },
+  ],
+  [
+    {
+      body: {
+        title: "title",
+        description: "description",
+        category: "category",
+        noOfCredits: 100001,
+        price: 123,
+        stripePriceId: "123"
+      },
+      e: "body.noOfCredits 100001 out of bounds. Max body.noOfCredits is 100000",
+    },
+  ],
+  [
+    {
+      body: {
+        title: "title",
+        description: "description",
+        category: "category",
+        noOfCredits: 123,
+        price: null,
+        stripePriceId: "123"
+      },
+      e: "body.price must be a number",
+    },
+  ],
+  [
+    {
+      body: {
+        title: "title",
+        description: "description",
+        category: "category",
+        noOfCredits: 123,
+        price: 0,
+        stripePriceId: "123"
+      },
+      e: "body.price 0 out of bounds. Min body.price is 1",
+    },
+  ],
+  [
+    {
+      body: {
+        title: "title",
+        description: "description",
+        category: "category",
+        noOfCredits: 123,
+        price: 100001,
+        stripePriceId: "123"
+      },
+      e: "body.price 100001 out of bounds. Max body.price is 100000",
+    },
+  ],
+  [
+    {
+      body: {
+        title: "title",
+        description: "description",
+        category: "category",
+        noOfCredits: 123,
+        price: 123,
+        stripePriceId: ""
+      },
+      e: "stripePriceId is required",
+    },
+  ],
+])("ProductService.create invalid partitions", async ({ body, e }) => {
+  await expect(ProductService.create(body)).rejects.toThrowError(e);
+});
+
