@@ -98,7 +98,7 @@
     "asarUnpack": [
       "node_modules/sqlite-vec-windows-x64/**",
       "node_modules/sqlite-vec-darwin-x64/**",
-      "node_modules/sqlite-vec-linux-x64/**"
+      "vec/**"
     ],
     "files": [
       "dist/**/*",
