@@ -378,7 +378,7 @@ jobs:
     needs: 
       - build
       - test
-    runs-on: macos-11
+    runs-on: macos-latest
     steps:
       - name: Clone repo
         uses: actions/checkout@v3
