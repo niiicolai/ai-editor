@@ -378,7 +378,7 @@ jobs:
     needs: 
       - build
       - test
-    runs-on: macos-latest
+    runs-on: macos-11
     steps:
       - name: Clone repo
         uses: actions/checkout@v3
@@ -397,19 +397,19 @@ jobs:
         run: |
           cd ./app_desktop
           npm install
+          npm i sqlite-vec-darwin-x64
 
-      - name: Build Electron app (macOS) under Rosetta (x86_64)
+      - name: Build Electron app (macOS)
         run: |
           cd ./app_desktop
-          arch -x86_64 npm run build
+          npm run build
 
-      - name: Publish macOS release under Rosetta (x86_64)
+      - name: Publish macOS release
         run: |
           cd ./app_desktop
-          arch -x86_64 npm exec electron-builder -- --mac --x64 --publish always
+          npm exec electron-builder -- --mac --x64 --publish always
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
 
   release-windows:
     needs: 
