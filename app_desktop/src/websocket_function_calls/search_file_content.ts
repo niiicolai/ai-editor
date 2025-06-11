@@ -1,16 +1,16 @@
-import { useTerminal } from "../hooks/useTerminal";
+//import { useTerminal } from "../hooks/useTerminal";
 
 export default () => {
-  const terminal = useTerminal();
+  //const terminal = useTerminal();
 
   const execute = async (_id: string, clientFn: any, sendMessage: (msg: string) => void) => {
     const parsedArgs = JSON.parse(JSON.parse(clientFn?.args));
     const path = parsedArgs.path;
     const pattern = parsedArgs.pattern;
 
-    const searchResult = (await terminal.executeString(
-      `powershell -Command "Get-ChildItem -Path '${path}' -Recurse -Include *.js -File | Where-Object { -not $_.FullName.Contains('node_modules') } | Select-String -Pattern '${pattern}'"`
-    )) as any;
+    const searchResult = ""//(await terminal.executeString(
+    //  `powershell -Command "Get-ChildItem -Path '${path}' -Recurse -Include *.js -File | Where-Object { -not $_.FullName.Contains('node_modules') } | Select-String -Pattern '${pattern}'"`
+    //)) as any;
 
     sendMessage(
       JSON.stringify({

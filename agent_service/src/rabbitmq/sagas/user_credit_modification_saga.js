@@ -6,39 +6,38 @@ import mongoose from "mongoose";
 
 import SagaBuilder from "../saga/SagaBuilder.js";
 
-const queueName = "user_credit_modification:payment_service";
-const consumer = SagaBuilder.consumer(queueName, rabbitMq)
+const queueNameIn = "user_credit_modification:payment_service";
+const queueNameOut = "user_credit_modification:agent_service";
 
+const consumer = SagaBuilder
+  .chain(queueNameIn, queueNameOut, rabbitMq)
   .onConsume(async (message) => {
-    const { userId, userProducts, transaction } = message;
+    const { _id, type } = message.transaction;
+    const { userProducts } = message;
+    const { _id: userId } = message.user;
+    const exists = await TransactionModel.exists({ _id }); 
+    if (exists) throw new Error("Transaction already processed");
 
     const user = await UserModel.findOne({ _id: userId, deleted_at: null });
     if (!user) throw new Error("User not found");
-
-    const existingTransaction = await TransactionModel.findOne({
-      _id: transaction._id,
-    });
-    if (existingTransaction) throw new Error("Transaction already processed");
 
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const newTransaction = new TransactionModel({
-        _id: transaction._id,
-        type: transaction.type,
-        state: "complete",
+      const transaction = new TransactionModel({
+        _id,
+        type,
+        state: "pending",
         parameters: JSON.stringify({ message }),
       });
-
-      await newTransaction.save({ session });
 
       for (const userProduct of userProducts) {
         await UserCreditModificationModel.create(
           [{
             user_product: userProduct._id,
             amount: userProduct.credit.noOfCredits,
-            user: user._id,
+            user: userId,
           }],
           { session }
         );
@@ -46,22 +45,59 @@ const consumer = SagaBuilder.consumer(queueName, rabbitMq)
         user.credit += userProduct.credit.noOfCredits; 
       }
 
+      user.incomplete_transactions.push({ transaction: transaction._id });
+
+      await transaction.save({ session });
       await user.save({ session });
       await session.commitTransaction();
 
-      return {
-        userId,
-        transaction: newTransaction,
-      };
-
+      return message;
     } catch (error) {
       await session.abortTransaction();
-      throw new Error("Error processing transaction", error);
+      throw error;
     } finally {
       await session.endSession();
     }
   })
+  .onCompensate(async (message) => {
+    const { error, transaction } = message;
+    const { _id } = transaction;
+    const exists = await TransactionModel.exists({ _id, state: "pending" }); 
+    if (!exists) throw new Error(`Transaction not found: ${_id}`);
+    await TransactionModel.updateOne({ _id }, { state: "error", error });
+    return message;
+  })
+  .onSuccess(async (message) => {
+    const { _id } = message.transaction;
+    const { _id: userId } = message.user;
+    const exists = await TransactionModel.exists({ _id, state: "pending" }); 
+    if (!exists) throw new Error(`Transaction not found: ${_id}`);
 
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) throw new Error("User not found");
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      await TransactionModel.updateOne(
+        { _id },
+        { state: "completed", error: null },
+        { session }
+      );
+      user.incomplete_transactions.pull({
+        transaction: _id,
+      });
+      await user.save({ session });
+      await session.commitTransaction();
+
+      return message;
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      await session.endSession();
+    }
+  })
   .build();
-
+  
 export default async () => consumer.addListeners();

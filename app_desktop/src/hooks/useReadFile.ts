@@ -22,7 +22,8 @@ export const useReadFile = () => {
                 name: file.name,
                 isDirectory: file.isDirectory,
                 content,
-                language
+                language, 
+                isSaved: true
             }
         }
     } catch (error) {

@@ -8,6 +8,7 @@ import { idValidator } from "../validators/id_validator.js";
 import { fieldsValidator } from "../validators/fields_validator.js";
 import { paginatorValidator } from "../validators/paginator_validator.js";
 import { stringValidator } from "../validators/string_validator.js";
+import { numberValidator } from "../validators/number_validator.js";
 import { objectValidator } from "../validators/object_validator.js";
 
 const allowedFields = [
@@ -63,10 +64,19 @@ export default class UserAgentSessionOperationService {
   static async findAll(page, limit, sessionId, userId, state, fields = null) {
     paginatorValidator(page, limit);
     idValidator(userId, "userId");
+    idValidator(sessionId, "sessionId");
     fields = fieldsValidator(fields, allowedFields);
 
     const query = { user: userId, user_agent_session: sessionId };
-    if (state) query.state = state;
+    if (state) {
+      stringValidator(state, "state", {
+        min: { enabled: false, value: 0 },
+        max: { enabled: false, value: 0 },
+        regex: { enabled: true, value: /running|completed|error/ }
+      })
+      query.state = state;
+    }
+
     const userAgentSessionOperations =
       await UserAgentSessionOperationModel.find(query)
         .select(fields.join(" "))
@@ -88,10 +98,24 @@ export default class UserAgentSessionOperationService {
 
   static async create(body, sessionId, userId) {
     objectValidator(body, "body");
-    stringValidator(body.name, "name");
-    stringValidator(body.state, "state");
+    stringValidator(body.name, "body.name", {
+      min: { enabled: true, value: 2 },
+      max: { enabled: true, value: 250 },
+      regex: null,
+    });
+    stringValidator(body.state, "body.state", {
+      min: { enabled: false, value: 0 },
+      max: { enabled: false, value: 0 },
+      regex: { enabled: true, value: /running|completed|error/ },
+    });
     idValidator(sessionId, "sessionId");
     idValidator(userId, "userId");
+
+    if (body?.max_iterations !== undefined && body?.max_iterations !== null) numberValidator(body.max_iterations, "body.max_iterations", {
+      min: { enabled: true, value: 1 },
+      max: { enabled: true, value: 10 },
+      regex: null
+    });
 
     const user = await UserModel.findOne({ _id: userId });
     if (!user) ClientError.notFound("user not found");
@@ -120,6 +144,16 @@ export default class UserAgentSessionOperationService {
     objectValidator(body, "body");
     idValidator(_id, "_id");
     idValidator(userId, "userId");
+    if (body.name) stringValidator(body.name, "body.name", {
+      min: { enabled: true, value: 2 },
+      max: { enabled: true, value: 250 },
+      regex: null,
+    });
+    if (body.state) stringValidator(body.state, "body.state", {
+      min: { enabled: false, value: 0 },
+      max: { enabled: false, value: 0 },
+      regex: { enabled: true, value: /running|completed|error/ },
+    });
 
     const user = await UserModel.findOne({ _id: userId });
     if (!user) ClientError.notFound("user not found");

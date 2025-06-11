@@ -227,7 +227,7 @@ export default function UsageIndexView() {
             <div className="max-w-3xl mx-auto">
               <div className="bg-white shadow overflow-hidden sm:rounded-lg">
                 <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900" data-testid="usage-title">
                     LLM Usage
                   </h3>
 

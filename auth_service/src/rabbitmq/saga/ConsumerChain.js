@@ -4,44 +4,50 @@ export class ConsumerChain {
         this.queueNameIn = queueNameIn;
         this.queueNameOut = queueNameOut;
         this.rabbitMq = rabbitMq;
-        this.onConsumeIn = options.onConsumeIn;
-        this.onCompensateIn = options.onCompensateIn;
-        this.onCompensateOut = options.onCompensateOut;
-        this.onSuccessOut = options.onSuccessOut;
+        this.onConsume = options.onConsume;
+        this.onCompensate = options.onCompensate;
+        this.onSuccess = options.onSuccess;
     }
     
     addListeners() {
-        this.rabbitMq.addListener(`${this.queueNameIn}`, this.consumeIn.bind(this));
-        this.rabbitMq.addListener(`${this.queueNameOut}_success`, this.successOut.bind(this));
-        this.rabbitMq.addListener(`${this.queueNameOut}_compensate`, this.compensateOut.bind(this));
+        this.rabbitMq.addListener(`${this.queueNameIn}`, this.consume.bind(this));
+        this.rabbitMq.addListener(`${this.queueNameOut}_success`, this.success.bind(this));
+        this.rabbitMq.addListener(`${this.queueNameOut}_compensate`, this.compensate.bind(this));
     }
 
-    async consumeIn(msg) {
+    async consume(msg) {
         try {
-            const message = await this.onConsumeIn(msg);
+            const message = await this.onConsume(msg);
             this.rabbitMq.sendMessage(`${this.queueNameOut}`, message);
-        } catch {
-            const message = await this.onCompensateIn(msg);
-            this.rabbitMq.sendMessage(`${this.queueNameIn}_compensate`, message);
+        } catch (error) {
+            this.rabbitMq.sendMessage(`${this.queueNameIn}_compensate`, {
+                ...msg,
+                error: error.message,
+            });
         }
     }
 
-    async successOut(msg) {
+    async success(msg) {
         try {
-            const message = await this.onSuccessOut(msg);
+            const message = await this.onSuccess(msg);
             this.rabbitMq.sendMessage(`${this.queueNameIn}_success`, message);
-        } catch {
-            const message = await this.onCompensateOut(msg);
-            this.rabbitMq.sendMessage(`${this.queueNameIn}_compensate`, message);
+        } catch (error) {
+            this.rabbitMq.sendMessage(`${this.queueNameIn}_compensate`, {
+                ...msg,
+                error: error.message,
+            });
         }
     }
 
-    async compensateOut(msg) {
+    async compensate(msg) {
         try {
-            const message = await this.onCompensateOut(msg);
+            const message = await this.onCompensate(msg);
             this.rabbitMq.sendMessage(`${this.queueNameIn}_compensate`, message);
-        } catch {
-            this.rabbitMq.sendMessage(`${this.queueNameIn}_compensate`, msg);
+        } catch (error) {
+            this.rabbitMq.sendMessage(`${this.queueNameIn}_compensate`, {
+                ...msg,
+                error: error.message,
+            });
         }
     }
 }
@@ -51,23 +57,18 @@ export class ConsumerChainBuilder {
         this.params = { queueNameIn, queueNameOut, rabbitMq };
     }
 
-    onConsumeIn(callback) {
-        this.params.onConsumeIn = callback;
+    onConsume(callback) {
+        this.params.onConsume = callback;
         return this;
     }
 
-    onCompensateIn(callback) {
-        this.params.onCompensateIn = callback;
+    onCompensate(callback) {
+        this.params.onCompensate = callback;
         return this;
     }
 
-    onCompensateOut(callback) {
-        this.params.onCompensateOut = callback;
-        return this;
-    }
-
-    onSuccessOut(callback) {
-        this.params.onSuccessOut = callback;
+    onSuccess(callback) {
+        this.params.onSuccess = callback;
         return this;
     }
 
@@ -75,17 +76,14 @@ export class ConsumerChainBuilder {
         if (!this.params.queueNameIn) throw new Error("A queueNameIn must be specified!");
         if (!this.params.queueNameOut) throw new Error("A queueNameOut must be specified!");
         if (!this.params.rabbitMq) throw new Error("A rabbitMq must be specified!");
-        if (!this.params.onConsumeIn) throw new Error("An onConsumeIn callback must be specified!");
-        if (!this.params.onCompensateIn) throw new Error("An onCompensateIn callback must be specified!");
-        if (!this.params.onCompensateOut) throw new Error("An onCompensateOut callback must be specified!");
-        if (!this.params.onSuccessOut) throw new Error("An onSuccessOut callback must be specified!");
+        if (!this.params.onConsume) throw new Error("An onConsume callback must be specified!");
+        if (!this.params.onCompensate) throw new Error("An onCompensate callback must be specified!");
+        if (!this.params.onSuccess) throw new Error("An onSuccess callback must be specified!");
 
         const chain = new ConsumerChain(this.params.queueNameIn, this.params.queueNameOut, this.params.rabbitMq, {
-            onConsumeIn: this.params.onConsumeIn,
-            onCompensateIn: this.params.onCompensateIn,
-            onCompensateIn: this.params.onCompensateIn,
-            onCompensateOut: this.params.onCompensateOut,
-            onSuccessOut: this.params.onSuccessOut,
+            onConsume: this.params.onConsume,
+            onCompensate: this.params.onCompensate,
+            onSuccess: this.params.onSuccess,
         });
 
         return chain;

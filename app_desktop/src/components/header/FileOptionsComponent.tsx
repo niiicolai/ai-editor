@@ -43,13 +43,15 @@ function FileOptionsComponent() {
   };
 
   const handleNewFile = () => {
+    const f = `temp-file-${new Date().getTime()}`;
     dispatch(
       setFile({
-        id: ``,
-        name: `temp-file-${new Date().getTime()}`,
+        id: f,
+        name: f,
         content: "",
         language: "text",
-        path: "",
+        path: "temp/"+f,
+        isSaved: false, 
       })
     )
   }
@@ -67,6 +69,7 @@ function FileOptionsComponent() {
       slot={
         <div className="relative">
           <button
+            data-testid="editor-header-new-file-button"
             onClick={() => handleNewFile()}
             className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
@@ -90,6 +93,7 @@ function FileOptionsComponent() {
           </button>
           <hr className="border-color" />
           <button
+            data-testid="editor-header-save-button"
             onClick={() => handleSave()}
             className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
@@ -107,6 +111,7 @@ function FileOptionsComponent() {
           {isAuthorized && (
             <>
               <button
+                data-testid="editor-header-credit-button"
                 onClick={() =>
                   openExternalBrowser(`${WEBSITE_DOMAIN_URL}/products`)
                 }
@@ -115,6 +120,7 @@ function FileOptionsComponent() {
                 Credit
               </button>
               <button
+                data-testid="editor-header-profile-button"
                 onClick={() =>
                   openExternalBrowser(`${WEBSITE_DOMAIN_URL}/user`)
                 }
@@ -123,6 +129,7 @@ function FileOptionsComponent() {
                 Profile
               </button>
               <button
+                data-testid="editor-header-sign-into-another-account-button"
                 onClick={() => navigate("/user/login")}
                 className="button-main w-full text-left px-2 py-1"
               >
@@ -133,12 +140,14 @@ function FileOptionsComponent() {
           {!isAuthorized && (
             <>
               <button
+                data-testid="editor-header-login-button"
                 onClick={() => navigate("/user/login")}
                 className="button-main w-full text-left px-2 py-1"
               >
                 Login
               </button>
               <button
+                data-testid="editor-header-signup-button"
                 onClick={() => navigate("/user/signup")}
                 className="button-main w-full text-left px-2 py-1"
               >
