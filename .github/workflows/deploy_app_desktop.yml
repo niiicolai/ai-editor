@@ -397,6 +397,7 @@ jobs:
         run: |
           cd ./app_desktop
           npm install
+          npm i sqlite-vec-darwin-x64
 
       - name: Build Electron app (macOS)
         run: |

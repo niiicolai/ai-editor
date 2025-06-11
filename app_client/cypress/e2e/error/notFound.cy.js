@@ -11,7 +11,7 @@ describe('show not found test', () => {
     cy.goto('/not_a_real_path');
 
     cy.get('[data-testid=error-back-link]').click();
-    cy.get('[data-testid=editor-wrapper]').should('exist');
+    cy.get('[data-testid=home-wrapper]').should('exist');
     cy.urlShould('/');
   });
 });
