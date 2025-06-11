@@ -25,7 +25,8 @@ function UserEditView() {
       });
       navigate("/user");
     } catch (err) {
-      setFormError(err as string);
+      const message = JSON.parse((err as any)?.message).error;
+      setFormError(message as string);
     }
   };
 

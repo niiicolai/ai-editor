@@ -20,14 +20,14 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
       await session.commitTransaction();
       return {
         sample: {
-            input_prompt: body.input_prompt,
-            input_embedded_files: body.input_embedded_files,
-            output_response: body.output_response,
-            llm_config: body.llm_config,
-            embedding_config: body.embedding_config,
-            chunk_config: body.chunk_config,
-            search_config: body.search_config,
-            event_config: body.event_config,
+          input_prompt: body.input_prompt,
+          input_embedded_files: body.input_embedded_files,
+          output_response: body.output_response,
+          llm_config: body.llm_config,
+          embedding_config: body.embedding_config,
+          chunk_config: body.chunk_config,
+          search_config: body.search_config,
+          event_config: body.event_config,
         },
         transaction: {
           _id: transaction._id,
@@ -44,48 +44,33 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
   })
 
   .onCompensate(async (message) => {
-    const transaction = await TransactionModel.findOne({
-      _id: message.transaction._id,
-      state: "pending",
-    });
-    if (!transaction) throw new Error("Transaction not found");
-
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    try {
-      await TransactionModel.updateOne(
-        { _id: message.transaction._id },
-        { state: "error", error: message.transaction.error },
-        { session }
-      );
-      await session.commitTransaction();
-    } catch (error) {
-      await session.abortTransaction();
-      console.error("onCompensate", error);
-    } finally {
-      await session.endSession();
-    }
+    const { error, transaction } = message;
+    const { _id } = transaction;
+    const exists = await TransactionModel.exists({ _id, state: "pending" });
+    if (!exists) throw new Error(`Transaction not found: ${_id}`);
+    await TransactionModel.updateOne({ _id }, { state: "error", error });
+    return message;
   })
 
   .onSuccess(async (message) => {
-    const transaction = await TransactionModel.findOne({
-      _id: message.transaction._id,
-      state: "pending",
-    });
-    if (!transaction) throw new Error("Transaction not found");
+    const { _id } = message.transaction;
+    const exists = await TransactionModel.exists({ _id, state: "pending" });
+    if (!exists) throw new Error(`Transaction not found: ${_id}`);
 
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
       await TransactionModel.updateOne(
-        { _id: message.transaction._id },
+        { _id },
         { state: "completed", error: null },
         { session }
       );
       await session.commitTransaction();
+
+      return message;
     } catch (error) {
       await session.abortTransaction();
-      console.error("onSuccess", error);
+      throw error;
     } finally {
       await session.endSession();
     }
@@ -93,5 +78,6 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
 
   .build();
 
-export const produceNewSampleSaga = async (body) => await producer.produce(body);
+export const produceNewSampleSaga = async (body) =>
+  await producer.produce(body);
 export default async () => producer.addListeners();

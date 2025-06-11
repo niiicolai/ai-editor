@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Create .env file
         run: |
@@ -28,7 +28,7 @@ jobs:
         run: |
           cd ./app_desktop
           rm .env
-
+          
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
       # https://engineering.synatic.com/a-simple-way-to-run-a-mongodb-replica-set-in-github-actions
       - name: Start mongo
@@ -337,7 +337,7 @@ jobs:
         run: |
           cd ./app_desktop
           rm .env
-
+ 
   release-linux:
     needs: 
       - build
@@ -350,7 +350,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Create .env file
         run: |
@@ -386,7 +386,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Create .env file
         run: |
@@ -398,18 +398,17 @@ jobs:
           cd ./app_desktop
           npm install
 
-      - name: Build Electron app (macOS) under Rosetta (x86_64)
+      - name: Build Electron app (macOS)
         run: |
           cd ./app_desktop
-          arch -x86_64 npm run build
+          npm run build
 
-      - name: Publish macOS release under Rosetta (x86_64)
+      - name: Publish macOS release
         run: |
           cd ./app_desktop
-          arch -x86_64 npm exec electron-builder -- --mac --x64 --publish always
+          npm exec electron-builder -- --mac --x64 --publish always
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
 
   release-windows:
     needs: 
@@ -423,7 +422,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Create .env file
         run: |

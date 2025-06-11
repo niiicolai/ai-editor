@@ -15,20 +15,19 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
     session.startTransaction();
 
     try {
-      user.deleted_at = new Date();
-
       const transaction = new TransactionModel({
         state: "pending",
         type: queueName,
         parameters: JSON.stringify({ _id: body._id }),
       });
-      await transaction.save({ session });
 
+      user.deleted_at = new Date();
       user.incomplete_transactions.push({
         transaction: transaction._id,
       });
-      await user.save({ session });
 
+      await transaction.save({ session });
+      await user.save({ session });
       await session.commitTransaction();
 
       return {
@@ -51,57 +50,38 @@ const producer = SagaBuilder.producer(queueName, rabbitMq)
   })
 
   .onCompensate(async (message) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    try {
-      const transaction = await TransactionModel.findOne(
-        { _id: message.transaction._id, state: "pending" },
-        { session }
-      );
-      if (!transaction) throw new Error("Transaction not found");
-
-      await TransactionModel.updateOne(
-        { _id: message.transaction._id },
-        { state: "error", error: message.transaction.error },
-        { session }
-      );
-      await session.commitTransaction();
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      await session.endSession();
-    }
+    const { error, transaction } = message;
+    const { _id } = transaction;
+    const exists = await TransactionModel.exists({ _id, state: "pending" });
+    if (!exists) throw new Error(`Transaction not found: ${_id}`);
+    await TransactionModel.updateOne({ _id }, { state: "error", error });
+    return message;
   })
 
   .onSuccess(async (message) => {
+    const { _id } = message.transaction;
+    const { _id: userId } = message.user;
+    const exists = await TransactionModel.exists({ _id, state: "pending" });
+    if (!exists) throw new Error(`Transaction not found: ${_id}`);
+
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) throw new Error("User not found");
+
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      const transaction = await TransactionModel.findOne(
-        { _id: message.transaction._id, state: "pending" },
-        { session }
-      );
-      if (!transaction) throw new Error("Transaction not found");
-
-      const user = await UserModel.findOne(
-        { _id: message.user._id },
-        { session }
-      );
-      if (!user) throw new Error("User not found");
-
-      user.incomplete_transactions.pull({
-        transaction: message.transaction._id,
-      });
-      await user.save({ session });
-
       await TransactionModel.updateOne(
-        { _id: message.transaction._id },
+        { _id },
         { state: "completed", error: null },
         { session }
       );
-
+      user.incomplete_transactions.pull({
+        transaction: _id,
+      });
+      await user.save({ session });
       await session.commitTransaction();
+
+      return message;
     } catch (error) {
       await session.abortTransaction();
       throw error;
