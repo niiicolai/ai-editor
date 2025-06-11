@@ -21,6 +21,7 @@ function SelectionOptionsComponent() {
       slot={
         <>
           <button
+            data-testid="editor-header-select-all-button"
             onClick={() => exeEditorCmd('select-all')}
             className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
@@ -29,6 +30,7 @@ function SelectionOptionsComponent() {
           </button>
           <hr className="border-color" />
           <button
+            data-testid="editor-header-close-active-tab-button"
             onClick={() => closeActiveTab()}
             className="button-main w-full text-left px-2 py-1 flex justify-between"
           >

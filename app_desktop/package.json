@@ -18,6 +18,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "package": "npm run build && electron-builder",
+    "package:mac-darwin-x64": "npm run build && npm exec electron-builder -- --mac --x64",
     "postinstall": "electron-rebuild -v 35.1.2",
     "cy:run": "npx cypress run",
     "cy:open": "npx cypress open"
@@ -35,9 +36,10 @@
     "cypress": "^14.4.0",
     "electron-squirrel-startup": "^1.0.1",
     "lucide-react": "^0.488.0",
+    "minimatch": "^9.0.1",
     "monaco-editor": "^0.52.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "react-hotkeys-hook": "^5.0.1",
     "react-markdown": "^10.1.0",
     "react-redux": "^9.2.0",
@@ -61,8 +63,8 @@
     "@types/better-sqlite3": "^7.6.13",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "^22.14.1",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^36.3.2",
     "electron-builder": "^26.0.12",
@@ -76,9 +78,9 @@
     "vite": "^6.2.0"
   },
   "optionalDependencies": {
-    "sqlite-vec-windows-x64": "0.1.7-alpha.2",
-    "sqlite-vec-darwin-arm64": "0.1.7-alpha.2",
-    "sqlite-vec-linux-x64": "0.1.7-alpha.2"
+    "sqlite-vec-darwin-x64": "0.1.7-alpha.2",
+    "sqlite-vec-linux-x64": "0.1.7-alpha.2",
+    "sqlite-vec-windows-x64": "0.1.7-alpha.2"
   },
   "build": {
     "appId": "com.palm.editor",
@@ -97,15 +99,16 @@
     },
     "asarUnpack": [
       "node_modules/sqlite-vec-windows-x64/**",
-      "node_modules/sqlite-vec-darwin-arm64/**",
-      "node_modules/sqlite-vec-linux-x64/**"
+      "node_modules/sqlite-vec-linux-x64/**",
+      "vec-darwin-x64/**"
     ],
     "files": [
       "dist/**/*",
       "electron_main/**/*",
       "main.prod.cjs",
       "preload.cjs",
-      ".env"
+      ".env",
+      "vec-darwin-x64/**"
     ],
     "publish": [
       {

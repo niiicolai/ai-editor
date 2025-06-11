@@ -8,51 +8,45 @@ const queueName = "new_user:agent_service";
 const consumer = SagaBuilder.consumer(queueName, rabbitMq)
 
   .onConsume(async (message) => {
-    const { user, transaction } = message;
+    const { _id, type } = message.transaction;
+    const { _id: userId, username, email } = message.user;
+    
+    const exists = await TransactionModel.exists({ _id }); 
+    if (exists) throw new Error("Transaction already processed");
 
-    if (await UserModel.findOne({ _id: user._id, deleted_at: null })) 
-      throw new Error("User already exists");
-
-    const existingTransaction = await TransactionModel.findOne({
-      _id: transaction._id,
-    });
-    if (existingTransaction) throw new Error("Transaction already processed");
+    const userExists = await UserModel.findOne({ _id: userId });
+    if (userExists) throw new Error("User already exists");
 
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const newTransaction = new TransactionModel({
-        _id: transaction._id,
-        type: transaction.type,
-        state: "complete",
+      const transaction = new TransactionModel({
+        _id,
+        type,
+        state: "completed",
         parameters: JSON.stringify({ message }),
       });
-      await newTransaction.save({ session });
 
-      const newUser = new UserModel({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
+      const user = new UserModel({
+        _id: userId,
+        username,
+        email,
         incomplete_transactions: [],
       });
 
-      await newUser.save({ session });
+      await transaction.save({ session });
+      await user.save({ session });
       await session.commitTransaction();
 
-      return {
-        user: newUser,
-        transaction: newTransaction,
-      };
-
+      return message;
     } catch (error) {
       await session.abortTransaction();
-      throw new Error("Error processing transaction", error);
+      throw error;
     } finally {
       await session.endSession();
     }
   })
-
   .build();
 
 export default async () => consumer.addListeners();

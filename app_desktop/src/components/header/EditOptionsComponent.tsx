@@ -26,6 +26,7 @@ function EditOptionsComponent() {
       slot={
         <>
           <button
+            data-testid="editor-header-undo-button"
             onClick={() => exeEditorCmd('undo')}
             className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
@@ -33,6 +34,7 @@ function EditOptionsComponent() {
             <span>{shortcuts.undo.join(' + ')}</span>
           </button>
           <button
+            data-testid="editor-header-redo-button"
             onClick={() => exeEditorCmd('redo')}
             className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
@@ -41,6 +43,7 @@ function EditOptionsComponent() {
           </button>
           <hr className="border-color" />
           <button
+            data-testid="editor-header-cut-button"
             onClick={() => exeEditorCmd('cut')}
             className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
@@ -48,6 +51,7 @@ function EditOptionsComponent() {
             <span>{shortcuts.cut.join(' + ')}</span>
           </button>
           <button
+            data-testid="editor-header-copy-button"
             onClick={() => exeEditorCmd('copy')}
             className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
@@ -55,6 +59,7 @@ function EditOptionsComponent() {
             <span>{shortcuts.copy.join(' + ')}</span>
           </button>
           <button
+            data-testid="editor-header-paste-button"
             onClick={() => exeEditorCmd('paste')}
             className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
@@ -63,6 +68,7 @@ function EditOptionsComponent() {
           </button>
           <hr className="border-color" />
           <button
+            data-testid="editor-header-find-button"
             onClick={() => handleFind()}
             className="button-main w-full text-left px-2 py-1 flex justify-between"
           >

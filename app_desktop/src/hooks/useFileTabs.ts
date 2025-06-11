@@ -45,15 +45,17 @@ export const useFileTabs = () => {
       i++;
     }
     if (newTabs.length === 0) {
+      const f = `temp-file-${new Date().getTime()}`;
       const dummyFile = {
-        id: "",
-        name: "file",
+        id: f,
+        name: f,
         content: "",
         language: "javascript",
-        path: "",
+        path: "temp/"+f,
+        isSaved: false,
       };
       dispatch(setFile(dummyFile));
-      dispatch(setTabs([{ file: dummyFile }]));
+      dispatch(setTabs([{ file: dummyFile, contentIsChanged: false }]));
     } else {
       if (editor.file.name === t.file.name) dispatch(setFile(newTabs[0].file));
       dispatch(setTabs([...newTabs]));
@@ -66,16 +68,16 @@ export const useFileTabs = () => {
       tabs[0].file.name === "file" &&
       tabs[0].file.content === ""
     ) {
-      dispatch(setTabs([{ file }]));
+      dispatch(setTabs([{ file, contentIsChanged: false }]));
       return;
     }
     for (const tab of tabs) {
       if (tab.file.name === file.name) {
-        viewTab({ file });
+        viewTab({ file, contentIsChanged: false });
         return;
       }
     }
-    dispatch(setTabs([{ file }, ...tabs]));
+    dispatch(setTabs([{ file, contentIsChanged: false }, ...tabs]));
   };
 
   const useEffectUpdateTabs = () => {

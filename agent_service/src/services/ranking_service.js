@@ -2,12 +2,18 @@ import { pipeline } from "@xenova/transformers";
 
 export default class RankingService {
   static async rerank(query, documents) {
+    if (process.NODE_ENV === 'test') {
+      return documents.map((d, i) => {
+        return { text: JSON.stringify(d), score: i/documents.length }
+      })
+    }
+    
     const embed = await pipeline(
       "feature-extraction",
       "Xenova/all-MiniLM-L6-v2"
     );
-    
-    documents = documents.map((d) => JSON.stringify(d))
+
+    documents = documents.map((d) => JSON.stringify(d));
     // Embed all sentences
     const queryEmbedding = await embed(query);
     const candidateEmbeddings = await Promise.all(documents.map(embed));
@@ -28,6 +34,6 @@ export default class RankingService {
       .map((text, i) => ({ text, score: scores[i] }))
       .sort((a, b) => b.score - a.score);
 
-      return ranked;
+    return ranked;
   }
 }

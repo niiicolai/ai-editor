@@ -2,9 +2,11 @@ import UserCreditModification from "../mongodb/models/user_credit_modification_m
 import User from "../mongodb/models/user_model.js";
 import dto from "../dto/user_credit_modification_dto.js";
 import ClientError from '../errors/client_error.js';
+import mongoose from "mongoose";
 
 import { objectValidator } from "../validators/object_validator.js";
 import { stringValidator } from "../validators/string_validator.js";
+import { numberValidator } from "../validators/number_validator.js";
 import { idValidator } from "../validators/id_validator.js";
 import { fieldsValidator } from "../validators/fields_validator.js";
 import { paginatorValidator } from "../validators/paginator_validator.js";
@@ -58,8 +60,16 @@ export default class UserCreditModificationService {
 
     static async create(body, userId, fields = null) {
         objectValidator(body, "body");
-        stringValidator(body.user_product, "user_product");
-        stringValidator(body.amount, "amount");
+        stringValidator(body.user_product, "body.user_product", {
+            min: { enabled: true, value: 2, },
+            max: { enabled: true, value: 100 },
+            regex: null
+        });
+        numberValidator(body.amount, "body.amount", {
+            min: { enabled: true, value: 1, },
+            max: { enabled: true, value: 100000 },
+            regex: null
+        });
         idValidator(userId, "userId");
 
         const user = await User.findOne({ _id: userId });

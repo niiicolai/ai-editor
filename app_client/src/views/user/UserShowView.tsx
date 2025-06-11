@@ -66,7 +66,7 @@ function UserShowView() {
                 <div className="text-sm font-medium text-gray-500">
                   Username
                 </div>
-                <div className="sm:col-span-2 text-sm text-gray-900">
+                <div className="sm:col-span-2 text-sm text-gray-900" data-testid="profile-username">
                   {user?.username}
                 </div>
               </div>

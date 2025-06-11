@@ -23,6 +23,11 @@ jobs:
         run: | 
           cd ./app_client
           npm install
+      
+      - name: Build client
+        run: | 
+          cd ./app_client
+          npm run build
 
       - name: Remove .env file
         run: |
@@ -115,13 +120,100 @@ jobs:
         run: |
           for i in {1..30}; do
             if curl -s http://localhost:3001 > /dev/null; then
-              echo "Frontend server is ready!"
+              echo "agent service is ready!"
               exit 0
             fi
             echo "Waiting for agent service server to be ready..."
             sleep 2
           done
           echo "agent service server did not become ready in time!"
+          exit 1
+
+      - name: Create docs service .env file
+        run: |
+          cd ./docs_service
+          echo "${{ secrets.DOCS_TEST_ENV_FILE }}" > .env   
+        
+      - name: Install docs service dependencies
+        run: |
+          cd ./docs_service
+          npm install
+
+      - name: Start docs service in the background
+        run: |
+          cd ./docs_service
+          npm start &
+          
+      - name: Wait for docs service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3004 > /dev/null; then
+              echo "docs service is ready!"
+              exit 0
+            fi
+            echo "Waiting for docs service server to be ready..."
+            sleep 2
+          done
+          echo "docs service server did not become ready in time!"
+          exit 1
+
+      - name: Create email service .env file
+        run: |
+          cd ./email_service
+          echo "${{ secrets.EMAIL_TEST_ENV_FILE }}" > .env   
+        
+      - name: Install email service dependencies
+        run: |
+          cd ./email_service
+          npm install
+
+      - name: Start email service in the background
+        run: |
+          cd ./email_service
+          npm start &
+          
+      - name: Wait for email service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3006 > /dev/null; then
+              echo "email service is ready!"
+              exit 0
+            fi
+            echo "Waiting for email service server to be ready..."
+            sleep 2
+          done
+          echo "email service server did not become ready in time!"
+          exit 1
+
+      - name: Create rag evaluation service .env file
+        run: | 
+          cd ./rag_evaluation_service
+          echo "${{ secrets.RAG_EVALUATION_TEST_ENV_FILE }}" > .env    
+
+      - name: Install rag evaluation service dependencies
+        run: | 
+          cd ./rag_evaluation_service
+          python -m pip install --upgrade pip
+          pip install wheel
+          pip install "fastapi[standard]"
+          pip install -r requirements.txt
+
+      - name: Start rag evaluation service in the background
+        run: |
+          cd ./rag_evaluation_service
+          python main.py &
+          
+      - name: Wait for rag evaluation service server to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3005 > /dev/null; then
+              echo "rag evaluation service is ready!"
+              exit 0
+            fi
+            echo "Waiting for rag evaluation service server to be ready..."
+            sleep 2
+          done
+          echo "rag evaluation service server did not become ready in time!"
           exit 1
 
       - name: Create payment service .env file
@@ -143,7 +235,7 @@ jobs:
         run: |
           for i in {1..30}; do
             if curl -s http://localhost:3002 > /dev/null; then
-              echo "Frontend server is ready!"
+              echo "payment service is ready!"
               exit 0
             fi
             echo "Waiting for payment service server to be ready..."
@@ -173,7 +265,7 @@ jobs:
         run: |
           for i in {1..30}; do
             if curl -s http://localhost:3000 > /dev/null; then
-              echo "Frontend server is ready!"
+              echo "auth service is ready!"
               exit 0
             fi
             echo "Waiting for auth service server to be ready..."
@@ -198,6 +290,18 @@ jobs:
       - name: Remove auth .env file
         run: |
           cd ./auth_service
+          rm .env
+      - name: Remove docs .env file
+        run: |
+          cd ./docs_service
+          rm .env
+      - name: Remove email .env file
+        run: |
+          cd ./email_service
+          rm .env
+      - name: Remove rag evaluation .env file
+        run: |
+          cd ./rag_evaluation_service
           rm .env
       - name: Remove frontend .env file
         run: |

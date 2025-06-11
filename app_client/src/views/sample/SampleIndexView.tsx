@@ -166,7 +166,7 @@ export default function SampleIndexView() {
                   <div className="bg-white shadow overflow-hidden sm:rounded-lg">
                     <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
                       <div>
-                        <h3 className="text-lg leading-6 font-medium text-gray-900">
+                        <h3 className="text-lg leading-6 font-medium text-gray-900" data-testid="sample-title">
                           RAG Evaluation Management
                         </h3>
                         <div className="flex flex-col items-start gap-1 mt-2">
