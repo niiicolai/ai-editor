@@ -96,7 +96,7 @@ function LayoutComponent(props: LayoutComponentProps) {
       </div>
       <div
         className={`${
-          showMobileMenu ? "flex" : "hidden"
+          showMobileMenu ? "flex md:hidden" : "hidden"
         } fixed top-0 right-0 bottom-0 w-48 flex-col gap-0 z-50 border-l border-black`}
         style={{
           background: "linear-gradient(135deg, #FFD700, #FF8C00, #FF4500)",
