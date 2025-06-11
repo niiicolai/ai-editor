@@ -13,12 +13,19 @@ import { useExternalBrowser } from "../../hooks/useExternalBrowser";
 import { userAgentSessionSettingsActions } from "../../features/userAgentSessionSettings";
 
 const WEBSITE_DOMAIN_URL = import.meta.env.VITE_WEBSITE_DOMAIN;
-if (!WEBSITE_DOMAIN_URL) console.error('CONFIGURATION ERROR(ViewOptionsComponent.ts): VITE_WEBSITE_DOMAIN should be set in the .env file');
+if (!WEBSITE_DOMAIN_URL)
+  console.error(
+    "CONFIGURATION ERROR(ViewOptionsComponent.ts): VITE_WEBSITE_DOMAIN should be set in the .env file"
+  );
 
 function ViewOptionsComponent() {
-  const hierarchySettings = useSelector((state: RootState) => state.hierarchySettings);
+  const hierarchySettings = useSelector(
+    (state: RootState) => state.hierarchySettings
+  );
   const shortcuts = useSelector((state: RootState) => state.shortcuts);
-  const { disabled, minimized } = useSelector((state: RootState) => state.terminalSettings);
+  const { disabled, minimized } = useSelector(
+    (state: RootState) => state.terminalSettings
+  );
   const userAgentSessionSettings = useSelector(
     (state: RootState) => state.userAgentSessionSettings
   );
@@ -26,15 +33,40 @@ function ViewOptionsComponent() {
   const { openExternalBrowser } = useExternalBrowser();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const handleMinimizeTerminal = () => dispatch(setTerminalMinimized(!minimized));
-  const handleMinimizeExplorer = () => dispatch(hierarchySettingsActions.setHierarchyMinimized(!hierarchySettings.minimized));
-  useHotkeys(shortcuts.close_active_terminal.join('+'), () => closeActiveTab(), [closeActiveTab]);
-  useHotkeys(shortcuts.new_terminal.join('+'), () => newTab(), [newTab]);
-  useHotkeys(shortcuts.hide_terminal.join('+'), () => handleMinimizeTerminal(), [handleMinimizeTerminal]);
-  useHotkeys(shortcuts.hide_explorer.join('+'), () => handleMinimizeExplorer(), [handleMinimizeExplorer]);
-  useHotkeys(shortcuts.hide_agent.join('+'), () => dispatch(
-    userAgentSessionSettingsActions.setMinimized(!userAgentSessionSettings.minimized)
-  ), [userAgentSessionSettings, dispatch]);
+  const handleMinimizeTerminal = () =>
+    dispatch(setTerminalMinimized(!minimized));
+  const handleMinimizeExplorer = () =>
+    dispatch(
+      hierarchySettingsActions.setHierarchyMinimized(
+        !hierarchySettings.minimized
+      )
+    );
+  useHotkeys(
+    shortcuts.close_active_terminal.join("+"),
+    () => closeActiveTab(),
+    [closeActiveTab]
+  );
+  useHotkeys(shortcuts.new_terminal.join("+"), () => newTab(), [newTab]);
+  useHotkeys(
+    shortcuts.hide_terminal.join("+"),
+    () => handleMinimizeTerminal(),
+    [handleMinimizeTerminal]
+  );
+  useHotkeys(
+    shortcuts.hide_explorer.join("+"),
+    () => handleMinimizeExplorer(),
+    [handleMinimizeExplorer]
+  );
+  useHotkeys(
+    shortcuts.hide_agent.join("+"),
+    () =>
+      dispatch(
+        userAgentSessionSettingsActions.setMinimized(
+          !userAgentSessionSettings.minimized
+        )
+      ),
+    [userAgentSessionSettings, dispatch]
+  );
 
   return (
     <DropdownComponent
@@ -46,59 +78,68 @@ function ViewOptionsComponent() {
           <button
             onClick={() => navigate("/themes")}
             className="button-main w-full text-left px-2 py-1"
+            data-testid="editor-header-themes-button"
           >
             Themes
           </button>
           <button
             onClick={() => openExternalBrowser(`${WEBSITE_DOMAIN_URL}/docs`)}
             className="button-main w-full text-left px-2 py-1"
+            data-testid="editor-header-documentation-button"
           >
             Documentation
           </button>
           <button
             onClick={() => navigate("/shortcuts")}
             className="button-main w-full text-left px-2 py-1"
+            data-testid="editor-header-shortcuts-button"
           >
             Shortcuts
           </button>
           <button
             onClick={() => navigate("/rag")}
             className="button-main w-full text-left px-2 py-1"
+            data-testid="editor-header-rag-button"
           >
             RAG Settings
           </button>
           <hr className="border-color" />
           <button
-            onClick={() => dispatch(
-              hierarchySettingsActions.setHierarchyMinimized(
-                !hierarchySettings.minimized
+            data-testid="editor-header-hide-explorer-button"
+            onClick={() =>
+              dispatch(
+                hierarchySettingsActions.setHierarchyMinimized(
+                  !hierarchySettings.minimized
+                )
               )
-            )}
+            }
             className="button-main w-full text-left px-2 py-1 flex justify-between"
           >
-            
-              <span>{hierarchySettings.minimized
-              ? "Show Explorer"
-              : "Hide Explorer"}</span>
-              <span>{shortcuts.hide_explorer.join(" + ")}</span>
-          </button>
-          <hr className="border-color" />
-                 <button
-            onClick={() => dispatch(
-              userAgentSessionSettingsActions.setMinimized(
-                !userAgentSessionSettings.minimized
-              )
-            )}
-            className="button-main w-full text-left px-2 py-1 flex justify-between"
-          >
-            
-              <span>{userAgentSessionSettings.minimized
-              ? "Show Agent"
-              : "Hide Agent"}</span>
-              <span>{shortcuts.hide_agent.join(" + ")}</span>
+            <span>
+              {hierarchySettings.minimized ? "Show Explorer" : "Hide Explorer"}
+            </span>
+            <span>{shortcuts.hide_explorer.join(" + ")}</span>
           </button>
           <hr className="border-color" />
           <button
+            data-testid="editor-header-hide-agent-button"
+            onClick={() =>
+              dispatch(
+                userAgentSessionSettingsActions.setMinimized(
+                  !userAgentSessionSettings.minimized
+                )
+              )
+            }
+            className="button-main w-full text-left px-2 py-1 flex justify-between"
+          >
+            <span>
+              {userAgentSessionSettings.minimized ? "Show Agent" : "Hide Agent"}
+            </span>
+            <span>{shortcuts.hide_agent.join(" + ")}</span>
+          </button>
+          <hr className="border-color" />
+          <button
+            data-testid="editor-header-disable-terminal-button"
             onClick={() => dispatch(setTerminalDisabled(!disabled))}
             className="button-main w-full text-left px-2 py-1"
           >
@@ -111,16 +152,18 @@ function ViewOptionsComponent() {
                 <span>{shortcuts.close_active_terminal.join(" + ")}</span>
               </button>
               <button
-                onClick={() =>
-                  dispatch(setTerminalMinimized(!minimized))
-                }
+                data-testid="editor-header-hide-terminal-button"
+                onClick={() => dispatch(setTerminalMinimized(!minimized))}
                 className="button-main w-full text-left px-2 py-1 flex justify-between"
               >
                 <span>{minimized ? "Show Terminal" : "Hide Terminal"}</span>
                 <span>{shortcuts.hide_terminal.join(" + ")}</span>
               </button>
-              <button onClick={() => newTab()}
-              className="button-main w-full text-left px-2 py-1 flex justify-between">
+              <button
+                data-testid="editor-header-new-terminal-button"
+                onClick={() => newTab()}
+                className="button-main w-full text-left px-2 py-1 flex justify-between"
+              >
                 <span>New Terminal</span>
                 <span>{shortcuts.new_terminal.join(" + ")}</span>
               </button>

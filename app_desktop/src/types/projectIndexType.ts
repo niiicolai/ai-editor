@@ -3,7 +3,6 @@ import { FileItemType } from "./directoryInfoType";
 export interface ProjectIndexType {
   meta: ProjectIndexMetaType | null;
   items: ProjectIndexItemType;
-  isLoading: boolean;
   queue: FileItemType[];
 }
 

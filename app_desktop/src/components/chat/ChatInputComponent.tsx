@@ -70,7 +70,7 @@ function ChatInputComponent({
     }, [llms])
 
     return (
-        <div className="main-bgg border-r border-color p-1">
+        <div className="main-bgg border-r border-color p-1 main-color">
             {formError && (
                 <div>{formError}</div>
             )}

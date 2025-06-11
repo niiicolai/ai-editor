@@ -4,7 +4,7 @@ import HierarchyNewComponent from "./HierarchyNewComponent";
 import HierarchyDeleteComponent from "./HierarchyDeleteComponent";
 import editorNoFiles from "../../assets/editorNoFiles.png";
 import HierarchyRightClickMenuComponent from "./HierarchyRightClickMenuComponent";
-import { ChevronRight, ChevronDown, ChevronLeft } from "lucide-react";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 import { FileItemType } from "../../types/directoryInfoType";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
@@ -38,14 +38,13 @@ function HierarchyComponent() {
           onClick={() =>
             dispatch(hierarchySettingsActions.setHierarchyMinimized(false))
           }
-          className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
+          className="items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed hidden lg:inline-flex"
         >
           <ChevronLeft className="w-4 h-4 hidden lg:block" />
-          <ChevronDown className="w-4 h-4 block lg:hidden" />
         </button>
       </div>
 
-    <div className={`absolute left-0 right-0 bottom-0 top-0 lg:static lg:h-full lg:w-64 lg:flex lg:flex-col lg:justify-between main-bgg text-white ${isMinimized ? "lg:hidden" : ""} ${responsiveActive ? "block" : "hidden"}`}>
+    <div className={`absolute left-0 right-0 bottom-0 top-0 lg:static lg:h-full lg:w-64 lg:flex lg:flex-col lg:justify-between main-bgg text-white ${isMinimized ? "lg:hidden" : ""} ${responsiveActive ? "block" : "hidden"}`} data-testid="editor-explorer-wrapper">
       <HierarchyRightClickMenuComponent />
       <HierarchyDeleteComponent />
 
@@ -64,7 +63,7 @@ function HierarchyComponent() {
                 )}
                 <button
                   onClick={() => dispatch(hierarchySettingsActions.setHierarchyMinimized(true))}
-                  className="inline-flex items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="items-center border border-transparent rounded-full shadow-sm text-white button-main disabled:opacity-50 disabled:cursor-not-allowed hidden lg:inline-flex"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

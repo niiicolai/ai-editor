@@ -107,9 +107,9 @@ export const useDestroyAllQA = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (file_id: string) => {
-            await deleteAllQA(file_id, embeddingModel)
-            return file_id;
+        mutationFn: async (project_id: string) => {
+            await deleteAllQA(project_id, embeddingModel)
+            return project_id;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['qas'] })

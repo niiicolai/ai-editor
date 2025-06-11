@@ -13,7 +13,7 @@ function SearchComponent() {
   const hideSearch = () => dispatch(setSearchVisible(false));
 
   return (
-    <div className={`relative ${visible ? "" : "hidden"}`}>
+    <div className={`relative ${visible ? "" : "hidden"}`} data-testid="editor-header-search-wrapper">
       <div className="fixed w-96 z-50 flex flex-col main-color border-color border-1 main-bgg shadow-md left-3 top-3 h-64">
         <div className="flex items-center justify-between gap-1 p-2 border-b border-color">
           <div className="flex-1">
@@ -34,6 +34,7 @@ function SearchComponent() {
           </div>
           <div>
             <button
+              data-testid="editor-header-search-close-button"
               className="button-main flex items-center justify-center cursor-pointer p-1 rounded-full"
               onClick={hideSearch}
             >

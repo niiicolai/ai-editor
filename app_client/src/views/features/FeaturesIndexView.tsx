@@ -79,7 +79,7 @@ function FeaturesIndexView() {
             <div className="pointer-events-none absolute bottom-0 left-1/2 w-[250px] h-[250px] rounded-full bg-orange-400 opacity-20 blur-2xl z-0"></div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               <div className="text-center">
-                <h2 className="text-base text-cyan-400 font-semibold tracking-wide uppercase">
+                <h2 className="text-base text-cyan-400 font-semibold tracking-wide uppercase" data-testid="features-title">
                   Features
                 </h2>
                 <p className="mt-2 text-5xl font-extrabold tracking-tight text-white sm:text-6xl drop-shadow-lg">

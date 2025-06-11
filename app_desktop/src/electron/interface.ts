@@ -135,10 +135,16 @@ declare global {
       onDeleteQA: (callback: (content: any) => void) => void;
 
       deleteAllQA: (
-        file_id: string,
+        project_id: string,
         embeddingModel: string
       ) => void;
       onDeleteAllQA: (callback: (content: any) => void) => void;
+
+      deleteAllQAByFileId: (
+        file_id: string,
+        embeddingModel: string
+      ) => void;
+      onDeleteAllQAByFileId: (callback: (content: any) => void) => void;
 
       vectorSearchQA: (
         file_id: string,

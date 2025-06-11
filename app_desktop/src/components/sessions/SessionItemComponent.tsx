@@ -49,11 +49,7 @@ function SessionItemComponent({
 
   return (
     <div
-      className={`flex ${
-        sessionId === session._id
-          ? "bg-gray-700 text-indigo-100"
-          : "text-indigo-100"
-      }`}
+      className={`flex`}
       key={session._id}
     >
       <button
@@ -61,10 +57,10 @@ function SessionItemComponent({
         className={`flex-1 overflow-hidden truncate p-2 text-left flex items-center space-x-3 cursor-pointer hover:bg-gray-700`}
       >
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">
+          <p className="text-sm font-medium truncate main-color">
             {session.title || "Untitled Session"}
           </p>
-          <p className="text-xs text-gray-200 truncate">
+          <p className="text-xs main-color truncate">
             {new Date(session.created_at).toLocaleString()}
           </p>
         </div>
@@ -74,7 +70,7 @@ function SessionItemComponent({
         onClick={() => {
           handleDestroy(session._id);
         }}
-        className={`px-4 py-3 text-left flex items-center space-x-3 hover:bg-gray-700 cursor-pointer`}
+        className={`px-4 py-3 text-left flex items-center space-x-3 button-main cursor-pointer`}
       >
         {isPending 
           ? <LoaderIcon className="w-4 h-4" />

@@ -2,10 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import UserService from "../services/userService";
 import { UserType } from "../types/userType";
 
-const key = ['user'];
-
 export const useGetUser = () => {
-    return useQuery({ queryKey: key, queryFn: UserService.get });
+    return useQuery({ queryKey: ['user'], queryFn: UserService.get });
 }
 
 export const useIsAuthorized = () => {
@@ -17,9 +15,16 @@ export const useGetUserCreditLeft = () => {
 }
 
 export const useLoginUser = () => {
+    const queryClient = useQueryClient();
+    
     return useMutation({
         mutationFn: (credentials: { email: string, password: string }) =>
-            UserService.login(credentials.email, credentials.password)
+            UserService.login(credentials.email, credentials.password),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['user'] })
+            queryClient.invalidateQueries({ queryKey: ['user_auth_state'] })
+            queryClient.invalidateQueries({ queryKey: ['user_credit_left'] })
+        }
     });
 }
 
@@ -36,7 +41,7 @@ export const useUpdateUser = () => {
         mutationFn: async (body: { username: string, email: string, password: string }) => {
             return await UserService.update(body.username, body.email, body.password)
         },
-        onSuccess: (user: UserType) => queryClient.setQueryData(key, () => user)
+        onSuccess: (user: UserType) => queryClient.setQueryData(['user'], () => user)
     });
 }
 
@@ -46,8 +51,10 @@ export const useDestroyUser = () => {
     return useMutation({
         mutationFn: UserService.destroy,
         onSuccess: () => {
-            queryClient.setQueryData(key, null);
-            queryClient.invalidateQueries({ queryKey: key });
+            queryClient.setQueryData(['user'], null);
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+            queryClient.invalidateQueries({ queryKey: ['user_auth_state'] })
+            queryClient.invalidateQueries({ queryKey: ['user_credit_left'] })
         }
     });
 }

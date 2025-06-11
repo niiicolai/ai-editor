@@ -7,12 +7,12 @@ import { FileItemType } from "../types/directoryInfoType";
 import { readFile } from "../electron/readFile";
 import { setFile } from "../features/editor";
 import { useGetLanguage } from "./useGetLanguage";
-import { setQueue } from "../features/projectIndex";
 import { hierarchySettingsActions } from "../features/hierarchySettings";
+import { TabType } from "../types/fileTabType";
 
 export const useSelectFile = () => {
-  const { queue } = useSelector((state: RootState) => state.projectIndex);
   const { directoryState } = useSelector((state: RootState) => state.hierarchy);
+  const { tabs } = useSelector((state: RootState) => state.tabs);
   const { getLanguageFromFile } = useGetLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
@@ -33,10 +33,6 @@ export const useSelectFile = () => {
     setIsLoading(true);
     try {
       const directoryFiles = await readDirectory(path);
-      const newQueue = [
-        ...queue,
-        ...directoryFiles.filter((f) => !f.isDirectory),
-      ];
       const newDirectoryState = {
         ...directoryState,
         [path]: {
@@ -46,7 +42,6 @@ export const useSelectFile = () => {
       };
 
       dispatch(setDirectoryState(newDirectoryState));
-      dispatch(setQueue(newQueue));
     } catch (error) {
       console.error("Error reading directory:", error);
     } finally {
@@ -63,8 +58,17 @@ export const useSelectFile = () => {
         if (directoryExists) await handleToggleIsOpen(file);
         else await handleLoadDirectory(file.path);
       } else {
-        const content = (await readFile(file.path)) || "";
-        const language = getLanguageFromFile(file.name);
+        const tab = tabs.find((t:TabType) => t.file.path === file.path);
+        const content = tab
+        ? tab.file.content
+        : (await readFile(file.path)) || "";
+        const language = tab 
+        ? tab.file.language
+        : getLanguageFromFile(file.name);
+        const isSaved = tab
+        ? tab.file.isSaved
+        : true
+        
         dispatch(setCurrentFile(file));
         dispatch(
           setFile({
@@ -72,7 +76,8 @@ export const useSelectFile = () => {
             path: file.path,
             name: file.name,
             content,
-            language,
+            language, 
+            isSaved
           })
         );
         dispatch(hierarchySettingsActions.setHierarchyResponsiveActive(false));

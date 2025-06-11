@@ -8,6 +8,9 @@ import {
   useDestroyEmbeddedFile,
   useDestroyEmbeddedFiles,
 } from "../../hooks/useEmbeddedFile";
+import {
+  useDestroyAllQA,
+} from "../../hooks/useQAFile";
 import { QAType } from "../../types/qaType";
 import { useGetQAs } from "../../hooks/useQAFile";
 
@@ -16,11 +19,6 @@ function ProjectIndexIndexView() {
   const hierarchy = useSelector((state: RootState) => state.hierarchy);
   const projectId = projectIndex.meta?._id as string;
   const { page, limit, prevPage, nextPage } = usePagination(10);
-  /*const { data, isLoading, error } = useGetEmbeddedFiles(
-    page,
-    limit,
-    projectId
-  );*/
   const { data, isLoading, error } = useGetQAs(
     page,
     limit,
@@ -28,16 +26,12 @@ function ProjectIndexIndexView() {
   );
   const destroyFile = useDestroyEmbeddedFile();
   const destroyFiles = useDestroyEmbeddedFiles();
-  console.log(data)
-  /*const handleDestroyFile = async (id: number) => {
-    try {
-      await destroyFile.mutateAsync(id);
-    } catch {}
-  };*/
+  const destroyAllQa = useDestroyAllQA();
 
   const handleDestroyFiles = async () => {
     try {
       await destroyFiles.mutateAsync(projectId);
+      await destroyAllQa.mutateAsync(projectId);
     } catch {}
   };
 
@@ -47,7 +41,7 @@ function ProjectIndexIndexView() {
         <div className="secondary-bgg border border-color shadow overflow-hidden sm:rounded-lg">
           <div className="px-4 py-5 sm:px-6 border-b border-color">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg leading-6 font-medium main-color">
+              <h3 className="text-lg leading-6 font-medium main-color" data-testid="project-index-title">
                 Project Index:{" "}
                 {!projectIndex?.meta?._id
                   ? "No active index"
@@ -68,6 +62,7 @@ function ProjectIndexIndexView() {
                 )}
                 <Link
                   to="/"
+                  data-testid="project-index-back-link"
                   className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md button-main"
                 >
                   <XIcon className="w-4 h-4" />
@@ -114,7 +109,7 @@ function ProjectIndexIndexView() {
                       key={qa.rowid}
                       className="px-4 py-2 border-b border-color"
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-3">
                         <h4 className="text-sm font-medium main-color">
                           {qa.rowid}
                         </h4>
